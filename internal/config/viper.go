@@ -12,7 +12,7 @@ type Config struct {
 	DBDriver            string        `mapstructure:"DB_DRIVER"`
 	DBSource            string        `mapstructure:"DB_SOURCE"`
 	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
-	TokenSymetricKey    string        `mapstructure:"TOKEN_SYMETRIC_KEY"`
+	TokenSymetricKey    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 	SetMaxIdleConns     int           `mapstructure:"SET_MAX_IDLE_CONNS"`
 	SetMaxOpenConns     int           `mapstructure:"SET_MAX_OPEN_CONNS"`

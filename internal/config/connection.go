@@ -4,16 +4,16 @@ import (
 	"database/sql"
 	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/sirupsen/logrus"
 )
 
-func Connection() *sql.DB {
-	log := NewLogger()
+func Connection(log *logrus.Logger) *sql.DB {
 	configuration, err := LoadConfigDev("../.")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	db, err := sql.Open("postgres", configuration.DBSource)
+	db, err := sql.Open(configuration.DBDriver, configuration.DBSource)
 	if err != nil {
 		log.Fatal(err)
 	}

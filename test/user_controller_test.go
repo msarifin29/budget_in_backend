@@ -1,0 +1,122 @@
+package test
+
+import (
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
+	"github.com/msarifin29/be_budget_in/internal/model"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestCreateUserSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.CreateUserRequest{
+		UserName: "kai",
+		Email:    "test@mail.com",
+		Password: "123456",
+		TypeUser: "personal",
+		Balance:  "20000",
+		Savings:  "20000",
+		Cash:     "20000",
+		Debts:    "0",
+		Currency: "IDR",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/register", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+	assert.NotEmpty(t, res["data"])
+}
+
+func TestCreateUserDuplicate(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.CreateUserRequest{
+		UserName: "kai",
+		Email:    "test@mail.com",
+		Password: "123456",
+		TypeUser: "personal",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/register", strings.NewReader(string(body)))
+	router.Engine.ServeHTTP(w, req)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+func TestCreateUserRequestError(t *testing.T) {
+	router := NewTestServer(t)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/register", nil)
+	router.Engine.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestLoginUserSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.LoginUserRequest{
+		Email:    "test@mail.com",
+		Password: "123456",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/login", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+	assert.NotEmpty(t, res["data"])
+}
+
+func TestLoginUserInvalidEmail(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.LoginUserRequest{
+		Email:    "aa@mail.com",
+		Password: "123456",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/login", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+func TestLoginUserInvalidPassword(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.LoginUserRequest{
+		Email:    "test@mail.com",
+		Password: "password",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/login", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
