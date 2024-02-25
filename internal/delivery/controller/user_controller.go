@@ -140,7 +140,7 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 	err = c.UserUsecase.UpdateUser(ctx, req)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, model.MetaErrorResponse{
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		})
@@ -150,5 +150,53 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model.MetaResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
+	})
+}
+
+func (c *UserController) GetById(ctx *gin.Context) {
+	var req model.UserRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		c.Log.Errorf("binding %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	user, err := c.UserUsecase.GetById(ctx, req.Uid)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, model.MetaErrorResponse{
+			Code:    http.StatusNotFound,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	if user.UserName != authPayload.Username {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, model.MetaErrorResponse{
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+	profile := model.UserProfileResponse{
+		Uid:      user.Uid,
+		UserName: user.UserName,
+		Email:    user.Email,
+		Photo:    user.Photo,
+		TypeUser: user.TypeUser,
+		Balance:  user.Balance,
+		Savings:  user.Savings,
+		Cash:     user.Cash,
+		Debts:    user.Debts,
+		Currency: user.Currency,
+	}
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    profile,
 	})
 }

@@ -24,8 +24,8 @@ var ValidCurrency validator.Func = func(fieldLevel validator.FieldLevel) bool {
 
 //  Constants for all supported user type
 const (
-	PERSONAL = "Personal"
-	GROUP    = "Group"
+	PERSONAL = "personal"
+	GROUP    = "group"
 )
 
 func IsSupportedType(typeX string) bool {

@@ -60,6 +60,7 @@ func (server *Server) setupRoute() {
 
 	autRoutes := router.Group("/").Use(delivery.AuthMiddleware(server.TokenMaker))
 
+	autRoutes.GET("/api/user/:uid", server.UserC.GetById)
 	autRoutes.PUT("/api/update", server.UserC.UpdateUser)
 
 	server.Engine = router

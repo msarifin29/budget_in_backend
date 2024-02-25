@@ -52,3 +52,15 @@ func TestUpdateUser(t *testing.T) {
 	err := usecase.UpdateUser(context.Background(), user)
 	assert.NoError(t, err)
 }
+
+func TestGetUserById(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewUserRepository()
+	usecase := usecase.NewUserUsecase(repo, log, db)
+	uid := "f1687230-49d3-4657-96be-9b934ed0387f"
+
+	u, err := usecase.GetById(context.Background(), uid)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, u)
+}

@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +21,7 @@ func TestCreateUserSuccess(t *testing.T) {
 		UserName: "samsul",
 		Email:    "samsul@mail.com",
 		Password: "123456",
-		TypeUser: "Personal",
+		TypeUser: "personal",
 		Balance:  20000,
 		Savings:  20000,
 		Cash:     20000,
@@ -190,5 +191,54 @@ func TestUnAuthorizationUser(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPut, "/api/update", strings.NewReader(string(body)))
 	router.Engine.ServeHTTP(w, req)
 	assert.Nil(t, err)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestGetUserByIdSuccess(t *testing.T) {
+	router := NewTestServer(t)
+	user := model.UserRequest{
+		Uid: "f1687230-49d3-4657-96be-9b934ed0387f",
+	}
+
+	w := httptest.NewRecorder()
+	url := fmt.Sprintf("/api/user/%s", user.Uid)
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	fmt.Println("data :", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+}
+func TestGetUserInvalidId(t *testing.T) {
+	router := NewTestServer(t)
+	user := model.UserRequest{
+		Uid: "f1687230",
+	}
+
+	w := httptest.NewRecorder()
+	url := fmt.Sprintf("/api/user/%s", user.Uid)
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+func TestGetUserNoAuthorization(t *testing.T) {
+	router := NewTestServer(t)
+	user := model.UserRequest{
+		Uid: "f1687230-49d3-4657-96be-9b934ed0387f",
+	}
+
+	w := httptest.NewRecorder()
+	url := fmt.Sprintf("/api/user/%s", user.Uid)
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
+
+	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }

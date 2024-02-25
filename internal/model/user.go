@@ -35,8 +35,8 @@ type CreateUserRequest struct {
 }
 
 type LoginUserRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
 }
 
 type UserResponse struct {
@@ -50,25 +50,29 @@ type TokenUserResponse struct {
 }
 
 type UserProfileResponse struct {
-	Uid        uuid.UUID   `json:"uid"`
-	UserName   string      `json:"username"`
-	Email      string      `json:"email"`
-	Regency    Regencies   `json:"regency"`
-	Occupation Occupations `json:"occupation"`
-	Photo      string      `json:"photo"`
-	TypeUser   string      `json:"type_user"`
-	Balance    string      `json:"balance"`
-	Savings    string      `json:"savings"`
-	Cash       string      `json:"cash"`
-	Debts      string      `json:"Debts"`
-	Currency   string      `json:"currency"`
-	CreatedAt  time.Time   `json:"created_at"`
-	UpdatedAt  time.Time   `json:"updated_at"`
+	Uid      uuid.UUID `json:"uid"`
+	UserName string    `json:"username"`
+	Email    string    `json:"email"`
+	// Regency    Regencies   `json:"regency"`
+	// Occupation Occupations `json:"occupation"`
+	Photo     string    `json:"photo"`
+	TypeUser  string    `json:"type_user"`
+	Balance   float64   `json:"balance"`
+	Savings   float64   `json:"savings"`
+	Cash      float64   `json:"cash"`
+	Debts     float64   `json:"Debts"`
+	Currency  string    `json:"currency"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type UpdateUserRequest struct {
-	Uid      string `json:"uid"`
+	Uid      string `json:"uid" binding:"required"`
 	UserName string `json:"username"`
+}
+
+type UserRequest struct {
+	Uid string `uri:"uid"`
 }
 
 type Regencies struct {
