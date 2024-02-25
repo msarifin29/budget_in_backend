@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/msarifin29/be_budget_in/internal/config"
 	delivery "github.com/msarifin29/be_budget_in/internal/delivery/middleware"
 	"github.com/msarifin29/be_budget_in/internal/repository"
@@ -37,6 +38,11 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		Con:        Con,
 		TokenMaker: tokenMaker,
 		UserC:      *userController,
+	}
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", util.ValidCurrency)
+		v.RegisterValidation("type_user", util.ValidType)
 	}
 
 	server.setupRoute()

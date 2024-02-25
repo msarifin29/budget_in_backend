@@ -20,7 +20,7 @@ func TestCreateUserSuccess(t *testing.T) {
 		UserName: "samsul",
 		Email:    "samsul@mail.com",
 		Password: "123456",
-		TypeUser: "personal",
+		TypeUser: "Personal",
 		Balance:  20000,
 		Savings:  20000,
 		Cash:     20000,
@@ -50,6 +50,22 @@ func TestCreateUserDuplicate(t *testing.T) {
 		Email:    "test@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/register", strings.NewReader(string(body)))
+	router.Engine.ServeHTTP(w, req)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+func TestCreateUserInvalidType(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.CreateUserRequest{
+		UserName: "katakuri",
+		Email:    "katakuri@mail.com",
+		Password: "123456",
+		TypeUser: "type",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

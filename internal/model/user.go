@@ -26,12 +26,12 @@ type CreateUserRequest struct {
 	UserName string  `json:"username" binding:"required"`
 	Email    string  `json:"email" binding:"required,email"`
 	Password string  `json:"password" binding:"required"`
-	TypeUser string  `json:"type_user" binding:"required"`
+	TypeUser string  `json:"type_user" binding:"required,type_user"`
 	Balance  float64 `json:"balance" inding:"required"`
 	Savings  float64 `json:"savings" inding:"required"`
 	Cash     float64 `json:"cash" inding:"required"`
 	Debts    float64 `json:"Debts" inding:"required"`
-	Currency string  `json:"currency" inding:"required"`
+	Currency string  `json:"currency" inding:"required,currency"`
 }
 
 type LoginUserRequest struct {
