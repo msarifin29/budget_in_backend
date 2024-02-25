@@ -17,23 +17,23 @@ type User struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 	TypeUser     string    `json:"type_user"`
-	Balance      string    `json:"balance"`
-	Savings      string    `json:"savings"`
-	Cash         string    `json:"cash"`
-	Debts        string    `json:"Debts"`
+	Balance      float64   `json:"balance"`
+	Savings      float64   `json:"savings"`
+	Cash         float64   `json:"cash"`
+	Debts        float64   `json:"Debts"`
 	Currency     string    `json:"currency"`
 }
 
 type CreateUserRequest struct {
-	UserName string `json:"username" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-	TypeUser string `json:"type_user" binding:"required"`
-	Balance  string `json:"balance" inding:"required"`
-	Savings  string `json:"savings" inding:"required"`
-	Cash     string `json:"cash" inding:"required"`
-	Debts    string `json:"Debts" inding:"required"`
-	Currency string `json:"currency" inding:"required"`
+	UserName string  `json:"username" binding:"required"`
+	Email    string  `json:"email" binding:"required,email"`
+	Password string  `json:"password" binding:"required"`
+	TypeUser string  `json:"type_user" binding:"required"`
+	Balance  float64 `json:"balance" inding:"required"`
+	Savings  float64 `json:"savings" inding:"required"`
+	Cash     float64 `json:"cash" inding:"required"`
+	Debts    float64 `json:"Debts" inding:"required"`
+	Currency string  `json:"currency" inding:"required"`
 }
 
 type LoginUserRequest struct {
