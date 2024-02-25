@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -15,6 +16,8 @@ import (
 type UserUsecase interface {
 	CreateUser(ctx context.Context, user model.CreateUserRequest) (model.UserResponse, error)
 	GetUser(ctx context.Context, user model.LoginUserRequest) (model.UserResponse, error)
+	UpdateUser(ctx context.Context, user model.UpdateUserRequest) error
+	GetById(ctx context.Context, uid string) (model.User, error)
 }
 
 type UserUsecaseImpl struct {
@@ -29,7 +32,7 @@ func NewUserUsecase(UserRepository repository.UserRepository, Log *logrus.Logger
 
 func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserRequest) (model.UserResponse, error) {
 	tx, err := u.db.Begin()
-	defer tx.Rollback()
+	defer util.CommitOrRollback(tx)
 
 	var res model.UserResponse
 	if err != nil {
@@ -63,19 +66,13 @@ func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserR
 		return res, reqErr
 	}
 
-	cErr := tx.Commit()
-	if cErr != nil {
-		u.Log.Errorf("failed commit DB %e :", cErr)
-		return res, cErr
-	}
-
 	return model.UserResponse{Uid: req.Uid, UserName: req.UserName}, nil
 }
 
 func (u *UserUsecaseImpl) GetUser(ctx context.Context, user model.LoginUserRequest) (model.UserResponse, error) {
 	var res model.UserResponse
 	tx, err := u.db.Begin()
-	defer tx.Rollback()
+	defer util.CommitOrRollback(tx)
 
 	if err != nil {
 		u.Log.Errorf("failed start transaction %e :", err)
@@ -98,4 +95,32 @@ func (u *UserUsecaseImpl) GetUser(ctx context.Context, user model.LoginUserReque
 	rum := model.UserResponse{Uid: ru.Uid, UserName: ru.UserName}
 
 	return rum, nil
+}
+
+func (u *UserUsecaseImpl) UpdateUser(ctx context.Context, user model.UpdateUserRequest) error {
+	tx, _ := u.db.Begin()
+
+	defer util.CommitOrRollback(tx)
+
+	err := u.UserRepository.UpdateUserName(ctx, tx, user)
+
+	if err != nil {
+		u.Log.Errorf("failed update username %u :", err)
+		return err
+	}
+	return nil
+}
+
+func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.User, error) {
+	tx, _ := u.db.Begin()
+
+	defer util.CommitOrRollback(tx)
+
+	user, err := u.UserRepository.GetById(ctx, tx, uid)
+	if err != nil {
+		u.Log.Errorf("user not found with id %i :", err)
+		message := "user not found with id :" + uid
+		return model.User{}, errors.New(message)
+	}
+	return user, nil
 }

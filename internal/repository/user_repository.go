@@ -11,6 +11,8 @@ import (
 type UserRepository interface {
 	CreateUser(ctx context.Context, tx *sql.Tx, user model.User) (model.User, error)
 	GetUser(ctx context.Context, tx *sql.Tx, email string) (model.User, error)
+	GetById(ctx context.Context, tx *sql.Tx, uid string) (model.User, error)
+	UpdateUserName(ctx context.Context, tx *sql.Tx, user model.UpdateUserRequest) error
 }
 
 type UserRepositoryImpl struct{}
@@ -48,20 +50,16 @@ func (u *UserRepositoryImpl) CreateUser(ctx context.Context, tx *sql.Tx, user mo
 }
 
 func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email string) (model.User, error) {
-	sqlScript := `select uid, username, email, password, province_id, occupation_id, photo, created_at, updated_at, type_user, balance, savings, cash, debts, currency from users where email = ? limit 1`
+	sqlScript := `select uid, username, email, password, photo, created_at, updated_at, type_user, balance, savings, cash, debts, currency from users where email = ? limit 1`
 	row := tx.QueryRowContext(ctx, sqlScript, email)
 
 	var i model.User
 	update := zero.TimeFromPtr(&i.UpdatedAt)
-	provinceId := zero.StringFromPtr(&i.ProvinceId)
-	occupationId := zero.StringFromPtr(&i.OccupationId)
 	err := row.Scan(
 		&i.Uid,
 		&i.UserName,
 		&i.Email,
 		&i.Password,
-		&provinceId,
-		&occupationId,
 		&i.Photo,
 		&i.CreatedAt,
 		&update,
@@ -73,4 +71,34 @@ func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email stri
 		&i.Currency,
 	)
 	return i, err
+}
+
+func (u *UserRepositoryImpl) GetById(ctx context.Context, tx *sql.Tx, uid string) (model.User, error) {
+	sqlScript := `select uid, username, email, password, photo, created_at, updated_at, type_user, balance, savings, cash, debts, currency from users where uid = ? limit 1`
+	row := tx.QueryRowContext(ctx, sqlScript, uid)
+
+	var i model.User
+	update := zero.TimeFromPtr(&i.UpdatedAt)
+	err := row.Scan(
+		&i.Uid,
+		&i.UserName,
+		&i.Email,
+		&i.Password,
+		&i.Photo,
+		&i.CreatedAt,
+		&update,
+		&i.TypeUser,
+		&i.Balance,
+		&i.Savings,
+		&i.Cash,
+		&i.Debts,
+		&i.Currency,
+	)
+	return i, err
+}
+
+func (u *UserRepositoryImpl) UpdateUserName(ctx context.Context, tx *sql.Tx, user model.UpdateUserRequest) error {
+	sqlScript := `update users set username = ? where uid = ?`
+	_, err := tx.ExecContext(ctx, sqlScript, user.UserName, user.Uid)
+	return err
 }

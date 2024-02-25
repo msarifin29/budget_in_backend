@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/stretchr/testify/assert"
@@ -119,4 +120,59 @@ func TestLoginUserInvalidPassword(t *testing.T) {
 
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestUpdateteUserSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.UpdateUserRequest{
+		UserName: "samsul testing",
+		Uid:      "f1687230-49d3-4657-96be-9b934ed0387f",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/update", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+}
+func TestUpdateteUserWithIdInvalid(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.UpdateUserRequest{
+		UserName: "samsul testing",
+		Uid:      "f1687230",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/update", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+func TestUnAuthorizationUser(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.UpdateUserRequest{
+		UserName: "samsul testing",
+		Uid:      "f1687230-49d3-4657-96be-9b934ed0387f",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/update", strings.NewReader(string(body)))
+	router.Engine.ServeHTTP(w, req)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }

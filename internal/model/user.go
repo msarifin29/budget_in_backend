@@ -7,21 +7,19 @@ import (
 )
 
 type User struct {
-	Uid          uuid.UUID `json:"uid"`
-	UserName     string    `json:"username"`
-	Email        string    `json:"email"`
-	Password     string    `json:"password"`
-	ProvinceId   string    `json:"province_id"`
-	OccupationId string    `json:"occupation_id"`
-	Photo        string    `json:"photo"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	TypeUser     string    `json:"type_user"`
-	Balance      float64   `json:"balance"`
-	Savings      float64   `json:"savings"`
-	Cash         float64   `json:"cash"`
-	Debts        float64   `json:"Debts"`
-	Currency     string    `json:"currency"`
+	Uid       uuid.UUID `json:"uid"`
+	UserName  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	Photo     string    `json:"photo"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	TypeUser  string    `json:"type_user"`
+	Balance   float64   `json:"balance"`
+	Savings   float64   `json:"savings"`
+	Cash      float64   `json:"cash"`
+	Debts     float64   `json:"Debts"`
+	Currency  string    `json:"currency"`
 }
 
 type CreateUserRequest struct {
@@ -66,6 +64,11 @@ type UserProfileResponse struct {
 	Currency   string      `json:"currency"`
 	CreatedAt  time.Time   `json:"created_at"`
 	UpdatedAt  time.Time   `json:"updated_at"`
+}
+
+type UpdateUserRequest struct {
+	Uid      string `json:"uid"`
+	UserName string `json:"username"`
 }
 
 type Regencies struct {

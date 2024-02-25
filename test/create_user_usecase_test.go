@@ -40,3 +40,15 @@ func TestGetUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, u)
 }
+func TestUpdateUser(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewUserRepository()
+	usecase := usecase.NewUserUsecase(repo, log, db)
+	user := model.UpdateUserRequest{
+		UserName: "testing",
+		Uid:      "f1687230-49d3-4657-96be-9b934ed0387f",
+	}
+	err := usecase.UpdateUser(context.Background(), user)
+	assert.NoError(t, err)
+}
