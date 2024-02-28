@@ -30,13 +30,13 @@ CREATE TABLE `regencies` (
 );
 
 CREATE TABLE `expenses` (
-  `uid` varchar(255) UNIQUE NOT NULL,
+  `uid` varchar(255) NOT NULL,
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `type_x` varchar(10) NOT NULL,
-  `total` varchar(15) NOT NULL,
-  `Notes` varchar(100) DEFAULT '',
+  `expense_type` varchar(10) NOT NULL,
+  `total` INT NOT NULL DEFAULT 0,
+  `Notes` text,
   `created_at` timestamp DEFAULT (now()),
-  `updated_at` timestamp DEFAULT null
+  `updated_at` timestamp DEFAULT null ON UPDATE CURRENT_TIMESTAMP
 );
 
 

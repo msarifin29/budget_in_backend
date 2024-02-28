@@ -64,3 +64,59 @@ func TestGetUserById(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, u)
 }
+func TestCreateExpense(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewExpenseRepository()
+	usecase := usecase.NewExpenseUsecase(repo, log, db)
+	x := model.CreateExpenseRequest{
+		Uid:         "deb3823d-5581-4e98-896c-06e5aa3bac4a",
+		ExpenseType: "Credit",
+		Total:       1000000,
+	}
+	res, err := usecase.CreateExpense(context.Background(), x)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, res)
+}
+func TestGetExpense(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewExpenseRepository()
+	usecase := usecase.NewExpenseUsecase(repo, log, db)
+	res, err := usecase.GetExpenseById(context.Background(), model.ExpenseParamWithId{Id: 9})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, res)
+}
+func TestUpdateExpense(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewExpenseRepository()
+	usecase := usecase.NewExpenseUsecase(repo, log, db)
+	x := model.UpdateExpenseRequest{Id: 4, Total: 20500}
+	res, err := usecase.UpdateExpense(context.Background(), x)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, res)
+}
+func TestDeleteExpense(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewExpenseRepository()
+	usecase := usecase.NewExpenseUsecase(repo, log, db)
+	err := usecase.DeleteExpense(context.Background(), 4)
+	assert.NoError(t, err)
+}
+func TestGetExpenses(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewExpenseRepository()
+	usecase := usecase.NewExpenseUsecase(repo, log, db)
+
+	params := model.GetExpenseRequest{
+		Uid:       "f1687230-49d3-4657-96be-9b934ed0387f",
+		Page:      1,
+		TotalPage: 2,
+	}
+	x, err := usecase.GetExpenses(context.Background(), params)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, x)
+}

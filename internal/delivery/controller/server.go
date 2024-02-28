@@ -18,6 +18,7 @@ type Server struct {
 	Con        config.Config
 	TokenMaker util.Maker
 	UserC      UserController
+	ExpenseC   ExpenseController
 }
 
 func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
@@ -33,16 +34,23 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	userUsecase := usecase.NewUserUsecase(userRepo, Log, db)
 	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
 
+	// Expense
+	expenseRepo := repository.NewExpenseRepository()
+	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, Log, db)
+	expenseController := NewExpenseController(expenseUseCase, Log)
+
 	server := &Server{
 		Log:        Log,
 		Con:        Con,
 		TokenMaker: tokenMaker,
 		UserC:      *userController,
+		ExpenseC:   *expenseController,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("currency", util.ValidCurrency)
 		v.RegisterValidation("type_user", util.ValidType)
+		v.RegisterValidation("expense_type", util.ValidExpenseType)
 	}
 
 	server.setupRoute()
@@ -62,6 +70,13 @@ func (server *Server) setupRoute() {
 
 	autRoutes.GET("/api/user/:uid", server.UserC.GetById)
 	autRoutes.PUT("/api/update", server.UserC.UpdateUser)
+
+	// Expense
+	autRoutes.POST("api/expenses/create", server.ExpenseC.CreateExpense)
+	autRoutes.GET("api/expenses/:id", server.ExpenseC.GetExpenseById)
+	autRoutes.PUT("api/expenses/update", server.ExpenseC.UpdateExpense)
+	autRoutes.DELETE("api/expenses/:id", server.ExpenseC.DeleteExpense)
+	autRoutes.GET("api/expenses/", server.ExpenseC.GetExpenses)
 
 	server.Engine = router
 }

@@ -210,7 +210,6 @@ func TestGetUserByIdSuccess(t *testing.T) {
 	assert.Nil(t, err)
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)
-	fmt.Println("data :", string(bytes))
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "Success", res["message"])

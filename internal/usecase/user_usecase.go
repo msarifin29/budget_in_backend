@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
@@ -79,10 +78,9 @@ func (u *UserUsecaseImpl) GetUser(ctx context.Context, user model.LoginUserReque
 		return res, err
 	}
 	ru, getErr := u.UserRepository.GetUser(ctx, tx, user.Email)
-	fmt.Println("email => ", ru)
 
 	if getErr != nil {
-		u.Log.Errorf("user not found with email %e :", getErr)
+		u.Log.Errorf("user not found with email %v :", user.Email)
 		return res, getErr
 	}
 
@@ -118,7 +116,7 @@ func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.User, 
 
 	user, err := u.UserRepository.GetById(ctx, tx, uid)
 	if err != nil {
-		u.Log.Errorf("user not found with id %i :", err)
+		u.Log.Errorf("user not found with id %s :", uid)
 		message := "user not found with id :" + uid
 		return model.User{}, errors.New(message)
 	}

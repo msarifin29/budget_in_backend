@@ -42,3 +42,25 @@ var ValidType validator.Func = func(fieldLevel validator.FieldLevel) bool {
 	}
 	return false
 }
+
+//  Constants for all supported expense type
+const (
+	CASH   = "Cash"
+	CREDIT = "Credit"
+	DEBIT  = "Debit"
+)
+
+func IsSupportedExpenseType(typeX string) bool {
+	switch typeX {
+	case CASH, CREDIT, DEBIT:
+		return true
+	}
+	return false
+}
+
+var ValidExpenseType validator.Func = func(fieldLevel validator.FieldLevel) bool {
+	if typeX, ok := fieldLevel.Field().Interface().(string); ok {
+		return IsSupportedExpenseType(typeX)
+	}
+	return false
+}
