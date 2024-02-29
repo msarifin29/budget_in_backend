@@ -52,7 +52,7 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	token, _, ctErr := c.TokenMaker.CreateToken(res.UserName, c.Con.AccessTokenDuration)
+	token, _, ctErr := c.TokenMaker.CreateToken(res.UserName, c.Con.AccessTokenDuration, res.Uid)
 	if ctErr != nil {
 		c.Log.Error(ctErr)
 		ctx.JSON(http.StatusInternalServerError, model.MetaErrorResponse{
@@ -90,7 +90,7 @@ func (c *UserController) LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	token, _, ctErr := c.TokenMaker.CreateToken(res.UserName, c.Con.AccessTokenDuration)
+	token, _, ctErr := c.TokenMaker.CreateToken(res.UserName, c.Con.AccessTokenDuration, res.Uid)
 	if ctErr != nil {
 		c.Log.Errorf("cannot generate token %t:", ctErr)
 		ctx.JSON(http.StatusInternalServerError, model.MetaErrorResponse{

@@ -11,7 +11,7 @@ import (
 const minSecretKeySize = 30
 
 type Maker interface {
-	CreateToken(username string, duration time.Duration) (string, *Payload, error)
+	CreateToken(username string, duration time.Duration, uid string) (string, *Payload, error)
 	VerifyToken(token string) (*Payload, error)
 }
 
@@ -27,8 +27,8 @@ func NewJWTMaker(secretKey string) (Maker, error) {
 }
 
 // CreateToken implements Maker.
-func (maker *JWTMaker) CreateToken(username string, duration time.Duration) (string, *Payload, error) {
-	payload, err := NewPayload(username, duration)
+func (maker *JWTMaker) CreateToken(username string, duration time.Duration, uid string) (string, *Payload, error) {
+	payload, err := NewPayload(username, duration, uid)
 	if err != nil {
 		return "", nil, err
 	}

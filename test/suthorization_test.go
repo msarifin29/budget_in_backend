@@ -19,9 +19,10 @@ func SetAuthorization(
 	tokenMaker util.Maker,
 	authorizationType string,
 	username string,
+	uid string,
 	duration time.Duration,
 ) {
-	token, payload, err := tokenMaker.CreateToken(username, duration)
+	token, payload, err := tokenMaker.CreateToken(username, duration, uid)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, payload)
 
@@ -37,7 +38,7 @@ func TestAuthorizationSuccess(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	request, err := http.NewRequest(http.MethodGet, "/api/auth", nil)
 	assert.NoError(t, err)
-	SetAuthorization(t, request, server.TokenMaker, "bearer", "samsul", time.Minute)
+	SetAuthorization(t, request, server.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
 	server.Engine.ServeHTTP(recorder, request)
 	assert.Equal(t, http.StatusOK, recorder.Code)
 }
@@ -60,7 +61,7 @@ func TestInvalidAuthorization(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	request, err := http.NewRequest(http.MethodGet, "/api/auth", nil)
 	assert.NoError(t, err)
-	SetAuthorization(t, request, server.TokenMaker, "", "samsul", time.Minute)
+	SetAuthorization(t, request, server.TokenMaker, "", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
 	server.Engine.ServeHTTP(recorder, request)
 	assert.Equal(t, http.StatusUnauthorized, recorder.Code)
 }
@@ -72,7 +73,7 @@ func TestExpiredAuthorization(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	request, err := http.NewRequest(http.MethodGet, "/api/auth", nil)
 	assert.NoError(t, err)
-	SetAuthorization(t, request, server.TokenMaker, "bearer", "samsul", -time.Minute)
+	SetAuthorization(t, request, server.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", -time.Minute)
 	server.Engine.ServeHTTP(recorder, request)
 	assert.Equal(t, http.StatusUnauthorized, recorder.Code)
 }

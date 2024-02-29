@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	delivery "github.com/msarifin29/be_budget_in/internal/delivery/middleware"
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/usecase"
+	"github.com/msarifin29/be_budget_in/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -107,10 +109,21 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 		})
 		return
 	}
-	res, err := c.Usecase.GetExpenses(ctx, req)
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	params := model.GetExpenseParams{
+		Uid:    authPayload.Uid,
+		Limit:  req.TotalPage,
+		Offset: (req.Page - 1) * req.TotalPage,
+	}
+
+	expenses, err := c.Usecase.GetExpenses(ctx, params)
 
 	model.BadRequestResponseError(err, ctx)
-
+	res := model.ExpensesResponse{
+		Page:      req.Page,
+		TotalPage: req.TotalPage,
+		Data:      expenses,
+	}
 	ctx.JSON(http.StatusOK,
 		model.MetaResponse{
 			Code:    http.StatusOK,

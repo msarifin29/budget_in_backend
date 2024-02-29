@@ -27,7 +27,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -50,7 +50,7 @@ func TestCreateExpenseFailed(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
@@ -81,7 +81,7 @@ func TestGetExpenseByIdSuccess(t *testing.T) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	assert.Nil(t, err)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -102,7 +102,7 @@ func TestGetExpenseByIdWithInvalidId(t *testing.T) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	assert.Nil(t, err)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
@@ -119,7 +119,7 @@ func TestUpdateExpenseSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/expenses/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -143,7 +143,7 @@ func TestUpdateExpenseFailed(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/expenses/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
@@ -166,12 +166,12 @@ func TestUpdateExpenseUnAuthorized(t *testing.T) {
 func TestDeleteExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
-	params := model.ExpenseParamWithId{Id: 6}
+	params := model.ExpenseParamWithId{Id: 7}
 	w := httptest.NewRecorder()
 	url := fmt.Sprintf("/api/expenses/%v", params.Id)
 	req, _ := http.NewRequest(http.MethodDelete, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 }
@@ -183,7 +183,7 @@ func TestDeleteExpenseFailed(t *testing.T) {
 	url := fmt.Sprintf("/api/expenses/%v", params.Id)
 	req, _ := http.NewRequest(http.MethodDelete, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
@@ -192,22 +192,21 @@ func TestGetExpensesSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetExpenseRequest{
-		Uid:       "f1687230-49d3-4657-96be-9b934ed0387f",
-		Page:      1,
+		Page:      5,
 		TotalPage: 5,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
-	q.Add("uid", fmt.Sprintf("%v", params.Uid))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "akainu", "deb3823d-5581-4e98-896c-06e5aa3bac4a", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body : ", string(bytes))
 	assert.Nil(t, err)
 	var res model.MetaResponse
 	err = json.Unmarshal(bytes, &res)
@@ -216,24 +215,22 @@ func TestGetExpensesSuccess(t *testing.T) {
 	assert.Equal(t, "Success", res.Message)
 	assert.NotEmpty(t, res.Data)
 }
-func TestGetExpensesFailed(t *testing.T) {
+func TestGetExpensesInvalidInputTotalPage(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetExpenseRequest{
-		Uid:       "f1687230-49d3-4657-96be-9b934ed0387f",
-		Page:      1,
+		Page:      1000,
 		TotalPage: 5,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
-	q.Add("uid", fmt.Sprintf("%v", params.Uid))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)

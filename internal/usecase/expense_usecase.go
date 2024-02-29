@@ -17,7 +17,7 @@ type ExpenseUsecase interface {
 	GetExpenseById(ctx context.Context, request model.ExpenseParamWithId) (model.Expense, error)
 	UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (model.Expense, error)
 	DeleteExpense(ctx context.Context, id float64) error
-	GetExpenses(ctx context.Context, params model.GetExpenseRequest) (model.ExpensesResponse, error)
+	GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.Expense, error)
 }
 
 type ExpenseUsecaseImpl struct {
@@ -27,24 +27,16 @@ type ExpenseUsecaseImpl struct {
 }
 
 // GetExpensez implements ExpenseUsecase.
-func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetExpenseRequest) (model.ExpensesResponse, error) {
+func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.Expense, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
-	req := model.GetExpenseParams{
-		Uid:    params.Uid,
-		Limit:  params.TotalPage,
-		Offset: (params.Page - 1) * params.TotalPage,
-	}
-	expenses, err := u.ExpenseRepository.GetExpenses(ctx, tx, req)
+
+	expenses, err := u.ExpenseRepository.GetExpenses(ctx, tx, params)
 	if err != nil {
 		u.Log.Errorf("failed get expenses %v ", err)
-		return model.ExpensesResponse{}, err
+		return []model.Expense{}, err
 	}
-	return model.ExpensesResponse{
-		Page:      params.Page,
-		TotalPage: params.TotalPage,
-		Data:      expenses,
-	}, nil
+	return expenses, nil
 }
 
 // CreateExpense implements ExpenseUsecase.

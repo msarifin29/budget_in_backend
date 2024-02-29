@@ -111,10 +111,10 @@ func TestGetExpenses(t *testing.T) {
 	repo := repository.NewExpenseRepository()
 	usecase := usecase.NewExpenseUsecase(repo, log, db)
 
-	params := model.GetExpenseRequest{
-		Uid:       "f1687230-49d3-4657-96be-9b934ed0387f",
-		Page:      1,
-		TotalPage: 2,
+	params := model.GetExpenseParams{
+		// Uid:       "f1687230-49d3-4657-96be-9b934ed0387f",
+		Limit:  1,
+		Offset: 2,
 	}
 	x, err := usecase.GetExpenses(context.Background(), params)
 	assert.NoError(t, err)

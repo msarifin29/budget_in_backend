@@ -144,14 +144,14 @@ func TestUpdateteUserSuccess(t *testing.T) {
 
 	params := model.UpdateUserRequest{
 		UserName: "samsul testing",
-		Uid:      "f1687230-49d3-4657-96be-9b934ed0387f",
+		Uid:      "fe317556e-74b2-4199-8a30-33bd56fc5e9e",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -173,7 +173,7 @@ func TestUpdateteUserWithIdInvalid(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -204,7 +204,7 @@ func TestGetUserByIdSuccess(t *testing.T) {
 	url := fmt.Sprintf("/api/user/%s", user.Uid)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -224,7 +224,7 @@ func TestGetUserInvalidId(t *testing.T) {
 	url := fmt.Sprintf("/api/user/%s", user.Uid)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }

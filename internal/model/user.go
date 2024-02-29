@@ -2,12 +2,10 @@ package model
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type User struct {
-	Uid       uuid.UUID `json:"uid"`
+	Uid       string    `json:"uid"`
 	UserName  string    `json:"username"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
@@ -40,8 +38,8 @@ type LoginUserRequest struct {
 }
 
 type UserResponse struct {
-	Uid      uuid.UUID `json:"uid"`
-	UserName string    `json:"username"`
+	Uid      string `json:"uid"`
+	UserName string `json:"username"`
 }
 
 type TokenUserResponse struct {
@@ -50,9 +48,9 @@ type TokenUserResponse struct {
 }
 
 type UserProfileResponse struct {
-	Uid      uuid.UUID `json:"uid"`
-	UserName string    `json:"username"`
-	Email    string    `json:"email"`
+	Uid      string `json:"uid"`
+	UserName string `json:"username"`
+	Email    string `json:"email"`
 	// Regency    Regencies   `json:"regency"`
 	// Occupation Occupations `json:"occupation"`
 	Photo     string    `json:"photo"`

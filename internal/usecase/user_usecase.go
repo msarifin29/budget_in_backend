@@ -47,7 +47,7 @@ func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserR
 	}
 
 	userReq := model.User{
-		Uid:      uuid.New(),
+		Uid:      uuid.New().String(),
 		UserName: user.UserName,
 		Email:    user.Email,
 		Password: password,

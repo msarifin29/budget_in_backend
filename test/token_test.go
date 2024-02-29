@@ -20,7 +20,7 @@ func TestJWTMakerValid(t *testing.T) {
 	issuedAt := time.Now()
 	expiredAt := time.Now().Add(duration)
 
-	token, payload, err := maker.CreateToken(username, duration)
+	token, payload, err := maker.CreateToken(username, duration, "1111111111111111111111111111111111111111")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)
 	assert.NotEmpty(t, payload)
@@ -29,7 +29,7 @@ func TestJWTMakerValid(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)
 
-	assert.NotZero(t, payload.ID)
+	assert.NotZero(t, payload.Uid)
 	assert.Equal(t, username, payload.Username)
 	assert.WithinDuration(t, issuedAt, payload.IssuedAt, time.Second)
 	assert.WithinDuration(t, expiredAt, payload.ExpiredAt, time.Second)
