@@ -14,9 +14,18 @@ type ExpenseRepository interface {
 	UpdateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense, id float64) (model.Expense, error)
 	DeleteExpense(ctx context.Context, tx *sql.Tx, id float64) error
 	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error)
+	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string) (float64, error)
 }
 
 type ExpenseRepositoryImpl struct{}
+
+// GetTotalExpenses implements ExpenseRepository.
+func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string) (float64, error) {
+	var total float64
+	script := `SELECT COUNT(*)from expenses where uid = ?`
+	err := tx.QueryRowContext(ctx, script, uid).Scan(&total)
+	return total, err
+}
 
 // GetExpenses implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error) {

@@ -116,12 +116,15 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 		Offset: (req.Page - 1) * req.TotalPage,
 	}
 
-	expenses, err := c.Usecase.GetExpenses(ctx, params)
+	expenses, total, err := c.Usecase.GetExpenses(ctx, params)
 
 	model.BadRequestResponseError(err, ctx)
+	lastPage := int32(total/float64(req.TotalPage) + 1)
 	res := model.ExpensesResponse{
 		Page:      req.Page,
 		TotalPage: req.TotalPage,
+		LastPage:  lastPage,
+		Total:     int32(total),
 		Data:      expenses,
 	}
 	ctx.JSON(http.StatusOK,

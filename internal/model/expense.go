@@ -39,9 +39,8 @@ type ExpenseParamWithId struct {
 }
 
 type GetExpenseRequest struct {
-	// Uid       string `form:"uid" binding:"required"`
 	Page      int32 `form:"page" binding:"required,min=1"`
-	TotalPage int32 `form:"total_page" binding:"required,min=5"`
+	TotalPage int32 `form:"total_page" binding:"required,min=5,max=10"`
 }
 
 type ExpenseResponse struct {
@@ -57,5 +56,7 @@ type ExpenseResponse struct {
 type ExpensesResponse struct {
 	Page      int32     `json:"page"`
 	TotalPage int32     `json:"total_page"`
+	LastPage  int32     `json:"last_page"`
+	Total     int32     `json:"total"`
 	Data      []Expense `json:"data"`
 }

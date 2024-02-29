@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -10,6 +11,7 @@ import (
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/internal/usecase"
+	"github.com/msarifin29/be_budget_in/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -112,11 +114,25 @@ func TestGetExpenses(t *testing.T) {
 	usecase := usecase.NewExpenseUsecase(repo, log, db)
 
 	params := model.GetExpenseParams{
-		// Uid:       "f1687230-49d3-4657-96be-9b934ed0387f",
+		Uid:    "f1687230-49d3-4657-96be-9b934ed0387f",
 		Limit:  1,
 		Offset: 2,
 	}
-	x, err := usecase.GetExpenses(context.Background(), params)
+	x, total, err := usecase.GetExpenses(context.Background(), params)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, x)
+	assert.NotEqual(t, 0, total)
+}
+func TestGetTotalExpenses(t *testing.T) {
+	log := config.NewLogger()
+	db := config.Connection(log)
+	repo := repository.NewExpenseRepository()
+	tx, err := db.Begin()
+	assert.NoError(t, err)
+	defer util.CommitOrRollback(tx)
+	total, err := repo.GetTotalExpenses(context.Background(), tx, "deb3823d-5581-4e98-896c-06e5aa3bac4a")
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, total)
+	fmt.Println("total =>", int(total/5))
 }
