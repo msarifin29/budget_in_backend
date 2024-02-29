@@ -20,7 +20,9 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	params := model.CreateExpenseRequest{
 		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
 		ExpenseType: "Cash",
-		Total:       75000,
+		Total:       25000,
+		Category:    "other",
+		Status:      "success",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -110,9 +112,8 @@ func TestUpdateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:          9,
-		ExpenseType: "Cash",
-		Total:       90000,
+		Id:     10,
+		Status: "success",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -134,9 +135,7 @@ func TestUpdateExpenseFailed(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:          9,
-		ExpenseType: "Invalid",
-		Total:       75000,
+		Id: 9,
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -151,9 +150,7 @@ func TestUpdateExpenseUnAuthorized(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:          9,
-		ExpenseType: "Cash",
-		Total:       75000,
+		Id: 10,
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -192,13 +189,15 @@ func TestGetExpensesSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetExpenseRequest{
-		Page:      10,
+		Status:    "success",
+		Page:      1,
 		TotalPage: 10,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
+	q.Add("status", fmt.Sprintf("%v", params.Status))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()

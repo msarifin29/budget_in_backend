@@ -14,23 +14,23 @@ type ExpenseRepository interface {
 	UpdateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense, id float64) (model.Expense, error)
 	DeleteExpense(ctx context.Context, tx *sql.Tx, id float64) error
 	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error)
-	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string) (float64, error)
+	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string) (float64, error)
 }
 
 type ExpenseRepositoryImpl struct{}
 
 // GetTotalExpenses implements ExpenseRepository.
-func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string) (float64, error) {
+func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string) (float64, error) {
 	var total float64
-	script := `SELECT COUNT(*)from expenses where uid = ?`
-	err := tx.QueryRowContext(ctx, script, uid).Scan(&total)
+	script := `SELECT COUNT(*)from expenses where uid = ? && status = ?`
+	err := tx.QueryRowContext(ctx, script, uid, status).Scan(&total)
 	return total, err
 }
 
 // GetExpenses implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error) {
-	script := `select id, expense_type, total, notes, created_at, updated_at, uid from expenses where uid = ? order by id limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Limit, params.Offset)
+	script := `select * from expenses where uid = ? && status = ? order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status, params.Limit, params.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +48,8 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 			&i.CreatedAt,
 			&update,
 			&i.Uid,
+			&i.Category,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
@@ -76,14 +78,16 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 		&i.CreatedAt,
 		&update,
 		&i.Uid,
+		&i.Category,
+		&i.Status,
 	)
 	return i, err
 }
 
 // CreateExpense implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) CreateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense) (model.Expense, error) {
-	script := `insert into expenses (expense_type,total,notes,uid) values (?,?,?,?)`
-	result, errX := tx.ExecContext(ctx, script, &expense.ExpenseType, &expense.Total, &expense.Notes, &expense.Uid)
+	script := `insert into expenses (expense_type,total,notes,uid,category,status) values (?,?,?,?,?,?)`
+	result, errX := tx.ExecContext(ctx, script, &expense.ExpenseType, &expense.Total, &expense.Notes, &expense.Uid, &expense.Category, &expense.Status)
 	if errX != nil {
 		return model.Expense{}, errX
 	}
@@ -101,8 +105,8 @@ func (*ExpenseRepositoryImpl) DeleteExpense(ctx context.Context, tx *sql.Tx, id 
 
 // UpdateExpense implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) UpdateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense, id float64) (model.Expense, error) {
-	script := `update expenses set expense_type = ?, total = ?, notes = ? where id = ?`
-	_, err := tx.ExecContext(ctx, script, expense.ExpenseType, expense.Total, expense.Notes, id)
+	script := `update expenses set status = ? where id = ?`
+	_, err := tx.ExecContext(ctx, script, expense.Status, id)
 	return expense, err
 }
 

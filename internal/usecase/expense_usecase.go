@@ -31,7 +31,7 @@ func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetEx
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 
-	total, err := u.ExpenseRepository.GetTotalExpenses(ctx, tx, params.Uid)
+	total, err := u.ExpenseRepository.GetTotalExpenses(ctx, tx, params.Uid, params.Status)
 	if err != nil {
 		u.Log.Errorf("failed get toal expenses %v ", err)
 		return []model.Expense{}, 0, err
@@ -52,6 +52,8 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 	req := model.Expense{
 		ExpenseType: expense.ExpenseType,
 		Total:       expense.Total,
+		Category:    expense.Category,
+		Status:      expense.Status,
 		Notes:       notes.String,
 		Uid:         expense.Uid,
 	}
@@ -72,6 +74,8 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		Id:          res.Id,
 		ExpenseType: res.ExpenseType,
 		Total:       res.Total,
+		Category:    req.Category,
+		Status:      res.Status,
 		Notes:       notes.String,
 		CreatedAt:   res.CreatedAt,
 		UpdatedAt:   update.Time,
@@ -104,6 +108,8 @@ func (u *ExpenseUsecaseImpl) GetExpenseById(ctx context.Context, request model.E
 		Id:          x.Id,
 		ExpenseType: x.ExpenseType,
 		Total:       x.Total,
+		Category:    x.Category,
+		Status:      x.Status,
 		Notes:       notes.String,
 		CreatedAt:   x.CreatedAt,
 		UpdatedAt:   update.Time,
@@ -120,15 +126,21 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 		u.Log.Errorf("expense not found with id %v :", expense.Id)
 		return model.Expense{}, err
 	}
-	x.ExpenseType = expense.ExpenseType
-	x.Total = expense.Total
-	x.Notes = expense.Notes
+	if expense.Status == x.Status {
+		err := errors.New("cannot change status with the same type")
+		return model.Expense{}, err
+	}
+	x.Status = expense.Status
+	// x.ExpenseType = expense.ExpenseType
+	// x.Total = expense.Total
+	// x.Notes = expense.Notes
 
 	req := model.Expense{
-		Id:          x.Id,
-		ExpenseType: expense.ExpenseType,
-		Total:       expense.Total,
-		Notes:       expense.Notes,
+		Id:     x.Id,
+		Status: expense.Status,
+		// ExpenseType: expense.ExpenseType,
+		// Total:       expense.Total,
+		// Notes:       expense.Notes,
 	}
 
 	res, err := u.ExpenseRepository.UpdateExpense(ctx, tx, req, expense.Id)

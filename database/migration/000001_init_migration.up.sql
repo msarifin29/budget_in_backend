@@ -34,6 +34,8 @@ CREATE TABLE `expenses` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `expense_type` varchar(10) NOT NULL,
   `total` INT NOT NULL DEFAULT 0,
+  `category` varchar(50) DEFAULT 'other',
+  `status` varchar(10) DEFAULT 'success',
   `Notes` text,
   `created_at` timestamp DEFAULT (now()),
   `updated_at` timestamp DEFAULT null ON UPDATE CURRENT_TIMESTAMP

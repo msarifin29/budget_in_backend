@@ -64,3 +64,24 @@ var ValidExpenseType validator.Func = func(fieldLevel validator.FieldLevel) bool
 	}
 	return false
 }
+
+//  Constants for all supported status
+const (
+	SUCCESS   = "success"
+	CANCELLED = "cancelled"
+)
+
+func IsStatus(status string) bool {
+	switch status {
+	case SUCCESS, CANCELLED:
+		return true
+	}
+	return false
+}
+
+var ValidStatusType validator.Func = func(fieldLevel validator.FieldLevel) bool {
+	if status, ok := fieldLevel.Field().Interface().(string); ok {
+		return IsStatus(status)
+	}
+	return false
+}

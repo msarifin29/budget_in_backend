@@ -22,12 +22,23 @@ func NewExpenseController(Usecase usecase.ExpenseUsecase, Log *logrus.Logger) *E
 
 func (c *ExpenseController) CreateExpense(ctx *gin.Context) {
 	var req model.CreateExpenseRequest
-
-	model.BindingResponseError(&req, c.Log, ctx)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.Log.Errorf("failed binding request %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 
 	res, err := c.Usecase.CreateExpense(ctx, req)
-
-	model.BadRequestResponseError(err, ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, model.MetaResponse{
 		Code:    http.StatusOK,
@@ -47,7 +58,13 @@ func (c *ExpenseController) GetExpenseById(ctx *gin.Context) {
 	}
 	res, err := c.Usecase.GetExpenseById(ctx, req)
 
-	model.NotFoundResponseError(err, ctx)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, model.MetaErrorResponse{
+			Code:    http.StatusNotFound,
+			Message: err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, model.MetaResponse{
 		Code:    http.StatusOK,
@@ -57,11 +74,24 @@ func (c *ExpenseController) GetExpenseById(ctx *gin.Context) {
 }
 func (c *ExpenseController) UpdateExpense(ctx *gin.Context) {
 	var req model.UpdateExpenseRequest
-	model.BindingResponseError(&req, c.Log, ctx)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.Log.Errorf("failed binding request %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 
 	res, err := c.Usecase.UpdateExpense(ctx, req)
 
-	model.BadRequestResponseError(err, ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK,
 		model.MetaResponse{
@@ -90,8 +120,13 @@ func (c *ExpenseController) DeleteExpense(ctx *gin.Context) {
 		return
 	}
 	err = c.Usecase.DeleteExpense(ctx, x.Id)
-
-	model.BadRequestResponseError(err, ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, model.MetaResponse{
 		Code:    http.StatusOK,
@@ -112,13 +147,20 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
 	params := model.GetExpenseParams{
 		Uid:    authPayload.Uid,
+		Status: req.Status,
 		Limit:  req.TotalPage,
 		Offset: (req.Page - 1) * req.TotalPage,
 	}
 
 	expenses, total, err := c.Usecase.GetExpenses(ctx, params)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: "invalid input id",
+		})
+		return
+	}
 
-	model.BadRequestResponseError(err, ctx)
 	lastPage := int32(total/float64(req.TotalPage) + 1)
 	res := model.ExpensesResponse{
 		Page:      req.Page,

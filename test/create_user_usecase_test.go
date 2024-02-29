@@ -75,6 +75,8 @@ func TestCreateExpense(t *testing.T) {
 		Uid:         "deb3823d-5581-4e98-896c-06e5aa3bac4a",
 		ExpenseType: "Credit",
 		Total:       1000000,
+		Category:    "other",
+		Status:      "cancelled",
 	}
 	res, err := usecase.CreateExpense(context.Background(), x)
 	assert.NoError(t, err)
@@ -94,7 +96,7 @@ func TestUpdateExpense(t *testing.T) {
 	db := config.Connection(log)
 	repo := repository.NewExpenseRepository()
 	usecase := usecase.NewExpenseUsecase(repo, log, db)
-	x := model.UpdateExpenseRequest{Id: 4, Total: 20500}
+	x := model.UpdateExpenseRequest{Id: 60, Status: "cancelled"}
 	res, err := usecase.UpdateExpense(context.Background(), x)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, res)
@@ -130,7 +132,7 @@ func TestGetTotalExpenses(t *testing.T) {
 	tx, err := db.Begin()
 	assert.NoError(t, err)
 	defer util.CommitOrRollback(tx)
-	total, err := repo.GetTotalExpenses(context.Background(), tx, "deb3823d-5581-4e98-896c-06e5aa3bac4a")
+	total, err := repo.GetTotalExpenses(context.Background(), tx, "deb3823d-5581-4e98-896c-06e5aa3bac4a", "cancelled")
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, total)

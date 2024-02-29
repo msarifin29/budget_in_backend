@@ -9,6 +9,8 @@ type Expense struct {
 	Id          float64   `json:"id"`
 	ExpenseType string    `json:"expense_type"`
 	Total       float64   `json:"total"`
+	Category    string    `json:"category"`
+	Status      string    `json:"status"`
 	Notes       string    `json:"notes"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
@@ -17,19 +19,23 @@ type Expense struct {
 type CreateExpenseRequest struct {
 	Uid         string  `json:"uid" binding:"required"`
 	ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
+	Category    string  `json:"category" binding:"required,category"`
+	Status      string  `json:"status" binding:"required,status"`
 	Total       float64 `json:"total" binding:"required,min=2000"`
 	Notes       string  `json:"notes"`
 }
 
 type UpdateExpenseRequest struct {
-	Id          float64 `json:"id" binding:"required"`
-	ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
-	Total       float64 `json:"total" binding:"required,min=2000"`
-	Notes       string  `json:"notes"`
+	Id     float64 `json:"id" binding:"required"`
+	Status string  `json:"status" binding:"required,status"`
+	// ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
+	// Total float64 `json:"total" binding:"required,min=2000"`
+	// Notes       string  `json:"notes"`
 }
 
 type GetExpenseParams struct {
 	Uid    string `json:"uid" binding:"required"`
+	Status string `json:"status"`
 	Limit  int32  `json:"limit"`
 	Offset int32  `json:"offset"`
 }
@@ -39,8 +45,9 @@ type ExpenseParamWithId struct {
 }
 
 type GetExpenseRequest struct {
-	Page      int32 `form:"page" binding:"required,min=1"`
-	TotalPage int32 `form:"total_page" binding:"required,min=5,max=10"`
+	Status    string `form:"status" binding:"status"`
+	Page      int32  `form:"page" binding:"required,min=1"`
+	TotalPage int32  `form:"total_page" binding:"required,min=5,max=10"`
 }
 
 type ExpenseResponse struct {
@@ -48,6 +55,8 @@ type ExpenseResponse struct {
 	Id          float64   `json:"id"`
 	ExpenseType string    `json:"expense_type"`
 	Total       float64   `json:"total"`
+	Category    string    `json:"category"`
+	Status      string    `json:"status"`
 	Notes       string    `json:"notes"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
