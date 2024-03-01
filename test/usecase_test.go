@@ -23,7 +23,6 @@ func TestCreateExpenses(t *testing.T) {
 		Uid:         "deb3823d-5581-4e98-896c-06e5aa3bac4a",
 		ExpenseType: util.DEBIT,
 		Category:    util.OTHER,
-		Status:      util.SUCCESS,
 		Total:       2500,
 	}
 	value, err := use.CreateExpense(context.Background(), params)

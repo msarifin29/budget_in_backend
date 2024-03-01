@@ -55,7 +55,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		ExpenseType: expense.ExpenseType,
 		Total:       expense.Total,
 		Category:    expense.Category,
-		Status:      expense.Status,
+		Status:      util.SUCCESS,
 		Notes:       notes.String,
 		Uid:         expense.Uid,
 	}
@@ -65,12 +65,12 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		return model.Expense{}, inputErr
 	}
 	if expense.ExpenseType == util.DEBIT {
-		err := NewBalance(ctx, tx, u.Log, u.BalanceRepository, expense.Uid, req.Total)
+		err := NewBalance(ctx, tx, u.Log, u.BalanceRepository, util.SUCCESS, expense.Uid, req.Total)
 		if err != nil {
 			return model.Expense{}, err
 		}
 	} else if expense.ExpenseType == util.CASH {
-		err := NewCash(ctx, tx, u.Log, u.BalanceRepository, expense.Uid, req.Total)
+		err := NewCash(ctx, tx, u.Log, u.BalanceRepository, util.SUCCESS, expense.Uid, req.Total)
 		if err != nil {
 			return model.Expense{}, err
 		}
@@ -92,7 +92,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		Id:          res.Id,
 		ExpenseType: res.ExpenseType,
 		Total:       res.Total,
-		Category:    req.Category,
+		Category:    res.Category,
 		Status:      res.Status,
 		Notes:       notes.String,
 		CreatedAt:   res.CreatedAt,
@@ -144,15 +144,27 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 		u.Log.Errorf("expense not found with id %v :", expense.Id)
 		return model.Expense{}, err
 	}
-	if expense.Status == x.Status {
-		err := errors.New("cannot change status with the same type")
-		return model.Expense{}, err
+
+	if expense.ExpenseType == util.DEBIT {
+		err := NewBalance(ctx, tx, u.Log, u.BalanceRepository, util.CANCELLED, x.Uid, x.Total)
+		if err != nil {
+			return model.Expense{}, err
+		}
+	} else if expense.ExpenseType == util.CASH {
+		err := NewCash(ctx, tx, u.Log, u.BalanceRepository, util.CANCELLED, x.Uid, x.Total)
+		if err != nil {
+			return model.Expense{}, err
+		}
+	} else if expense.ExpenseType == util.CREDIT {
+		return model.Expense{}, errors.New("invalid input type expense")
 	}
-	x.Status = expense.Status
+
+	x.Status = util.CANCELLED
 
 	req := model.Expense{
-		Id:     x.Id,
-		Status: expense.Status,
+		Id:          x.Id,
+		Status:      x.Status,
+		ExpenseType: expense.ExpenseType,
 	}
 
 	res, err := u.ExpenseRepository.UpdateExpense(ctx, tx, req, expense.Id)

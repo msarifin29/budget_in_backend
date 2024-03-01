@@ -23,7 +23,6 @@ func TestCreateExpenseSuccess(t *testing.T) {
 		ExpenseType: util.CREDIT,
 		Total:       2500,
 		Category:    util.OTHER,
-		Status:      util.SUCCESS,
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -113,8 +112,8 @@ func TestUpdateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:     10,
-		Status: "success",
+		Id:          19,
+		ExpenseType: util.DEBIT,
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -136,7 +135,8 @@ func TestUpdateExpenseFailed(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id: 9,
+		Id:          11,
+		ExpenseType: util.DEBIT,
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

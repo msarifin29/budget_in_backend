@@ -7,22 +7,31 @@ import (
 	"fmt"
 
 	"github.com/msarifin29/be_budget_in/internal/repository"
+	"github.com/msarifin29/be_budget_in/util"
 	"github.com/sirupsen/logrus"
 )
 
-func NewBalance(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo repository.BalanceRepository, uid string, input float64) error {
+func NewBalance(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo repository.BalanceRepository, status string, uid string, input float64) error {
+	var newBalance float64
 	balance, err := balanceRepo.GetBalance(ctx, tx, uid)
 	if err != nil {
 		err = errors.New("failed get balance")
 		Log.Error(err)
 		return err
 	}
-	if balance < input {
-		err = fmt.Errorf("invalid input, your balance is %v ", balance)
-		Log.Error(err)
-		return err
+
+	switch status {
+	case util.SUCCESS:
+		if balance < input {
+			err = fmt.Errorf("invalid input, your balance is %v ", balance)
+			Log.Error(err)
+			return err
+		}
+		newBalance = balance - input
+	case util.CANCELLED:
+		newBalance = balance + input
 	}
-	newBalance := balance - input
+
 	Log.Infof("newbalance = %v, balance = %v, input = %v", newBalance, balance, input)
 	err = balanceRepo.SetBalance(ctx, tx, uid, newBalance)
 	if err != nil {
@@ -33,19 +42,26 @@ func NewBalance(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo
 	return nil
 }
 
-func NewCash(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo repository.BalanceRepository, uid string, input float64) error {
+func NewCash(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo repository.BalanceRepository, status string, uid string, input float64) error {
+	var newCash float64
 	cash, err := balanceRepo.GetCash(ctx, tx, uid)
 	if err != nil {
 		err = errors.New("failed get cash")
 		Log.Error(err)
 		return err
 	}
-	if cash < input {
-		err = fmt.Errorf("invalid input, your cash is %v ", cash)
-		Log.Error(err)
-		return err
+
+	switch status {
+	case util.SUCCESS:
+		if cash < input {
+			err = fmt.Errorf("invalid input, your cash is %v ", cash)
+			Log.Error(err)
+			return err
+		}
+		newCash = cash - input
+	case util.CANCELLED:
+		newCash = cash + input
 	}
-	newCash := cash - input
 	Log.Infof("newCash = %v, cash = %v, input = %v", newCash, cash, input)
 	err = balanceRepo.SetCash(ctx, tx, uid, newCash)
 	if err != nil {

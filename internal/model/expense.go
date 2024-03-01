@@ -20,15 +20,14 @@ type CreateExpenseRequest struct {
 	Uid         string  `json:"uid" binding:"required"`
 	ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
 	Category    string  `json:"category" binding:"required,category"`
-	Status      string  `json:"status" binding:"required,status"`
 	Total       float64 `json:"total" binding:"required,min=2000"`
 	Notes       string  `json:"notes"`
 }
 
 type UpdateExpenseRequest struct {
-	Id     float64 `json:"id" binding:"required"`
-	Status string  `json:"status" binding:"required,status"`
-	// ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
+	Id float64 `json:"id" binding:"required"`
+	// Status      string  `json:"status" binding:"required,status"`
+	ExpenseType string `json:"expense_type" binding:"required,expense_type"`
 	// Total float64 `json:"total" binding:"required,min=2000"`
 	// Notes       string  `json:"notes"`
 }
