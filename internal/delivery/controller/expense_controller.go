@@ -156,7 +156,7 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
 			Code:    http.StatusBadRequest,
-			Message: "invalid input id",
+			Message: err.Error(),
 		})
 		return
 	}

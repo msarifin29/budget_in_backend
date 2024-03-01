@@ -41,6 +41,15 @@ CREATE TABLE `expenses` (
   `updated_at` timestamp DEFAULT null ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE `incomes` (
+  `uid` VARCHAR(255) NOT NULL UNIQUE,
+  `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `category_income` VARCHAR(15) not NULL DEFAULT 'monthly',
+  `total` INT NOT NULL DEFAULT 0,
+  `type_income` VARCHAR(15) not NULL DEFAULT 'debit',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+);
 
 ALTER TABLE regencies add CONSTRAINT fk_regencies_users FOREIGN KEY (user_id) REFERENCES users (uid)
 

@@ -19,6 +19,7 @@ type Server struct {
 	TokenMaker util.Maker
 	UserC      UserController
 	ExpenseC   ExpenseController
+	IncomeC    IncomeController
 }
 
 func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
@@ -33,14 +34,17 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	userRepo := repository.NewUserRepository()
 	expenseRepo := repository.NewExpenseRepository()
 	balanceRepo := repository.NewBalanceRepository()
+	incomeRepo := repository.NewIncomeRepository()
 
 	// Usecases
 	userUsecase := usecase.NewUserUsecase(userRepo, Log, db)
 	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, Log, db)
+	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, Log, db)
 
 	// Controller
 	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
 	expenseController := NewExpenseController(expenseUseCase, Log)
+	incomeController := NewIncomeController(incomeUsecase, Log)
 
 	server := &Server{
 		Log:        Log,
@@ -48,6 +52,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		TokenMaker: tokenMaker,
 		UserC:      *userController,
 		ExpenseC:   *expenseController,
+		IncomeC:    *incomeController,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
@@ -56,6 +61,8 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		v.RegisterValidation("expense_type", util.ValidExpenseType)
 		v.RegisterValidation("category", util.ValidCategoryType)
 		v.RegisterValidation("status", util.ValidStatusType)
+		v.RegisterValidation("type_income", util.ValidIncomeType)
+		v.RegisterValidation("category_income", util.ValidCategoryIncome)
 	}
 
 	server.setupRoute()
@@ -83,6 +90,9 @@ func (server *Server) setupRoute() {
 	autRoutes.DELETE("api/expenses/:id", server.ExpenseC.DeleteExpense)
 	autRoutes.GET("api/expenses/", server.ExpenseC.GetExpenses)
 
+	// Incomes
+	autRoutes.POST("/api/incomes/create", server.IncomeC.CreateIncome)
+	autRoutes.GET("/api/incomes/", server.IncomeC.GetIncomes)
 	server.Engine = router
 }
 

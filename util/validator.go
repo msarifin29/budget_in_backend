@@ -85,3 +85,19 @@ var ValidStatusType validator.Func = func(fieldLevel validator.FieldLevel) bool 
 	}
 	return false
 }
+
+//  Constants for all supported income type
+func IsSupportedIncomeType(typeX string) bool {
+	switch typeX {
+	case CASH, DEBIT:
+		return true
+	}
+	return false
+}
+
+var ValidIncomeType validator.Func = func(fieldLevel validator.FieldLevel) bool {
+	if typeX, ok := fieldLevel.Field().Interface().(string); ok {
+		return IsSupportedIncomeType(typeX)
+	}
+	return false
+}
