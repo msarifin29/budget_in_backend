@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
+	"github.com/msarifin29/be_budget_in/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,10 +20,10 @@ func TestCreateExpenseSuccess(t *testing.T) {
 
 	params := model.CreateExpenseRequest{
 		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
-		ExpenseType: "Cash",
-		Total:       25000,
-		Category:    "other",
-		Status:      "success",
+		ExpenseType: util.CREDIT,
+		Total:       2500,
+		Category:    util.OTHER,
+		Status:      util.SUCCESS,
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -44,7 +45,7 @@ func TestCreateExpenseFailed(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateExpenseRequest{
-		ExpenseType: "Cash",
+		ExpenseType: util.CASH,
 		Total:       45000,
 	}
 	body, err := json.Marshal(params)

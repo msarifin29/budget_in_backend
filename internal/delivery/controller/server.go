@@ -29,14 +29,17 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		Log.Fatalf("cannot generate token %t :", err)
 	}
 
-	// User
+	// Repositories
 	userRepo := repository.NewUserRepository()
-	userUsecase := usecase.NewUserUsecase(userRepo, Log, db)
-	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
-
-	// Expense
 	expenseRepo := repository.NewExpenseRepository()
-	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, Log, db)
+	balanceRepo := repository.NewBalanceRepository()
+
+	// Usecases
+	userUsecase := usecase.NewUserUsecase(userRepo, Log, db)
+	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, Log, db)
+
+	// Controller
+	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
 	expenseController := NewExpenseController(expenseUseCase, Log)
 
 	server := &Server{

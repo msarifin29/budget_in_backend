@@ -22,6 +22,7 @@ type ExpenseUsecase interface {
 
 type ExpenseUsecaseImpl struct {
 	ExpenseRepository repository.ExpenseRepository
+	BalanceRepository repository.BalanceRepository
 	Log               *logrus.Logger
 	db                *sql.DB
 }
@@ -48,6 +49,7 @@ func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetEx
 func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.CreateExpenseRequest) (model.Expense, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
+
 	notes := zero.StringFromPtr(&expense.Notes)
 	req := model.Expense{
 		ExpenseType: expense.ExpenseType,
@@ -62,12 +64,28 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		inputErr := errors.New("invalid input total minimum")
 		return model.Expense{}, inputErr
 	}
+	if expense.ExpenseType == util.DEBIT {
+		err := NewBalance(ctx, tx, u.Log, u.BalanceRepository, expense.Uid, req.Total)
+		if err != nil {
+			return model.Expense{}, err
+		}
+	} else if expense.ExpenseType == util.CASH {
+		err := NewCash(ctx, tx, u.Log, u.BalanceRepository, expense.Uid, req.Total)
+		if err != nil {
+			return model.Expense{}, err
+		}
+	} else if expense.ExpenseType == util.CREDIT {
+		err := NewDebts(ctx, tx, u.Log, u.BalanceRepository, expense.Uid, req.Total)
+		if err != nil {
+			return model.Expense{}, err
+		}
+	}
 	res, err := u.ExpenseRepository.CreateExpense(ctx, tx, req)
-
 	if err != nil {
 		u.Log.Errorf("failed create expense %e :", err)
 		return model.Expense{}, err
 	}
+
 	update := zero.TimeFrom(res.UpdatedAt)
 	return model.Expense{
 		Uid:         res.Uid,
@@ -131,16 +149,10 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 		return model.Expense{}, err
 	}
 	x.Status = expense.Status
-	// x.ExpenseType = expense.ExpenseType
-	// x.Total = expense.Total
-	// x.Notes = expense.Notes
 
 	req := model.Expense{
 		Id:     x.Id,
 		Status: expense.Status,
-		// ExpenseType: expense.ExpenseType,
-		// Total:       expense.Total,
-		// Notes:       expense.Notes,
 	}
 
 	res, err := u.ExpenseRepository.UpdateExpense(ctx, tx, req, expense.Id)
@@ -159,9 +171,14 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 	}, nil
 }
 
-func NewExpenseUsecase(ExpenseRepository repository.ExpenseRepository, Log *logrus.Logger, db *sql.DB) ExpenseUsecase {
+func NewExpenseUsecase(
+	ExpenseRepository repository.ExpenseRepository,
+	BalanceRepository repository.BalanceRepository,
+	Log *logrus.Logger,
+	db *sql.DB) ExpenseUsecase {
 	return &ExpenseUsecaseImpl{
 		ExpenseRepository: ExpenseRepository,
+		BalanceRepository: BalanceRepository,
 		Log:               Log,
 		db:                db,
 	}
