@@ -46,7 +46,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 	update := zero.TimeFromPtr(&res.UpdatedAt)
 	return model.IncomeResponse{
 		Uid:            res.Uid,
-		Id:             req.Id,
+		Id:             res.Id,
 		CategoryIncome: res.CategoryIncome,
 		TypeIncome:     res.TypeIncome,
 		Total:          req.Total,

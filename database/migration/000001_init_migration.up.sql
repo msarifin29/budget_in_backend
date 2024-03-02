@@ -33,7 +33,7 @@ CREATE TABLE `expenses` (
 );
 
 CREATE TABLE `incomes` (
-  `uid` VARCHAR(255) NOT NULL UNIQUE,
+  `uid` VARCHAR(255) NOT NULL,
   `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `category_income` VARCHAR(15) not NULL DEFAULT 'monthly',
   `total` INT NOT NULL DEFAULT 0,
