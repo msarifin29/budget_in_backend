@@ -166,7 +166,7 @@ func TestUpdateteUserWithIdInvalid(t *testing.T) {
 
 	params := model.UpdateUserRequest{
 		UserName: "samsul testing",
-		Uid:      "f1687230",
+		Uid:      "deb3823d-5581-4e98-896c-06e5aa3bac4a",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

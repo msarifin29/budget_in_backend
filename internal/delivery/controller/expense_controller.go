@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,15 @@ func (c *ExpenseController) CreateExpense(ctx *gin.Context) {
 		})
 		return
 	}
-
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	if req.Uid != authPayload.Uid {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, model.MetaErrorResponse{
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
 	res, err := c.Usecase.CreateExpense(ctx, req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{

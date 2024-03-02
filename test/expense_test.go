@@ -62,14 +62,16 @@ func TestCreateExpenseUnAuthorized(t *testing.T) {
 
 	params := model.CreateExpenseRequest{
 		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
-		ExpenseType: "Cash",
+		ExpenseType: util.CASH,
 		Total:       45000,
+		Category:    util.OTHER,
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "deb3823d-5581-4e98-896c-06e5aa3bac4a", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
