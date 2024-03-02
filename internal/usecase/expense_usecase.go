@@ -74,11 +74,6 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		if err != nil {
 			return model.Expense{}, err
 		}
-	} else if expense.ExpenseType == util.CREDIT {
-		err := NewDebts(ctx, tx, u.Log, u.BalanceRepository, expense.Uid, req.Total)
-		if err != nil {
-			return model.Expense{}, err
-		}
 	}
 	res, err := u.ExpenseRepository.CreateExpense(ctx, tx, req)
 	if err != nil {
@@ -158,7 +153,7 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 		if err != nil {
 			return false, err
 		}
-	} else if expense.ExpenseType == util.CREDIT || expense.ExpenseType == "" || expense.ExpenseType != x.ExpenseType {
+	} else if expense.ExpenseType == "" || expense.ExpenseType != x.ExpenseType {
 		return false, errors.New("invalid input type expense")
 	}
 	x.Status = util.CANCELLED

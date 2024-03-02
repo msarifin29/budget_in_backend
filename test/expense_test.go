@@ -20,7 +20,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 
 	params := model.CreateExpenseRequest{
 		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
-		ExpenseType: util.CREDIT,
+		ExpenseType: util.DEBIT,
 		Total:       2500,
 		Category:    util.OTHER,
 	}
