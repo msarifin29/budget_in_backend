@@ -137,7 +137,7 @@ func TestUpdateExpenseFailed(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:          11,
+		Id:          86,
 		ExpenseType: util.DEBIT,
 	}
 	body, err := json.Marshal(params)
@@ -145,7 +145,7 @@ func TestUpdateExpenseFailed(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/expenses/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "boy", "a0ea433a-13b2-4414-aa8a-6369acd2b547", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }

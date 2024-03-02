@@ -15,7 +15,7 @@ import (
 type ExpenseUsecase interface {
 	CreateExpense(ctx context.Context, expense model.CreateExpenseRequest) (model.Expense, error)
 	GetExpenseById(ctx context.Context, request model.ExpenseParamWithId) (model.Expense, error)
-	UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (model.Expense, error)
+	UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (bool, error)
 	DeleteExpense(ctx context.Context, id float64) error
 	GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.Expense, float64, error)
 }
@@ -86,7 +86,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		return model.Expense{}, err
 	}
 
-	update := zero.TimeFrom(res.UpdatedAt)
+	update := zero.TimeFromPtr(&res.UpdatedAt)
 	return model.Expense{
 		Uid:         res.Uid,
 		Id:          res.Id,
@@ -136,29 +136,31 @@ func (u *ExpenseUsecaseImpl) GetExpenseById(ctx context.Context, request model.E
 }
 
 // UpdateExpense implements ExpenseUsecase.
-func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (model.Expense, error) {
+func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (bool, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 	x, err := u.ExpenseRepository.GetExpenseById(ctx, tx, expense.Id)
 	if err != nil {
 		u.Log.Errorf("expense not found with id %v :", expense.Id)
-		return model.Expense{}, err
+		return false, err
+	}
+	if x.Status != util.SUCCESS {
+		return false, errors.New("status is cancelled")
 	}
 
-	if expense.ExpenseType == util.DEBIT {
+	if expense.ExpenseType == util.DEBIT && expense.ExpenseType == x.ExpenseType {
 		err := NewBalance(ctx, tx, u.Log, u.BalanceRepository, util.CANCELLED, x.Uid, x.Total)
 		if err != nil {
-			return model.Expense{}, err
+			return false, err
 		}
-	} else if expense.ExpenseType == util.CASH {
+	} else if expense.ExpenseType == util.CASH && expense.ExpenseType == x.ExpenseType {
 		err := NewCash(ctx, tx, u.Log, u.BalanceRepository, util.CANCELLED, x.Uid, x.Total)
 		if err != nil {
-			return model.Expense{}, err
+			return false, err
 		}
-	} else if expense.ExpenseType == util.CREDIT {
-		return model.Expense{}, errors.New("invalid input type expense")
+	} else if expense.ExpenseType == util.CREDIT || expense.ExpenseType == "" || expense.ExpenseType != x.ExpenseType {
+		return false, errors.New("invalid input type expense")
 	}
-
 	x.Status = util.CANCELLED
 
 	req := model.Expense{
@@ -170,17 +172,10 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 	res, err := u.ExpenseRepository.UpdateExpense(ctx, tx, req, expense.Id)
 	if err != nil {
 		u.Log.Errorf("failed update expense %u :", err)
-		return model.Expense{}, err
+		return false, err
 	}
-	return model.Expense{
-		Uid:         res.Uid,
-		Id:          res.Id,
-		ExpenseType: res.ExpenseType,
-		Total:       res.Total,
-		Notes:       res.Notes,
-		CreatedAt:   req.CreatedAt,
-		UpdatedAt:   res.UpdatedAt,
-	}, nil
+	u.Log.Infof("success update expense with id %v", res.Id)
+	return true, nil
 }
 
 func NewExpenseUsecase(
