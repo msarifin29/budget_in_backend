@@ -95,19 +95,31 @@ func NewSavings(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo
 	return nil
 }
 
-func NewDebts(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo repository.BalanceRepository, uid string, input float64) error {
+func NewDebts(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, balanceRepo repository.BalanceRepository, status string, uid string, input float64) error {
+	var newDebt float64
 	debts, err := balanceRepo.GetDebt(ctx, tx, uid)
 	if err != nil {
 		err = errors.New("failed get debts")
 		Log.Error(err)
 		return err
 	}
-	if input <= 0 {
-		err = fmt.Errorf("invalid input, cannot add debts with value %v ", debts)
-		Log.Error(err)
-		return err
+	switch status {
+	case util.ACTIVE:
+		if input <= 0 {
+			err = fmt.Errorf("invalid input, cannot add debts with value %v ", input)
+			Log.Error(err)
+			return err
+		}
+		newDebt = debts + input
+	case util.COMPLETED:
+		if debts < 0 {
+			err = fmt.Errorf("min debts is 0 %v ", debts)
+			Log.Error(err)
+			return err
+		}
+		newDebt = debts - input
 	}
-	newDebt := debts + input
+
 	Log.Infof("newDebt = %v, debts = %v, input = %v", newDebt, debts, input)
 	err = balanceRepo.SetDebt(ctx, tx, uid, newDebt)
 	if err != nil {

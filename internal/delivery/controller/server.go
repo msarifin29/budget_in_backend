@@ -20,6 +20,7 @@ type Server struct {
 	UserC      UserController
 	ExpenseC   ExpenseController
 	IncomeC    IncomeController
+	CreditC    CreditController
 }
 
 func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
@@ -35,16 +36,19 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	expenseRepo := repository.NewExpenseRepository()
 	balanceRepo := repository.NewBalanceRepository()
 	incomeRepo := repository.NewIncomeRepository()
+	creditRepo := repository.NewCreditRepository()
 
 	// Usecases
 	userUsecase := usecase.NewUserUsecase(userRepo, Log, db)
 	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, Log, db)
 	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, Log, db)
+	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, Log, db)
 
 	// Controller
 	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
 	expenseController := NewExpenseController(expenseUseCase, Log)
 	incomeController := NewIncomeController(incomeUsecase, Log)
+	creditController := NewCreditController(creditUsecase, Log)
 
 	server := &Server{
 		Log:        Log,
@@ -53,6 +57,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		UserC:      *userController,
 		ExpenseC:   *expenseController,
 		IncomeC:    *incomeController,
+		CreditC:    *creditController,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
@@ -63,6 +68,9 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		v.RegisterValidation("status", util.ValidStatusType)
 		v.RegisterValidation("type_income", util.ValidIncomeType)
 		v.RegisterValidation("category_income", util.ValidCategoryIncome)
+		v.RegisterValidation("type_credit", util.ValidTypeCredit)
+		v.RegisterValidation("status_credit", util.ValidStatusHistoryCredit)
+		v.RegisterValidation("category_credit", util.ValidCategoryCredit)
 	}
 
 	server.setupRoute()
@@ -93,6 +101,9 @@ func (server *Server) setupRoute() {
 	// Incomes
 	autRoutes.POST("/api/incomes/create", server.IncomeC.CreateIncome)
 	autRoutes.GET("/api/incomes/", server.IncomeC.GetIncomes)
+
+	// Credits
+	autRoutes.POST("/api/credits/create", server.CreditC.CreateCredit)
 	server.Engine = router
 }
 

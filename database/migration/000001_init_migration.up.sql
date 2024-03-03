@@ -41,6 +41,28 @@ CREATE TABLE `incomes` (
   `updated_at` TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE `credits` (
+  `uid` varchar(255) NOT NULL,
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `category_credit` varchar(50) DEFAULT 'other',
+  `type_credit` varchar(15) NOT NULL DEFAULT 'monthly',
+  `total` int NOT NULL,
+  `loan_term` int NOT NULL DEFAULT 0,
+  `status_credit` varchar(10) NOT NULL DEFAULT 'active',
+  `created_at` timestamp DEFAULT (now()),
+  `updated_at` timestamp DEFAULT null ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `history_credit` (
+  `credit_id` int NOT NULL,
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `th` int NOT NULL,
+  `total` int NOT NULL,
+  `status` varchar(10) NOT NULL DEFAULT 'active',
+  `created_at` timestamp DEFAULT (now()),
+  `updated_at` timestamp DEFAULT null ON UPDATE CURRENT_TIMESTAMP
+);
+
 ALTER TABLE regencies add CONSTRAINT fk_regencies_users FOREIGN KEY (user_id) REFERENCES users (uid)
 
 ALTER TABLE occupations add CONSTRAINT fk_occupations_users FOREIGN KEY (user_id) REFERENCES users (uid)
@@ -57,3 +79,13 @@ ALTER TABLE `espenses` ADD COLUMN `category` varchar(50) DEFAULT 'other',
 ALTER TABLE `espenses` ADD COLUMN `status` varchar(10) DEFAULT 'success',
 
 ALTER TABLE `incomes` ADD COLUMN `type_income` VARCHAR(15) not NULL DEFAULT 'debit',
+
+ALTER TABLE `credits` ADD CONSTRAINT fk_credits_users FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);
+
+ALTER TABLE `history_credit` ADD CONSTRAINT fk_historycredit_credits FOREIGN KEY (`credit_id`) REFERENCES `credits` (`id`);
+
+ALTER TABLE `credits` ADD COLUMN `installment` INT NOT NULL
+ALTER TABLE `credits` ADD COLUMN `payment_time` INT NOT NULL
+
+ALTER TABLE `history_credit` ADD COLUMN `type_payment` VARCHAR(10) not NULL DEFAULT 'cash'
+ALTER TABLE `history_credit` ADD COLUMN `payment_time` int NOT NULL
