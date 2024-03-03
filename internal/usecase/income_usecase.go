@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
@@ -50,7 +51,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		CategoryIncome: res.CategoryIncome,
 		TypeIncome:     res.TypeIncome,
 		Total:          req.Total,
-		CreatedAt:      res.CreatedAt,
+		CreatedAt:      time.Now(),
 		UpdatedAt:      update.Time,
 	}, nil
 }

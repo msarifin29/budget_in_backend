@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
@@ -90,7 +91,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		Category:    res.Category,
 		Status:      res.Status,
 		Notes:       notes.String,
-		CreatedAt:   res.CreatedAt,
+		CreatedAt:   time.Now(),
 		UpdatedAt:   update.Time,
 	}, nil
 }
