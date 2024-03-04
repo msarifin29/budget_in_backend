@@ -16,7 +16,8 @@ import (
 
 type CreditUsecase interface {
 	CreateCredit(ctx context.Context, params model.CreateCreditRequest) (model.Credit, error)
-	UpdateCredit(ctx context.Context, params model.UpdateCreditRequest) (bool, error)
+	GetAllCredit(ctx context.Context, params model.GetCreditParams) ([]model.Credit, float64, error)
+	GetAllHistoryCredit(ctx context.Context, params model.GetHistoriesCreditParams) ([]model.HistoryCredit, float64, error)
 	UpdateHistoryCredit(ctx context.Context, params model.UpdateHistoryCreditParams) (model.UpdateHistoryResponse, error)
 }
 
@@ -25,6 +26,26 @@ type CreditUsecaseImpl struct {
 	BalanceRepo repository.BalanceRepository
 	Log         *logrus.Logger
 	db          *sql.DB
+}
+
+// GetAllHistoryCredit implements CreditUsecase.
+func (u *CreditUsecaseImpl) GetAllHistoryCredit(ctx context.Context, params model.GetHistoriesCreditParams) ([]model.HistoryCredit, float64, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	historiesCredits, err := u.CreditRepo.GetAllHistoryCredit(ctx, tx, params)
+	if err != nil {
+		u.Log.Error()
+		err = errors.New("failed get all history credit")
+		return []model.HistoryCredit{}, 0, err
+	}
+	count, err := u.CreditRepo.GetCountHistoryCredit(ctx, tx)
+	if err != nil {
+		u.Log.Error()
+		err = errors.New("failed get count history credit")
+		return []model.HistoryCredit{}, 0, err
+	}
+	return historiesCredits, count, nil
 }
 
 // CreateCredit implements CreditUsecase.
@@ -74,8 +95,23 @@ func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.Creat
 }
 
 // UpdateCredit implements CreditUsecase.
-func (u *CreditUsecaseImpl) UpdateCredit(ctx context.Context, params model.UpdateCreditRequest) (bool, error) {
-	panic("unimplemented")
+func (u *CreditUsecaseImpl) GetAllCredit(ctx context.Context, params model.GetCreditParams) ([]model.Credit, float64, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	credits, err := u.CreditRepo.GetAllCredit(ctx, tx, params)
+	if err != nil {
+		u.Log.Error()
+		err = errors.New("failed get all credit")
+		return []model.Credit{}, 0, err
+	}
+	count, err := u.CreditRepo.GetCountCredit(ctx, tx, params.Uid)
+	if err != nil {
+		u.Log.Error()
+		err = errors.New("failed get count credit")
+		return []model.Credit{}, 0, err
+	}
+	return credits, count, nil
 }
 
 // UpdateHistoryCredit implements CreditUsecase.

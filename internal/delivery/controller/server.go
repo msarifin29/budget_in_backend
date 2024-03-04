@@ -105,6 +105,8 @@ func (server *Server) setupRoute() {
 	// Credits
 	autRoutes.POST("/api/credits/create", server.CreditC.CreateCredit)
 	autRoutes.PUT("/api/credits/update_history", server.CreditC.UpdateCreditHistory)
+	autRoutes.GET("/api/credits/", server.CreditC.GetAllCredit)
+	autRoutes.GET("/api/histories_credits/", server.CreditC.GetAllHistoriesCredit)
 	server.Engine = router
 }
 

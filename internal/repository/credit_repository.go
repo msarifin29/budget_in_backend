@@ -13,12 +13,103 @@ type CreditRepository interface {
 	UpdateCredit(ctx context.Context, tx *sql.Tx, credit model.UpdateCreditRequest) (bool, error)
 	UpdateTotalCredit(ctx context.Context, tx *sql.Tx, uid string, id float64, total float64) (bool, error)
 	GetCreditById(ctx context.Context, tx *sql.Tx, credit model.GetCreditRequest) (model.Credit, error)
+	GetAllCredit(ctx context.Context, tx *sql.Tx, credit model.GetCreditParams) ([]model.Credit, error)
+	GetCountCredit(ctx context.Context, tx *sql.Tx, uid string) (float64, error)
 	CreateHistoryCredit(ctx context.Context, tx *sql.Tx, historyC model.HistoryCredit) (model.HistoryCredit, error)
 	UpdateHistoryCredit(ctx context.Context, tx *sql.Tx, historyC model.UpdateHistoryCreditParams) (bool, error)
 	GetHistoryCreditById(ctx context.Context, tx *sql.Tx, credit model.GetHistoryCreditRequest) (model.HistoryCredit, error)
+	GetAllHistoryCredit(ctx context.Context, tx *sql.Tx, credit model.GetHistoriesCreditParams) ([]model.HistoryCredit, error)
+	GetCountHistoryCredit(ctx context.Context, tx *sql.Tx) (float64, error)
 }
 
-type CreditRepositoryImpl struct {
+type CreditRepositoryImpl struct{}
+
+// GetCountCredit implements CreditRepository.
+func (CreditRepositoryImpl) GetCountCredit(ctx context.Context, tx *sql.Tx, uid string) (float64, error) {
+	var total float64
+	script := `SELECT COUNT(*)from credits where uid = ? `
+	err := tx.QueryRowContext(ctx, script, uid).Scan(&total)
+	return total, err
+}
+
+// GetCountHistoryCredit implements CreditRepository.
+func (CreditRepositoryImpl) GetCountHistoryCredit(ctx context.Context, tx *sql.Tx) (float64, error) {
+	var total float64
+	script := `SELECT COUNT(*)from history_credit`
+	err := tx.QueryRowContext(ctx, script).Scan(&total)
+	return total, err
+}
+
+// GetAllCredit implements CreditRepository.
+func (CreditRepositoryImpl) GetAllCredit(ctx context.Context, tx *sql.Tx, credit model.GetCreditParams) ([]model.Credit, error) {
+	script := `select * from credits where uid = ? limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, credit.Uid, credit.Limit, credit.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	credits := []model.Credit{}
+	for rows.Next() {
+		var i model.Credit
+		update := zero.TimeFromPtr(&i.UpdatedAt)
+
+		err := rows.Scan(
+			&i.Uid,
+			&i.Id,
+			&i.CategoryCredit,
+			&i.TypeCredit,
+			&i.Total,
+			&i.LoanTerm,
+			&i.StatusCredit,
+			&i.CreatedAt,
+			&update,
+			&i.Installment,
+			&i.PaymentTime,
+		)
+		if err != nil {
+			return nil, err
+		}
+		credits = append(credits, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return credits, nil
+}
+
+// GetAllHistoryCredit implements CreditRepository.
+func (CreditRepositoryImpl) GetAllHistoryCredit(ctx context.Context, tx *sql.Tx, credit model.GetHistoriesCreditParams) ([]model.HistoryCredit, error) {
+	script := `select * from history_credit order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, credit.Limit, credit.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	credits := []model.HistoryCredit{}
+	for rows.Next() {
+		var i model.HistoryCredit
+		update := zero.TimeFromPtr(&i.UpdatedAt)
+
+		err := rows.Scan(
+			&i.CreditId,
+			&i.Id,
+			&i.Th,
+			&i.Total,
+			&i.Status,
+			&i.CreatedAt,
+			&update,
+			&i.TypePayment,
+			&i.PaymentTime,
+		)
+		if err != nil {
+			return nil, err
+		}
+		credits = append(credits, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return credits, nil
 }
 
 // UpdateTotalCredit implements CreditRepository.

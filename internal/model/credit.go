@@ -32,6 +32,15 @@ type GetCreditRequest struct {
 	Uid string  `json:"uid" binding:"required"`
 	Id  float64 `json:"id" binding:"required"`
 }
+type GetCreditParams struct {
+	Uid    string `json:"uid" binding:"required"`
+	Limit  int32  `json:"limit"`
+	Offset int32  `json:"offset"`
+}
+type GetCreditsRequest struct {
+	Page      int32 `form:"page" binding:"required,min=1"`
+	TotalPage int32 `form:"total_page" binding:"required,min=5,max=10"`
+}
 
 func NewCredit(credit Credit) *Credit {
 	return &Credit{

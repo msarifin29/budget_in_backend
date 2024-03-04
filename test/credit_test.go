@@ -153,3 +153,57 @@ func TestUpdateHistoryCreditNoAuthorization(t *testing.T) {
 	fmt.Println("body =>", string(bytes))
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
+func TestGetCreditsSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.GetCreditsRequest{
+		Page:      1,
+		TotalPage: 5,
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/credits/", nil)
+	// Add query parameters to request URL
+	q := req.URL.Query()
+	q.Add("page", fmt.Sprintf("%d", params.Page))
+	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
+	req.URL.RawQuery = q.Encode()
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body : ", string(bytes))
+	assert.Nil(t, err)
+	var res model.MetaResponse
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res.Message)
+	assert.NotEmpty(t, res.Data)
+}
+func TestGetHistoriesCreditsSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.GetHistoriesCreditsRequest{
+		Page:      1,
+		TotalPage: 5,
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/histories_credits/", nil)
+	// Add query parameters to request URL
+	q := req.URL.Query()
+	q.Add("page", fmt.Sprintf("%d", params.Page))
+	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
+	req.URL.RawQuery = q.Encode()
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body : ", string(bytes))
+	assert.Nil(t, err)
+	var res model.MetaResponse
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res.Message)
+	assert.NotEmpty(t, res.Data)
+}
