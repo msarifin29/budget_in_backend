@@ -28,6 +28,10 @@ type UpdateCreditRequest struct {
 	Id           float64 `json:"id" binding:"required"`
 	StatusCredit string  `json:"status_credit" binding:"required,status_credit"`
 }
+type GetCreditRequest struct {
+	Uid string  `json:"uid" binding:"required"`
+	Id  float64 `json:"id" binding:"required"`
+}
 
 func NewCredit(credit Credit) *Credit {
 	return &Credit{

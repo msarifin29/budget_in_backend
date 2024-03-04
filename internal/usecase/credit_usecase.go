@@ -3,6 +3,8 @@ package usecase
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
@@ -15,7 +17,7 @@ import (
 type CreditUsecase interface {
 	CreateCredit(ctx context.Context, params model.CreateCreditRequest) (model.Credit, error)
 	UpdateCredit(ctx context.Context, params model.UpdateCreditRequest) (bool, error)
-	UpdateHistoryCredit(ctx context.Context, params model.UpdateHistoryCreditRequest) (bool, error)
+	UpdateHistoryCredit(ctx context.Context, params model.UpdateHistoryCreditParams) (model.UpdateHistoryResponse, error)
 }
 
 type CreditUsecaseImpl struct {
@@ -77,8 +79,67 @@ func (u *CreditUsecaseImpl) UpdateCredit(ctx context.Context, params model.Updat
 }
 
 // UpdateHistoryCredit implements CreditUsecase.
-func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params model.UpdateHistoryCreditRequest) (bool, error) {
-	panic("unimplemented")
+func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params model.UpdateHistoryCreditParams) (model.UpdateHistoryResponse, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	credit, err := u.CreditRepo.GetCreditById(ctx, tx, model.GetCreditRequest{Uid: params.Uid, Id: params.CreditId})
+	if err != nil {
+		u.Log.Errorf("failed get credit with credit id %v", params.CreditId)
+		return model.UpdateHistoryResponse{}, err
+	}
+	if params.Status == util.ACTIVE {
+		err := errors.New("cannot update history credit with same value")
+		return model.UpdateHistoryResponse{}, err
+	}
+
+	reqId := model.GetHistoryCreditRequest{Uid: params.Uid, Id: params.Id}
+	historyC, err := u.CreditRepo.GetHistoryCreditById(ctx, tx, reqId)
+	if err != nil {
+		u.Log.Errorf("failed get history credit with id %v", params.Id)
+		return model.UpdateHistoryResponse{}, err
+	}
+	if historyC.Status != util.ACTIVE {
+		err = errors.New("status credit is completed")
+		u.Log.Error(err)
+		return model.UpdateHistoryResponse{}, err
+	}
+
+	ok, err := u.CreditRepo.UpdateHistoryCredit(ctx, tx, params)
+	if err != nil || !ok {
+		u.Log.Error(err)
+		err = errors.New("failed update history credit")
+		return model.UpdateHistoryResponse{}, err
+	}
+	err = UpdateTotalBalanceOrCash(ctx, tx, u.CreditRepo, u.BalanceRepo, historyC, params.TypePayment, params.Uid, u.Log)
+	if err != nil {
+		return model.UpdateHistoryResponse{}, err
+	}
+	newCredit := credit.Total - historyC.Total
+	ok, totalErr := u.CreditRepo.UpdateTotalCredit(ctx, tx, params.Uid, params.CreditId, newCredit)
+	if totalErr != nil || !ok {
+		u.Log.Error(err)
+		err = errors.New("failed update total credit")
+		return model.UpdateHistoryResponse{}, err
+	}
+
+	if newCredit <= 0 {
+		ok, err := u.CreditRepo.UpdateCredit(ctx, tx, model.UpdateCreditRequest{Uid: params.Uid, Id: params.CreditId, StatusCredit: util.COMPLETED})
+		if !ok || err != nil {
+			u.Log.Error(err)
+			err = errors.New("failed update credit")
+			return model.UpdateHistoryResponse{}, err
+		}
+	}
+
+	return model.UpdateHistoryResponse{
+		Id:          historyC.Id,
+		Th:          historyC.Th,
+		Total:       historyC.Total,
+		Status:      params.Status,
+		TypePayment: params.TypePayment,
+		CreatedAt:   time.Now(),
+	}, nil
 }
 
 func NewCreditUsecase(CreditRepo repository.CreditRepository, BalanceRepo repository.BalanceRepository, Log *logrus.Logger, db *sql.DB) CreditUsecase {
@@ -97,6 +158,53 @@ func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.Cre
 		}
 		_, err := creditRepo.CreateHistoryCredit(ctx, tx, req)
 		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func UpdateTotalBalanceOrCash(ctx context.Context, tx *sql.Tx,
+	creditRepo repository.CreditRepository,
+	BalanceRepo repository.BalanceRepository,
+	historyCredit model.HistoryCredit,
+	typePayment string,
+	uid string,
+	Log *logrus.Logger,
+) error {
+	switch typePayment {
+	case util.DEBIT:
+		balance, err := BalanceRepo.GetBalance(ctx, tx, uid)
+		if err != nil {
+			err = fmt.Errorf("failed get balance from uid %v", uid)
+			return err
+		}
+		if balance < historyCredit.Total {
+			err = errors.New("cannot upgrade balance with total greater than balance")
+			return err
+		}
+		newBalance := balance - historyCredit.Total
+		Log.Infof("newbalance = %v, balance = %v, input = %v", newBalance, balance, historyCredit.Total)
+		err = BalanceRepo.SetBalance(ctx, tx, uid, newBalance)
+		if err != nil {
+			err = errors.New("failed update balance")
+			return err
+		}
+	case util.CASH:
+		cash, err := BalanceRepo.GetCash(ctx, tx, uid)
+		if err != nil {
+			err = fmt.Errorf("failed get cash from uid %v", uid)
+			return err
+		}
+		if cash < historyCredit.Total {
+			err = errors.New("cannot upgrade cash with total greater than cash")
+			return err
+		}
+		newCash := cash - historyCredit.Total
+		Log.Infof("newCash = %v, cash = %v, input = %v", newCash, cash, historyCredit.Total)
+		err = BalanceRepo.SetCash(ctx, tx, uid, newCash)
+		if err != nil {
+			err = errors.New("failed update cash")
 			return err
 		}
 	}

@@ -21,11 +21,31 @@ type CreateHistoryCredit struct {
 	TypePayment string  `json:"type_payment"`
 	PaymentTime int     `json:"payment_time"`
 }
-type UpdateHistoryCreditRequest struct {
+type UpdateHistoryCreditParams struct {
 	Uid         string  `json:"uid" binding:"required"`
+	CreditId    float64 `json:"credit_id" binding:"required"`
 	Id          float64 `json:"id" binding:"required"`
 	Status      string  `json:"status" binding:"required,status_credit"`
 	TypePayment string  `json:"type_payment" binding:"required,expense_type"`
+}
+type UpdateHistoryCreditRequest struct {
+	Uid         string  `json:"uid" binding:"required"`
+	CreditId    float64 `json:"credit_id" binding:"required"`
+	Id          float64 `json:"id" binding:"required"`
+	TypePayment string  `json:"type_payment" binding:"required,expense_type"`
+}
+type GetHistoryCreditRequest struct {
+	Uid string  `json:"uid" binding:"required"`
+	Id  float64 `json:"id" binding:"required"`
+}
+
+type UpdateHistoryResponse struct {
+	Id          float64   `json:"id"`
+	Th          float64   `json:"th"`
+	Total       float64   `json:"total"`
+	Status      string    `json:"status"`
+	TypePayment string    `json:"type_payment"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 func NewHistoryCredit(history HistoryCredit) *HistoryCredit {

@@ -23,7 +23,7 @@ func TestCreateCreditSuccess(t *testing.T) {
 		CategoryCredit: util.ELECTRONIC,
 		TypeCredit:     util.MONTHLY,
 		LoanTerm:       3,
-		Installment:    3000,
+		Installment:    2500,
 		PaymentTime:    time.Now().Day(),
 	}
 	body, err := json.Marshal(params)
@@ -81,6 +81,71 @@ func TestCreateCreditNoAuthorization(t *testing.T) {
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/credits/create", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.NoError(t, err)
+	fmt.Println("body =>", string(bytes))
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+func TestUpdateHistoryCreditSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.UpdateHistoryCreditRequest{
+		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
+		Id:          22,
+		CreditId:    5,
+		TypePayment: util.DEBIT,
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/credits/update_history", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body =>", string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+	assert.NotEmpty(t, res["data"])
+}
+func TestUpdateHistoryCreditFailed(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.UpdateHistoryCreditRequest{
+		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
+		Id:          3,
+		TypePayment: util.ELECTRONIC,
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/credits/update_history", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.NoError(t, err)
+	fmt.Println("body =>", string(bytes))
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+func TestUpdateHistoryCreditNoAuthorization(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.UpdateHistoryCreditRequest{
+		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
+		Id:          3,
+		TypePayment: util.ELECTRONIC,
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/credits/update_history", strings.NewReader(string(body)))
 
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
