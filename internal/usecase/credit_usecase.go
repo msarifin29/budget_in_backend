@@ -166,6 +166,14 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 			err = errors.New("failed update credit")
 			return model.UpdateHistoryResponse{}, err
 		}
+		// Update debts from user
+		newCreditCompletted := credit.Installment * credit.LoanTerm
+		err = NewDebts(ctx, tx, u.Log, u.BalanceRepo, util.COMPLETED, params.Uid, newCreditCompletted)
+		if err != nil {
+			u.Log.Error(err)
+			err = errors.New("failed update debts user")
+			return model.UpdateHistoryResponse{}, err
+		}
 	}
 
 	return model.UpdateHistoryResponse{

@@ -20,8 +20,8 @@ type CreateCreditRequest struct {
 	CategoryCredit string  `json:"category_credit" binding:"required,category_credit"`
 	TypeCredit     string  `json:"type_credit" binding:"required,type_credit"`
 	LoanTerm       float64 `json:"loan_term" binding:"required,min=1"`
-	Installment    float64 `json:"installment" binding:"required"`
-	PaymentTime    int     `json:"payment_time" binding:"required"`
+	Installment    float64 `json:"installment" binding:"required,min=2000"`
+	PaymentTime    int     `json:"payment_time" binding:"required,min=1,max=31"`
 }
 type UpdateCreditRequest struct {
 	Uid          string  `json:"uid" binding:"required"`
