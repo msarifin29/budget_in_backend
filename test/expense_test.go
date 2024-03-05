@@ -192,14 +192,16 @@ func TestGetExpensesSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetExpenseRequest{
-		Status:    "success",
-		Page:      1,
-		TotalPage: 10,
+		Status:      "success",
+		ExpenseType: "",
+		Page:        1,
+		TotalPage:   5,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
+	q.Add("expense_type", fmt.Sprintf("%v", params.ExpenseType))
 	q.Add("status", fmt.Sprintf("%v", params.Status))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))

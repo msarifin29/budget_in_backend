@@ -33,15 +33,15 @@ func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetEx
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 
-	total, err := u.ExpenseRepository.GetTotalExpenses(ctx, tx, params.Uid, params.Status)
+	total, err := u.ExpenseRepository.GetTotalExpenses(ctx, tx, params.Uid, params.Status, params.ExpenseType)
 	if err != nil {
-		u.Log.Errorf("failed get toal expenses %v ", err)
-		return []model.Expense{}, 0, err
+		u.Log.Errorf("failed get count expenses %v ", err)
+		return []model.Expense{}, 0, errors.New("failed get count expenses")
 	}
 	expenses, err := u.ExpenseRepository.GetExpenses(ctx, tx, params)
 	if err != nil {
 		u.Log.Errorf("failed get expenses %v ", err)
-		return []model.Expense{}, 0, err
+		return []model.Expense{}, 0, errors.New("failed get expenses")
 	}
 	return expenses, total, nil
 }
