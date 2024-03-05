@@ -184,6 +184,7 @@ func TestGetHistoriesCreditsSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetHistoriesCreditsRequest{
+		CreditId:  3,
 		Page:      1,
 		TotalPage: 5,
 	}
@@ -191,6 +192,7 @@ func TestGetHistoriesCreditsSuccess(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/api/histories_credits/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
+	q.Add("credit_id", fmt.Sprintf("%v", params.CreditId))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()

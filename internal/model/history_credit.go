@@ -39,12 +39,14 @@ type GetHistoryCreditRequest struct {
 	Id  float64 `json:"id" binding:"required"`
 }
 type GetHistoriesCreditParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	CreditId float64 `json:"credit_id" binding:"required"`
+	Limit    int32   `json:"limit"`
+	Offset   int32   `json:"offset"`
 }
 type GetHistoriesCreditsRequest struct {
-	Page      int32 `form:"page" binding:"required,min=1"`
-	TotalPage int32 `form:"total_page" binding:"required,min=5,max=10"`
+	CreditId  float64 `form:"credit_id" binding:"required"`
+	Page      int32   `form:"page" binding:"required,min=1"`
+	TotalPage int32   `form:"total_page" binding:"required,min=5,max=10"`
 }
 
 type UpdateHistoryResponse struct {

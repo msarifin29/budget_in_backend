@@ -145,8 +145,9 @@ func (c *CreditController) GetAllHistoriesCredit(ctx *gin.Context) {
 		return
 	}
 	params := model.GetHistoriesCreditParams{
-		Limit:  req.TotalPage,
-		Offset: (req.Page - 1) * req.TotalPage,
+		CreditId: req.CreditId,
+		Limit:    req.TotalPage,
+		Offset:   (req.Page - 1) * req.TotalPage,
 	}
 	histories, total, err := c.CreditUsecase.GetAllHistoryCredit(ctx, params)
 	if err != nil {

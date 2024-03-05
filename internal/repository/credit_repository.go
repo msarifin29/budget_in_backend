@@ -19,7 +19,7 @@ type CreditRepository interface {
 	UpdateHistoryCredit(ctx context.Context, tx *sql.Tx, historyC model.UpdateHistoryCreditParams) (bool, error)
 	GetHistoryCreditById(ctx context.Context, tx *sql.Tx, credit model.GetHistoryCreditRequest) (model.HistoryCredit, error)
 	GetAllHistoryCredit(ctx context.Context, tx *sql.Tx, credit model.GetHistoriesCreditParams) ([]model.HistoryCredit, error)
-	GetCountHistoryCredit(ctx context.Context, tx *sql.Tx) (float64, error)
+	GetCountHistoryCredit(ctx context.Context, tx *sql.Tx, creditId float64) (float64, error)
 }
 
 type CreditRepositoryImpl struct{}
@@ -33,10 +33,10 @@ func (CreditRepositoryImpl) GetCountCredit(ctx context.Context, tx *sql.Tx, uid 
 }
 
 // GetCountHistoryCredit implements CreditRepository.
-func (CreditRepositoryImpl) GetCountHistoryCredit(ctx context.Context, tx *sql.Tx) (float64, error) {
+func (CreditRepositoryImpl) GetCountHistoryCredit(ctx context.Context, tx *sql.Tx, creditId float64) (float64, error) {
 	var total float64
-	script := `SELECT COUNT(*)from history_credit`
-	err := tx.QueryRowContext(ctx, script).Scan(&total)
+	script := `SELECT COUNT(*)from history_credit where credit_id = ?`
+	err := tx.QueryRowContext(ctx, script, creditId).Scan(&total)
 	return total, err
 }
 
@@ -79,8 +79,8 @@ func (CreditRepositoryImpl) GetAllCredit(ctx context.Context, tx *sql.Tx, credit
 
 // GetAllHistoryCredit implements CreditRepository.
 func (CreditRepositoryImpl) GetAllHistoryCredit(ctx context.Context, tx *sql.Tx, credit model.GetHistoriesCreditParams) ([]model.HistoryCredit, error) {
-	script := `select * from history_credit order by id limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, credit.Limit, credit.Offset)
+	script := `select * from history_credit where credit_id = ? order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, credit.CreditId, credit.Limit, credit.Offset)
 	if err != nil {
 		return nil, err
 	}

@@ -39,7 +39,7 @@ func (u *CreditUsecaseImpl) GetAllHistoryCredit(ctx context.Context, params mode
 		err = errors.New("failed get all history credit")
 		return []model.HistoryCredit{}, 0, err
 	}
-	count, err := u.CreditRepo.GetCountHistoryCredit(ctx, tx)
+	count, err := u.CreditRepo.GetCountHistoryCredit(ctx, tx, params.CreditId)
 	if err != nil {
 		u.Log.Error()
 		err = errors.New("failed get count history credit")
