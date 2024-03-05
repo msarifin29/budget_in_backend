@@ -74,7 +74,7 @@ func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email stri
 }
 
 func (u *UserRepositoryImpl) GetById(ctx context.Context, tx *sql.Tx, uid string) (model.User, error) {
-	sqlScript := `select uid, username, email, password, photo, created_at, updated_at, type_user, balance, savings, cash, debts, currency from users where uid = ? limit 1`
+	sqlScript := `select * from users where uid = ? limit 1`
 	row := tx.QueryRowContext(ctx, sqlScript, uid)
 
 	var i model.User
