@@ -18,6 +18,9 @@ type Config struct {
 	SetMaxOpenConns     int           `mapstructure:"SET_MAX_OPEN_CONNS"`
 	SetConnMaxLifeTime  int           `mapstructure:"SET_CONN_MAX_LIFE_TIME"`
 	SetConnMaxIdleTime  int           `mapstructure:"SET_CONN_MAX_IDLE_TIME"`
+	SenderName          string        `mapstructure:"SENDER_NAME"`
+	AuthEmail           string        `mapstructure:"AUTH_EMAIL"`
+	AuthPassword        string        `mapstructure:"AUTH_PASSWORD"`
 }
 
 func LoadConfigDev(path string) (config Config, err error) {

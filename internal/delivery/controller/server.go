@@ -39,7 +39,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	creditRepo := repository.NewCreditRepository()
 
 	// Usecases
-	userUsecase := usecase.NewUserUsecase(userRepo, Log, db)
+	userUsecase := usecase.NewUserUsecase(userRepo, Log, db, Con)
 	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, Log, db)
 	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, Log, db)
 	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, Log, db)
@@ -85,6 +85,8 @@ func (server *Server) setupRoute() {
 
 	router.POST("/api/register", server.UserC.CreateUser)
 	router.POST("/api/login", server.UserC.LoginUser)
+
+	router.POST("/api/user/forgot_password", server.UserC.ForgotPassword)
 
 	autRoutes := router.Group("/").Use(delivery.AuthMiddleware(server.TokenMaker))
 

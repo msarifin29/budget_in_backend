@@ -4,12 +4,21 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"net/smtp"
+	"strings"
 
 	"github.com/google/uuid"
+	"github.com/msarifin29/be_budget_in/internal/config"
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/util"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	CONFIG_SMTP_HOST = "smtp.gmail.com"
+	CONFIG_SMTP_PORT = 587
 )
 
 type UserUsecase interface {
@@ -17,16 +26,18 @@ type UserUsecase interface {
 	GetUser(ctx context.Context, user model.LoginUserRequest) (model.UserResponse, error)
 	UpdateUser(ctx context.Context, user model.UpdateUserRequest) error
 	GetById(ctx context.Context, uid string) (model.User, error)
+	ResetPassword(ctx context.Context, req model.EmailUserRequest) (bool, error)
 }
 
 type UserUsecaseImpl struct {
 	UserRepository repository.UserRepository
 	Log            *logrus.Logger
 	db             *sql.DB
+	conf           config.Config
 }
 
-func NewUserUsecase(UserRepository repository.UserRepository, Log *logrus.Logger, db *sql.DB) UserUsecase {
-	return &UserUsecaseImpl{UserRepository: UserRepository, Log: Log, db: db}
+func NewUserUsecase(UserRepository repository.UserRepository, Log *logrus.Logger, db *sql.DB, conf config.Config) UserUsecase {
+	return &UserUsecaseImpl{UserRepository: UserRepository, Log: Log, db: db, conf: conf}
 }
 
 func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserRequest) (model.UserResponse, error) {
@@ -42,7 +53,7 @@ func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserR
 	password, hashErr := util.HashPassword(user.Password)
 
 	if hashErr != nil {
-		u.Log.Errorf("failed start transaction %e", hashErr)
+		u.Log.Errorf("failed hash password %e", hashErr)
 		return res, hashErr
 	}
 
@@ -121,4 +132,55 @@ func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.User, 
 		return model.User{}, errors.New(message)
 	}
 	return user, nil
+}
+
+func (u *UserUsecaseImpl) ResetPassword(ctx context.Context, req model.EmailUserRequest) (bool, error) {
+	tx, _ := u.db.Begin()
+
+	defer util.CommitOrRollback(tx)
+	emailUser, err := u.UserRepository.GetUserByEmail(ctx, tx, req)
+	if err != nil {
+		err = fmt.Errorf("user not found with email %v", req.Email)
+		u.Log.Error(err)
+		return false, err
+	}
+	to := []string{emailUser}
+	cc := []string{}
+	subject := "New Password"
+	newPassword := subject + " : " + util.RandomString(6)
+	err = sendMail(to, cc, subject, newPassword, u.conf)
+	if err != nil {
+		u.Log.Errorf("failed send email %v:", err)
+		return false, err
+	}
+	password, hashErr := util.HashPassword(newPassword)
+
+	if hashErr != nil {
+		u.Log.Errorf("failed hash password %e", hashErr)
+		return false, hashErr
+	}
+	ok, errSetPass := u.UserRepository.UpdatePassword(ctx, tx, emailUser, password)
+	if !ok || errSetPass != nil {
+		errSetPass = errors.New("failed update password")
+		return false, errSetPass
+	}
+	return true, nil
+}
+
+func sendMail(to []string, cc []string, subject, message string, conf config.Config) error {
+	body := "From: " + conf.SenderName + "\n" +
+		"To: " + strings.Join(to, ",") + "\n" +
+		"Cc: " + strings.Join(cc, ",") + "\n" +
+		"Subject: " + subject + "\n\n" +
+		message
+
+	auth := smtp.PlainAuth("", conf.AuthEmail, conf.AuthPassword, CONFIG_SMTP_HOST)
+	smtpAddr := fmt.Sprintf("%s:%d", CONFIG_SMTP_HOST, CONFIG_SMTP_PORT)
+
+	err := smtp.SendMail(smtpAddr, auth, conf.AuthEmail, append(to, cc...), []byte(body))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

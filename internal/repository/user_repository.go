@@ -13,6 +13,8 @@ type UserRepository interface {
 	GetUser(ctx context.Context, tx *sql.Tx, email string) (model.User, error)
 	GetById(ctx context.Context, tx *sql.Tx, uid string) (model.User, error)
 	UpdateUserName(ctx context.Context, tx *sql.Tx, user model.UpdateUserRequest) error
+	GetUserByEmail(ctx context.Context, tx *sql.Tx, req model.EmailUserRequest) (string, error)
+	UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error)
 }
 
 type UserRepositoryImpl struct{}
@@ -101,4 +103,23 @@ func (u *UserRepositoryImpl) UpdateUserName(ctx context.Context, tx *sql.Tx, use
 	sqlScript := `update users set username = ? where uid = ?`
 	_, err := tx.ExecContext(ctx, sqlScript, user.UserName, user.Uid)
 	return err
+}
+
+// GetUserByEmail implements UserRepository.
+func (*UserRepositoryImpl) GetUserByEmail(ctx context.Context, tx *sql.Tx, req model.EmailUserRequest) (string, error) {
+	sqlScript := `select email from users where email = ? limit 1`
+	row := tx.QueryRowContext(ctx, sqlScript, req.Email)
+	var e string
+	err := row.Scan(&e)
+	return e, err
+}
+
+// UpdatePassword implements UserRepository.
+func (*UserRepositoryImpl) UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error) {
+	sqlScript := `update users set password = ? where email = ?`
+	_, err := tx.ExecContext(ctx, sqlScript, newPassword, email)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }

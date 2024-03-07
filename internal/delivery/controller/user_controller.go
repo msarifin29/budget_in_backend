@@ -200,3 +200,28 @@ func (c *UserController) GetById(ctx *gin.Context) {
 		Data:    profile,
 	})
 }
+
+func (c *UserController) ForgotPassword(ctx *gin.Context) {
+	var req model.EmailUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.Log.Error(err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	ok, err := c.UserUsecase.ResetPassword(ctx, req)
+	if !ok || err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    ok,
+	})
+}

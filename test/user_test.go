@@ -241,3 +241,39 @@ func TestGetUserNoAuthorization(t *testing.T) {
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
+func TestForgotPasswordSuccess(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.EmailUserRequest{
+		Email: "asamsul474@gmail.com",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/user/forgot_password", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println(string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+}
+func TestForgotPasswordFailed(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.EmailUserRequest{
+		Email: "failed@gmail.com",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/user/forgot_password", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.NoError(t, err)
+	fmt.Println(string(bytes))
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}

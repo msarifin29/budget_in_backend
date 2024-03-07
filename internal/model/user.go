@@ -23,7 +23,7 @@ type User struct {
 type CreateUserRequest struct {
 	UserName string  `json:"username" binding:"required"`
 	Email    string  `json:"email" binding:"required,email"`
-	Password string  `json:"password" binding:"required"`
+	Password string  `json:"password" binding:"required,min=6"`
 	TypeUser string  `json:"type_user" binding:"required,type_user"`
 	Balance  float64 `json:"balance" inding:"required"`
 	Savings  float64 `json:"savings" inding:"required"`
@@ -34,7 +34,7 @@ type CreateUserRequest struct {
 
 type LoginUserRequest struct {
 	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	Password string `json:"password" binding:"required,min=6"`
 }
 
 type UserResponse struct {
@@ -84,4 +84,8 @@ type Regencies struct {
 type Occupations struct {
 	OccupationId string `json:"occupation_id"`
 	Title        string `json:"title"`
+}
+
+type EmailUserRequest struct {
+	Email string `json:"email" binding:"required,email"`
 }
