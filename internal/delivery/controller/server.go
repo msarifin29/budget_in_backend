@@ -41,9 +41,9 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 
 	// Usecases
 	userUsecase := usecase.NewUserUsecase(userRepo, Log, db, Con)
-	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, Log, db)
-	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, Log, db)
-	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, Log, db)
+	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, accountRepo, Log, db)
+	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, accountRepo, Log, db)
+	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, accountRepo, Log, db)
 	accountUsacase := usecase.NewAccountUsacase(accountRepo, Log, db)
 
 	// Controller

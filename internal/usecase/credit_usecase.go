@@ -24,6 +24,7 @@ type CreditUsecase interface {
 type CreditUsecaseImpl struct {
 	CreditRepo  repository.CreditRepository
 	BalanceRepo repository.BalanceRepository
+	AccountRepo repository.AccountRepository
 	Log         *logrus.Logger
 	db          *sql.DB
 }
@@ -147,7 +148,7 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		err = errors.New("failed update history credit")
 		return model.UpdateHistoryResponse{}, err
 	}
-	err = UpdateTotalBalanceOrCash(ctx, tx, u.CreditRepo, u.BalanceRepo, historyC, params.TypePayment, params.Uid, u.Log)
+	err = UpdateTotalBalanceOrCash(ctx, tx, u.CreditRepo, u.BalanceRepo, historyC, u.AccountRepo, params.TypePayment, params.AccountId, u.Log)
 	if err != nil {
 		return model.UpdateHistoryResponse{}, err
 	}
@@ -168,7 +169,7 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		}
 		// Update debts from user
 		newCreditCompletted := credit.Installment * credit.LoanTerm
-		err = NewDebts(ctx, tx, u.Log, u.BalanceRepo, util.COMPLETED, params.Uid, newCreditCompletted)
+		err = util.NewDebts(ctx, tx, u.Log, u.AccountRepo, util.COMPLETED, params.AccountId, newCreditCompletted)
 		if err != nil {
 			u.Log.Error(err)
 			err = errors.New("failed update debts user")
@@ -186,8 +187,8 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 	}, nil
 }
 
-func NewCreditUsecase(CreditRepo repository.CreditRepository, BalanceRepo repository.BalanceRepository, Log *logrus.Logger, db *sql.DB) CreditUsecase {
-	return &CreditUsecaseImpl{CreditRepo: CreditRepo, BalanceRepo: BalanceRepo, Log: Log, db: db}
+func NewCreditUsecase(CreditRepo repository.CreditRepository, BalanceRepo repository.BalanceRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB) CreditUsecase {
+	return &CreditUsecaseImpl{CreditRepo: CreditRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db}
 }
 
 func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.CreditRepository, credit model.Credit) error {
@@ -212,15 +213,17 @@ func UpdateTotalBalanceOrCash(ctx context.Context, tx *sql.Tx,
 	creditRepo repository.CreditRepository,
 	BalanceRepo repository.BalanceRepository,
 	historyCredit model.HistoryCredit,
+	accountRepo repository.AccountRepository,
 	typePayment string,
-	uid string,
+	accountId string,
 	Log *logrus.Logger,
 ) error {
 	switch typePayment {
 	case util.DEBIT:
-		balance, err := BalanceRepo.GetBalance(ctx, tx, uid)
+		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		balance := account.Balance
 		if err != nil {
-			err = fmt.Errorf("failed get balance from uid %v", uid)
+			err = fmt.Errorf("failed get balance from user id %v", account.UserId)
 			return err
 		}
 		if balance < historyCredit.Total {
@@ -229,15 +232,16 @@ func UpdateTotalBalanceOrCash(ctx context.Context, tx *sql.Tx,
 		}
 		newBalance := balance - historyCredit.Total
 		Log.Infof("newbalance = %v, balance = %v, input = %v", newBalance, balance, historyCredit.Total)
-		err = BalanceRepo.SetBalance(ctx, tx, uid, newBalance)
+		err = accountRepo.UpdateAccountBalance(ctx, tx, model.UpdateAccountBalance{AccountId: accountId, Balance: newBalance})
 		if err != nil {
 			err = errors.New("failed update balance")
 			return err
 		}
 	case util.CASH:
-		cash, err := BalanceRepo.GetCash(ctx, tx, uid)
+		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		cash := account.Cash
 		if err != nil {
-			err = fmt.Errorf("failed get cash from uid %v", uid)
+			err = fmt.Errorf("failed get cash from user id %v", account.UserId)
 			return err
 		}
 		if cash < historyCredit.Total {
@@ -246,7 +250,7 @@ func UpdateTotalBalanceOrCash(ctx context.Context, tx *sql.Tx,
 		}
 		newCash := cash - historyCredit.Total
 		Log.Infof("newCash = %v, cash = %v, input = %v", newCash, cash, historyCredit.Total)
-		err = BalanceRepo.SetCash(ctx, tx, uid, newCash)
+		err = accountRepo.UpdateAccountCash(ctx, tx, model.UpdateAccountCash{AccountId: accountId, Cash: newCash})
 		if err != nil {
 			err = errors.New("failed update cash")
 			return err

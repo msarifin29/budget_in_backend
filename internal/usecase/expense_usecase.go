@@ -25,6 +25,7 @@ type ExpenseUsecase interface {
 type ExpenseUsecaseImpl struct {
 	ExpenseRepository repository.ExpenseRepository
 	BalanceRepository repository.BalanceRepository
+	AccountRepo       repository.AccountRepository
 	Log               *logrus.Logger
 	db                *sql.DB
 }
@@ -85,12 +86,12 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		return model.Expense{}, inputErr
 	}
 	if expense.ExpenseType == util.DEBIT {
-		err := NewBalance(ctx, tx, u.Log, u.BalanceRepository, util.SUCCESS, expense.Uid, req.Total)
+		err := util.NewBalance(ctx, tx, u.Log, u.AccountRepo, util.SUCCESS, expense.AccountId, req.Total)
 		if err != nil {
 			return model.Expense{}, err
 		}
 	} else if expense.ExpenseType == util.CASH {
-		err := NewCash(ctx, tx, u.Log, u.BalanceRepository, util.SUCCESS, expense.Uid, req.Total)
+		err := util.NewCash(ctx, tx, u.Log, u.AccountRepo, util.SUCCESS, expense.AccountId, req.Total)
 		if err != nil {
 			return model.Expense{}, err
 		}
@@ -164,12 +165,12 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 	}
 
 	if expense.ExpenseType == util.DEBIT && expense.ExpenseType == x.ExpenseType {
-		err := NewBalance(ctx, tx, u.Log, u.BalanceRepository, util.CANCELLED, x.Uid, x.Total)
+		err := util.NewBalance(ctx, tx, u.Log, u.AccountRepo, util.CANCELLED, expense.AccountId, x.Total)
 		if err != nil {
 			return false, err
 		}
 	} else if expense.ExpenseType == util.CASH && expense.ExpenseType == x.ExpenseType {
-		err := NewCash(ctx, tx, u.Log, u.BalanceRepository, util.CANCELLED, x.Uid, x.Total)
+		err := util.NewCash(ctx, tx, u.Log, u.AccountRepo, util.CANCELLED, expense.AccountId, x.Total)
 		if err != nil {
 			return false, err
 		}
@@ -196,11 +197,13 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 func NewExpenseUsecase(
 	ExpenseRepository repository.ExpenseRepository,
 	BalanceRepository repository.BalanceRepository,
+	AccountRepo repository.AccountRepository,
 	Log *logrus.Logger,
 	db *sql.DB) ExpenseUsecase {
 	return &ExpenseUsecaseImpl{
 		ExpenseRepository: ExpenseRepository,
 		BalanceRepository: BalanceRepository,
+		AccountRepo:       AccountRepo,
 		Log:               Log,
 		db:                db,
 	}

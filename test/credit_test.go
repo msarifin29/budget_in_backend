@@ -93,9 +93,10 @@ func TestUpdateHistoryCreditSuccess(t *testing.T) {
 
 	params := model.UpdateHistoryCreditRequest{
 		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
-		Id:          28,
-		CreditId:    7,
-		TypePayment: util.DEBIT,
+		Id:          7,
+		CreditId:    3,
+		TypePayment: util.CASH,
+		AccountId:   "96be-9b934ed0387f",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

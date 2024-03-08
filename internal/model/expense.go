@@ -22,14 +22,13 @@ type CreateExpenseRequest struct {
 	Category    string  `json:"category" binding:"required,category"`
 	Total       float64 `json:"total" binding:"required,min=2000"`
 	Notes       string  `json:"notes"`
+	AccountId   string  `json:"account_id" binding:"required"`
 }
 
 type UpdateExpenseRequest struct {
-	Id float64 `json:"id" binding:"required"`
-	// Status      string  `json:"status" binding:"required,status"`
-	ExpenseType string `json:"expense_type" binding:"required,expense_type"`
-	// Total float64 `json:"total" binding:"required,min=2000"`
-	// Notes       string  `json:"notes"`
+	Id          float64 `json:"id" binding:"required"`
+	ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
+	AccountId   string  `json:"account_id" binding:"required"`
 }
 
 type GetExpenseParams struct {

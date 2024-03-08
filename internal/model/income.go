@@ -16,6 +16,7 @@ type CreateIncomeRequest struct {
 	CategoryIncome string  `json:"category_income" binding:"required,category_income"`
 	TypeIncome     string  `json:"type_income" binding:"required,type_income"`
 	Total          float64 `json:"total" binding:"required,min=2000"`
+	AccountId      string  `json:"account_id" binding:"required"`
 }
 type GetIncomeParams struct {
 	Uid            string `json:"uid" binding:"required"`

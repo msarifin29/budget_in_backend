@@ -15,9 +15,17 @@ type AccountRepository interface {
 	UpdateAccountName(ctx context.Context, tx *sql.Tx, account model.UpdateAccountName) error
 	UpdateAccountBalance(ctx context.Context, tx *sql.Tx, account model.UpdateAccountBalance) error
 	UpdateAccountCash(ctx context.Context, tx *sql.Tx, account model.UpdateAccountCash) error
+	UpdateAccountDebts(ctx context.Context, tx *sql.Tx, account model.UpdateAccountDebts) error
 }
 
 type AccountRepositoryImpl struct{}
+
+// UpdateAccountDebts implements AccountRepository.
+func (AccountRepositoryImpl) UpdateAccountDebts(ctx context.Context, tx *sql.Tx, account model.UpdateAccountDebts) error {
+	script := `update accounts set debts = ? where account_id = ?`
+	_, err := tx.ExecContext(ctx, script, account.Debts, account.AccountId)
+	return err
+}
 
 // CreateAccount implements AccountRepository.
 func (AccountRepositoryImpl) CreateAccount(ctx context.Context, tx *sql.Tx, account model.Account) (model.Account, error) {
@@ -37,10 +45,10 @@ func (AccountRepositoryImpl) CreateAccount(ctx context.Context, tx *sql.Tx, acco
 
 // GetAccountByUserId implements AccountRepository.
 func (AccountRepositoryImpl) GetAccountByUserId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error) {
-	script := `select * from accounts where user_id = ? and account_id = ?`
-	row := tx.QueryRowContext(ctx, script, account.UserId, account.AccountId)
+	script := `select * from accounts where account_id = ?`
+	row := tx.QueryRowContext(ctx, script, account.AccountId)
 	var i model.Account
-	update := zero.TimeFromPtr(&i.UpdatedAt)
+	update := zero.TimeFrom(i.UpdatedAt)
 	err := row.Scan(
 		&i.UserId,
 		&i.AccountId,
@@ -92,22 +100,22 @@ func (AccountRepositoryImpl) GetAllAccount(ctx context.Context, tx *sql.Tx, user
 
 // UpdateAccountBalance implements AccountRepository.
 func (AccountRepositoryImpl) UpdateAccountBalance(ctx context.Context, tx *sql.Tx, account model.UpdateAccountBalance) error {
-	script := `update accounts set balance = ? where user_id = ? and account_id = ?`
-	_, err := tx.ExecContext(ctx, script, account.Balance, account.UserId, account.AccountId)
+	script := `update accounts set balance = ? where account_id = ?`
+	_, err := tx.ExecContext(ctx, script, account.Balance, account.AccountId)
 	return err
 }
 
 // UpdateAccountCash implements AccountRepository.
 func (AccountRepositoryImpl) UpdateAccountCash(ctx context.Context, tx *sql.Tx, account model.UpdateAccountCash) error {
-	script := `update accounts set cash = ? where user_id = ? and account_id = ?`
-	_, err := tx.ExecContext(ctx, script, account.Cash, account.UserId, account.AccountId)
+	script := `update accounts set cash = ? where account_id = ?`
+	_, err := tx.ExecContext(ctx, script, account.Cash, account.AccountId)
 	return err
 }
 
 // UpdateAccountName implements AccountRepository.
 func (AccountRepositoryImpl) UpdateAccountName(ctx context.Context, tx *sql.Tx, account model.UpdateAccountName) error {
-	script := `update accounts set account_name = ? where user_id = ? and account_id = ?`
-	_, err := tx.ExecContext(ctx, script, account.AccountName, account.UserId, account.AccountId)
+	script := `update accounts set account_name = ? where account_id = ?`
+	_, err := tx.ExecContext(ctx, script, account.AccountName, account.AccountId)
 	return err
 }
 

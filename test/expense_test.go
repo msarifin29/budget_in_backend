@@ -19,17 +19,18 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateExpenseRequest{
-		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
+		Uid:         "fadab647-cf23-46fc-bd4d-e7d06d32d753",
 		ExpenseType: util.DEBIT,
 		Total:       2500,
 		Category:    util.OTHER,
+		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -65,6 +66,7 @@ func TestCreateExpenseUnAuthorized(t *testing.T) {
 		ExpenseType: util.CASH,
 		Total:       45000,
 		Category:    util.OTHER,
+		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -114,15 +116,16 @@ func TestUpdateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:          19,
+		Id:          90,
 		ExpenseType: util.DEBIT,
+		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/expenses/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)

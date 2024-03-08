@@ -22,21 +22,21 @@ type CreateAccountRequest struct {
 	Currency    string  `json:"currency" binding:"required,currency"`
 }
 type GetAccountRequest struct {
-	UserId    string `json:"user_id" binding:"required"`
 	AccountId string `json:"account_id" binding:"required"`
 }
 type UpdateAccountBalance struct {
-	UserId    string  `json:"user_id" binding:"required"`
 	AccountId string  `json:"account_id" binding:"required"`
 	Balance   float64 `json:"balance" binding:"required,min=2000"`
 }
 type UpdateAccountCash struct {
-	UserId    string  `json:"user_id" binding:"required"`
 	AccountId string  `json:"account_id" binding:"required"`
 	Cash      float64 `json:"cash" binding:"required,min=2000"`
 }
+type UpdateAccountDebts struct {
+	AccountId string  `json:"account_id" binding:"required"`
+	Debts     float64 `json:"debts" binding:"required,min=2000"`
+}
 type UpdateAccountName struct {
-	UserId      string `json:"user_id" binding:"required"`
 	AccountId   string `json:"account_id" binding:"required"`
 	AccountName string `json:"account_name" binding:"required"`
 }

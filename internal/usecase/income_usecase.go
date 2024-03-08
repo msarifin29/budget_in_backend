@@ -22,6 +22,7 @@ type IncomeUsecase interface {
 type IncomeUsecaseImpl struct {
 	IncomeRepo  repository.IncomeRepository
 	BalanceRepo repository.BalanceRepository
+	AccountRepo repository.AccountRepository
 	Log         *logrus.Logger
 	db          *sql.DB
 }
@@ -54,7 +55,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		TypeIncome:     params.TypeIncome,
 		Total:          params.Total,
 	}
-	err := NewIncome(ctx, tx, u.BalanceRepo, u.Log, params.TypeIncome, params.Uid, params.Total)
+	err := NewIncome(ctx, tx, u.AccountRepo, u.Log, params.TypeIncome, params.AccountId, params.Total)
 	if err != nil {
 		return model.IncomeResponse{}, err
 	}
@@ -92,16 +93,17 @@ func (u *IncomeUsecaseImpl) GetIncomes(ctx context.Context, params model.GetInco
 	return incomes, total, nil
 }
 
-func NewIncomeUsecase(IncomeRepo repository.IncomeRepository, BalanceRepo repository.BalanceRepository, Log *logrus.Logger, db *sql.DB) IncomeUsecase {
-	return &IncomeUsecaseImpl{IncomeRepo: IncomeRepo, BalanceRepo: BalanceRepo, Log: Log, db: db}
+func NewIncomeUsecase(IncomeRepo repository.IncomeRepository, BalanceRepo repository.BalanceRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB) IncomeUsecase {
+	return &IncomeUsecaseImpl{IncomeRepo: IncomeRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db}
 }
 
-func NewIncome(ctx context.Context, tx *sql.Tx, balanceRepo repository.BalanceRepository, Log *logrus.Logger, typeIncome string, uid string, input float64) error {
+func NewIncome(ctx context.Context, tx *sql.Tx, accountRepo repository.AccountRepository, Log *logrus.Logger, typeIncome string, accountId string, input float64) error {
 	var newCash, newDebit float64
 
 	switch typeIncome {
 	case util.CASH:
-		cash, err := balanceRepo.GetCash(ctx, tx, uid)
+		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		cash := account.Cash
 		if err != nil {
 			err = errors.New("failed get cash")
 			Log.Error(err)
@@ -114,14 +116,15 @@ func NewIncome(ctx context.Context, tx *sql.Tx, balanceRepo repository.BalanceRe
 		}
 		newCash = cash + input
 		Log.Infof("newCash = %v, cash = %v, input = %v", newCash, cash, input)
-		err = balanceRepo.SetCash(ctx, tx, uid, newCash)
+		err = accountRepo.UpdateAccountCash(ctx, tx, model.UpdateAccountCash{AccountId: accountId, Cash: newCash})
 		if err != nil {
 			err = errors.New("failed update cash")
 			Log.Error(err)
 			return err
 		}
 	case util.DEBIT:
-		debit, err := balanceRepo.GetBalance(ctx, tx, uid)
+		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		debit := account.Balance
 		if err != nil {
 			err = errors.New("failed get debit")
 			Log.Error(err)
@@ -134,7 +137,7 @@ func NewIncome(ctx context.Context, tx *sql.Tx, balanceRepo repository.BalanceRe
 		}
 		newDebit = debit + input
 		Log.Infof("newdebit = %v, debit = %v, input = %v", newDebit, debit, input)
-		err = balanceRepo.SetBalance(ctx, tx, uid, newDebit)
+		err = accountRepo.UpdateAccountBalance(ctx, tx, model.UpdateAccountBalance{AccountId: accountId, Balance: newDebit})
 		if err != nil {
 			err = errors.New("failed update debit")
 			Log.Error(err)

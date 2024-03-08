@@ -80,6 +80,7 @@ func (c *CreditController) UpdateCreditHistory(ctx *gin.Context) {
 		CreditId:    req.CreditId,
 		Status:      util.COMPLETED,
 		TypePayment: req.TypePayment,
+		AccountId:   req.AccountId,
 	}
 	res, err := c.CreditUsecase.UpdateHistoryCredit(ctx, params)
 	if err != nil {

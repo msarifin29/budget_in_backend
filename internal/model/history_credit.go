@@ -27,12 +27,14 @@ type UpdateHistoryCreditParams struct {
 	Id          float64 `json:"id" binding:"required"`
 	Status      string  `json:"status" binding:"required,status_credit"`
 	TypePayment string  `json:"type_payment" binding:"required,expense_type"`
+	AccountId   string  `json:"account_id" binding:"required"`
 }
 type UpdateHistoryCreditRequest struct {
 	Uid         string  `json:"uid" binding:"required"`
 	CreditId    float64 `json:"credit_id" binding:"required"`
 	Id          float64 `json:"id" binding:"required"`
 	TypePayment string  `json:"type_payment" binding:"required,expense_type"`
+	AccountId   string  `json:"account_id" binding:"required"`
 }
 type GetHistoryCreditRequest struct {
 	Uid string  `json:"uid" binding:"required"`
