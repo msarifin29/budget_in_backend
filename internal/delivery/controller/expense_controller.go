@@ -186,3 +186,42 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 			Data:    res,
 		})
 }
+func (c *ExpenseController) GetExpensesByMonth(ctx *gin.Context) {
+	var req model.MonthlyRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		c.Log.Errorf("failed binding request query with %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	params := model.MonthlyParams{
+		Uid:   authPayload.Uid,
+		Year:  req.Year,
+		Month: req.Month,
+	}
+	valid := util.IsValidYearMonth(req.Year, req.Month)
+	if !valid {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: errors.New("invalid input year or month").Error(),
+		})
+		return
+	}
+
+	total, err := c.Usecase.GetExpensesByMonth(ctx, params)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    total,
+	})
+}

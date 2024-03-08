@@ -12,9 +12,41 @@ type IncomeRepository interface {
 	CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error)
 	GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.Income, error)
 	GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string) (float64, error)
+	GetIncomesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Income, error)
 }
 
 type IncomeRepositoryImpl struct{}
+
+// GetIncomesByMonth implements IncomeRepository.
+func (*IncomeRepositoryImpl) GetIncomesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Income, error) {
+	script := `SELECT uid,id,category_income,total,created_at,type_income
+	from incomes where uid = ?
+	AND YEAR(created_at) = ? AND MONTH(created_at) = ?`
+	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Year, params.Month)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	incomes := []model.Income{}
+	for rows.Next() {
+		var i model.Income
+		if err := rows.Scan(
+			&i.Uid,
+			&i.Id,
+			&i.CategoryIncome,
+			&i.Total,
+			&i.CreatedAt,
+			&i.TypeIncome,
+		); err != nil {
+			return nil, err
+		}
+		incomes = append(incomes, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return incomes, nil
+}
 
 // GetTotalIncomes implements IncomeRepository.
 func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string) (float64, error) {

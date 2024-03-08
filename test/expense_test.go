@@ -245,3 +245,48 @@ func TestGetExpensesInvalidInputTotalPage(t *testing.T) {
 	assert.Equal(t, "Success", res.Message)
 	assert.NotEmpty(t, res.Data)
 }
+
+func TestGetExpensesByMonthSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.MonthlyRequest{Year: "2024", Month: "03"}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/monthly_report/", nil)
+	// Add query parameters to request URL
+	q := req.URL.Query()
+	q.Add("year", fmt.Sprintf("%v", params.Year))
+	q.Add("month", fmt.Sprintf("%v", params.Month))
+	req.URL.RawQuery = q.Encode()
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "akainu", "deb3823d-5581-4e98-896c-06e5aa3bac4a", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body : ", string(bytes))
+	assert.Nil(t, err)
+	var res model.MetaResponse
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res.Message)
+	assert.NotEmpty(t, res.Data)
+}
+
+func TestGetExpensesByMonthFailed(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.MonthlyRequest{Year: "2024", Month: "13"}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/monthly_report/", nil)
+	// Add query parameters to request URL
+	q := req.URL.Query()
+	q.Add("year", fmt.Sprintf("%v", params.Year))
+	q.Add("month", fmt.Sprintf("%v", params.Month))
+	req.URL.RawQuery = q.Encode()
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "akainu", "deb3823d-5581-4e98-896c-06e5aa3bac4a", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body : ", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}

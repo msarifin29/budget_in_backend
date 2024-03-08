@@ -99,10 +99,12 @@ func (server *Server) setupRoute() {
 	autRoutes.PUT("api/expenses/update", server.ExpenseC.UpdateExpense)
 	autRoutes.DELETE("api/expenses/:id", server.ExpenseC.DeleteExpense)
 	autRoutes.GET("api/expenses/", server.ExpenseC.GetExpenses)
+	autRoutes.GET("api/expenses/monthly_report/", server.ExpenseC.GetExpensesByMonth)
 
 	// Incomes
 	autRoutes.POST("/api/incomes/create", server.IncomeC.CreateIncome)
 	autRoutes.GET("/api/incomes/", server.IncomeC.GetIncomes)
+	autRoutes.GET("/api/incomes/monthly_report/", server.IncomeC.GetIncomesByMonth)
 
 	// Credits
 	autRoutes.POST("/api/credits/create", server.CreditC.CreateCredit)

@@ -16,6 +16,7 @@ import (
 type IncomeUsecase interface {
 	CreateIncome(ctx context.Context, params model.CreateIncomeRequest) (model.IncomeResponse, error)
 	GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.Income, float64, error)
+	GetIncomesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error)
 }
 
 type IncomeUsecaseImpl struct {
@@ -23,6 +24,24 @@ type IncomeUsecaseImpl struct {
 	BalanceRepo repository.BalanceRepository
 	Log         *logrus.Logger
 	db          *sql.DB
+}
+
+// GetIncomesByMonth implements IncomeUsecase.
+func (u *IncomeUsecaseImpl) GetIncomesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error) {
+	var totalIncomes float64
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	expenses, err := u.IncomeRepo.GetIncomesByMonth(ctx, tx, params)
+	if err != nil {
+		u.Log.Error(err)
+		err = errors.New("failed get incomes")
+		return 0, err
+	}
+	for _, ex := range expenses {
+		totalIncomes += ex.Total
+	}
+	return totalIncomes, nil
 }
 
 // CreateIncome implements IncomeUsecase.
