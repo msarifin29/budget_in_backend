@@ -18,12 +18,12 @@ func TestCreateUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateUserRequest{
-		UserName: "samsul",
-		Email:    "samsul@mail.com",
+		UserName: "sakura",
+		Email:    "sakura@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  20000,
-		Savings:  20000,
+		Savings:  0,
 		Cash:     20000,
 		Debts:    0,
 		Currency: "IDR",

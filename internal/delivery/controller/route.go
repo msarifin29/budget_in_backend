@@ -19,6 +19,8 @@ func (server *Server) SetUpRoute() {
 
 	autRoutes := router.Group("/").Use(delivery.AuthMiddleware(server.TokenMaker))
 
+	autRoutes.POST("/api/accounts/create", server.AccountC.CreateAccount)
+
 	autRoutes.GET("/api/user/:uid", server.UserC.GetById)
 	autRoutes.PUT("/api/update", server.UserC.UpdateUser)
 

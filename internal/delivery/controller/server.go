@@ -20,6 +20,7 @@ type Server struct {
 	ExpenseC   ExpenseController
 	IncomeC    IncomeController
 	CreditC    CreditController
+	AccountC   AccountController
 }
 
 func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
@@ -36,18 +37,21 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	balanceRepo := repository.NewBalanceRepository()
 	incomeRepo := repository.NewIncomeRepository()
 	creditRepo := repository.NewCreditRepository()
+	accountRepo := repository.NewAccountRepository()
 
 	// Usecases
 	userUsecase := usecase.NewUserUsecase(userRepo, Log, db, Con)
 	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, Log, db)
 	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, Log, db)
 	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, Log, db)
+	accountUsacase := usecase.NewAccountUsacase(accountRepo, Log, db)
 
 	// Controller
 	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
 	expenseController := NewExpenseController(expenseUseCase, Log)
 	incomeController := NewIncomeController(incomeUsecase, Log)
 	creditController := NewCreditController(creditUsecase, Log)
+	accountController := NewAccountController(accountUsacase, Log)
 
 	server := &Server{
 		Log:        Log,
@@ -57,6 +61,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		ExpenseC:   *expenseController,
 		IncomeC:    *incomeController,
 		CreditC:    *creditController,
+		AccountC:   *accountController,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
