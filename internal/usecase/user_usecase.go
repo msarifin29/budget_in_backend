@@ -31,13 +31,14 @@ type UserUsecase interface {
 
 type UserUsecaseImpl struct {
 	UserRepository repository.UserRepository
+	AccountRepo    repository.AccountRepository
 	Log            *logrus.Logger
 	db             *sql.DB
 	conf           config.Config
 }
 
-func NewUserUsecase(UserRepository repository.UserRepository, Log *logrus.Logger, db *sql.DB, conf config.Config) UserUsecase {
-	return &UserUsecaseImpl{UserRepository: UserRepository, Log: Log, db: db, conf: conf}
+func NewUserUsecase(UserRepository repository.UserRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, conf config.Config) UserUsecase {
+	return &UserUsecaseImpl{UserRepository: UserRepository, AccountRepo: AccountRepo, Log: Log, db: db, conf: conf}
 }
 
 func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserRequest) (model.UserResponse, error) {
@@ -75,7 +76,21 @@ func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserR
 		u.Log.Errorf("failed create user %e :", reqErr)
 		return res, reqErr
 	}
-
+	reqAccount := model.Account{
+		UserId:      req.Uid,
+		AccountId:   uuid.NewString(),
+		AccountName: "",
+		Balance:     user.Balance,
+		Cash:        user.Cash,
+		Debts:       0,
+		Savings:     0,
+		Currency:    "IDR",
+	}
+	_, err = u.AccountRepo.CreateAccount(ctx, tx, reqAccount)
+	if err != nil {
+		u.Log.Errorf("failed create account %e :", err)
+		return res, err
+	}
 	return model.UserResponse{Uid: req.Uid, UserName: req.UserName}, nil
 }
 

@@ -18,14 +18,12 @@ func TestCreateUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateUserRequest{
-		UserName: "sakura",
-		Email:    "sakura@mail.com",
+		UserName: "jay",
+		Email:    "jay@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  20000,
-		Savings:  0,
 		Cash:     20000,
-		Debts:    0,
 		Currency: "IDR",
 	}
 	body, err := json.Marshal(params)
