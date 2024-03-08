@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"github.com/msarifin29/be_budget_in/internal/config"
-	delivery "github.com/msarifin29/be_budget_in/internal/delivery/middleware"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/internal/usecase"
 	"github.com/msarifin29/be_budget_in/util"
@@ -73,45 +72,8 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		v.RegisterValidation("category_credit", util.ValidCategoryCredit)
 	}
 
-	server.setupRoute()
+	server.SetUpRoute()
 	return server, nil
-}
-
-func (server *Server) setupRoute() {
-
-	router := gin.Default()
-
-	binding.Validator.Engine()
-
-	router.POST("/api/register", server.UserC.CreateUser)
-	router.POST("/api/login", server.UserC.LoginUser)
-
-	router.POST("/api/user/forgot_password", server.UserC.ForgotPassword)
-
-	autRoutes := router.Group("/").Use(delivery.AuthMiddleware(server.TokenMaker))
-
-	autRoutes.GET("/api/user/:uid", server.UserC.GetById)
-	autRoutes.PUT("/api/update", server.UserC.UpdateUser)
-
-	// Expense
-	autRoutes.POST("api/expenses/create", server.ExpenseC.CreateExpense)
-	autRoutes.GET("api/expenses/:id", server.ExpenseC.GetExpenseById)
-	autRoutes.PUT("api/expenses/update", server.ExpenseC.UpdateExpense)
-	autRoutes.DELETE("api/expenses/:id", server.ExpenseC.DeleteExpense)
-	autRoutes.GET("api/expenses/", server.ExpenseC.GetExpenses)
-	autRoutes.GET("api/expenses/monthly_report/", server.ExpenseC.GetExpensesByMonth)
-
-	// Incomes
-	autRoutes.POST("/api/incomes/create", server.IncomeC.CreateIncome)
-	autRoutes.GET("/api/incomes/", server.IncomeC.GetIncomes)
-	autRoutes.GET("/api/incomes/monthly_report/", server.IncomeC.GetIncomesByMonth)
-
-	// Credits
-	autRoutes.POST("/api/credits/create", server.CreditC.CreateCredit)
-	autRoutes.PUT("/api/credits/update_history", server.CreditC.UpdateCreditHistory)
-	autRoutes.GET("/api/credits/", server.CreditC.GetAllCredit)
-	autRoutes.GET("/api/histories_credits/", server.CreditC.GetAllHistoriesCredit)
-	server.Engine = router
 }
 
 func (server *Server) Start(address string) error {
