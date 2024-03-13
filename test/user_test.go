@@ -18,8 +18,8 @@ func TestCreateUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateUserRequest{
-		UserName: "jay",
-		Email:    "jay@mail.com",
+		UserName: "jaya",
+		Email:    "jaya@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  20000,
@@ -195,16 +195,17 @@ func TestUnAuthorizationUser(t *testing.T) {
 func TestGetUserByIdSuccess(t *testing.T) {
 	router := NewTestServer(t)
 	user := model.UserRequest{
-		Uid: "f1687230-49d3-4657-96be-9b934ed0387f",
+		Uid: "9b9821be-a211-46f1-b07e-c53181068f09",
 	}
 
 	w := httptest.NewRecorder()
 	url := fmt.Sprintf("/api/user/%s", user.Uid)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "9b9821be-a211-46f1-b07e-c53181068f09", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("account :", string(bytes))
 	assert.Nil(t, err)
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)

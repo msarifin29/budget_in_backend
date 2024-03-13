@@ -16,7 +16,7 @@ type User struct {
 	Balance   float64   `json:"balance"`
 	Savings   float64   `json:"savings"`
 	Cash      float64   `json:"cash"`
-	Debts     float64   `json:"Debts"`
+	Debts     float64   `json:"debts"`
 	Currency  string    `json:"currency"`
 }
 
@@ -28,7 +28,7 @@ type CreateUserRequest struct {
 	Balance  float64 `json:"balance" binding:"required"`
 	Savings  float64 `json:"savings"`
 	Cash     float64 `json:"cash" binding:"required"`
-	Debts    float64 `json:"Debts"`
+	Debts    float64 `json:"debts"`
 	Currency string  `json:"currency"`
 }
 
@@ -58,7 +58,7 @@ type UserProfileResponse struct {
 	Balance   float64   `json:"balance"`
 	Savings   float64   `json:"savings"`
 	Cash      float64   `json:"cash"`
-	Debts     float64   `json:"Debts"`
+	Debts     float64   `json:"debts"`
 	Currency  string    `json:"currency"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

@@ -140,9 +140,9 @@ func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.User, 
 
 	defer util.CommitOrRollback(tx)
 
-	user, err := u.UserRepository.GetById(ctx, tx, uid)
+	user, err := u.UserRepository.GetUserAccount(ctx, tx, uid)
 	if err != nil {
-		u.Log.Errorf("user not found with id %s :", uid)
+		u.Log.Errorf("user not found with id %s :", err)
 		message := "user not found with id :" + uid
 		return model.User{}, errors.New(message)
 	}
