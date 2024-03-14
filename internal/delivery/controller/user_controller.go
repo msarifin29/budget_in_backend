@@ -182,22 +182,11 @@ func (c *UserController) GetById(ctx *gin.Context) {
 		})
 		return
 	}
-	profile := model.UserProfileResponse{
-		Uid:      user.Uid,
-		UserName: user.UserName,
-		Email:    user.Email,
-		Photo:    user.Photo,
-		TypeUser: user.TypeUser,
-		Balance:  user.Balance,
-		Savings:  user.Savings,
-		Cash:     user.Cash,
-		Debts:    user.Debts,
-		Currency: user.Currency,
-	}
+
 	ctx.JSON(http.StatusOK, model.MetaResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
-		Data:    profile,
+		Data:    user,
 	})
 }
 

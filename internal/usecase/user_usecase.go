@@ -25,7 +25,7 @@ type UserUsecase interface {
 	CreateUser(ctx context.Context, user model.CreateUserRequest) (model.UserResponse, error)
 	GetUser(ctx context.Context, user model.LoginUserRequest) (model.UserResponse, error)
 	UpdateUser(ctx context.Context, user model.UpdateUserRequest) error
-	GetById(ctx context.Context, uid string) (model.User, error)
+	GetById(ctx context.Context, uid string) (model.AccountUser, error)
 	ResetPassword(ctx context.Context, req model.EmailUserRequest) (bool, error)
 }
 
@@ -135,7 +135,7 @@ func (u *UserUsecaseImpl) UpdateUser(ctx context.Context, user model.UpdateUserR
 	return nil
 }
 
-func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.User, error) {
+func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.AccountUser, error) {
 	tx, _ := u.db.Begin()
 
 	defer util.CommitOrRollback(tx)
@@ -144,7 +144,7 @@ func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.User, 
 	if err != nil {
 		u.Log.Errorf("user not found with id %s :", err)
 		message := "user not found with id :" + uid
-		return model.User{}, errors.New(message)
+		return model.AccountUser{}, errors.New(message)
 	}
 	return user, nil
 }

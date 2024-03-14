@@ -63,6 +63,21 @@ type UserProfileResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+type AccountUser struct {
+	Uid       string    `json:"uid"`
+	AccountId string    `json:"account_id"`
+	UserName  string    `json:"username"`
+	Email     string    `json:"email"`
+	Photo     string    `json:"photo"`
+	TypeUser  string    `json:"type_user"`
+	Balance   float64   `json:"balance"`
+	Savings   float64   `json:"savings"`
+	Cash      float64   `json:"cash"`
+	Debts     float64   `json:"debts"`
+	Currency  string    `json:"currency"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
 
 type UpdateUserRequest struct {
 	Uid      string `json:"uid" binding:"required"`
