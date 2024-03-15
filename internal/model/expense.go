@@ -19,7 +19,7 @@ type Expense struct {
 type CreateExpenseRequest struct {
 	Uid         string  `json:"uid" binding:"required"`
 	ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
-	Category    string  `json:"category" binding:"required,category"`
+	Category    string  `json:"category" binding:"required,category_expense"`
 	Total       float64 `json:"total" binding:"required,min=2000"`
 	Notes       string  `json:"notes"`
 	AccountId   string  `json:"account_id" binding:"required"`

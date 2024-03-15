@@ -38,22 +38,21 @@ var ValidStatusHistoryCredit validator.Func = func(fieldLevel validator.FieldLev
 }
 
 //  Constants for all supported category credit
-const (
-	ELECTRONIC     = "electronic"
-	SMARTPHONE     = "smathphone"
-	LAPTOP         = "laptop"
-	COMPUTER       = "computer"
-	MOTORCYCLE     = "motorcycle"
-	CAR            = "car"
-	PROPERTY       = "property"
-	FURNITURE      = "furniture"
-	KITCHENSET     = "kitchen set"
-	VENTURECAPITAL = "venture capital"
+const ( // other id 1
+	ELECTRONIC        = "electronic"          // id 2
+	HANDTPHONE        = "handphone"           // id 3
+	COMPUTERANDLAPTOP = "computer and laptop" // id 4
+	MOTORCYCLE        = "motorcycle"          // id 5
+	CAR               = "car"                 // id 6
+	PROPERTY          = "property"            // id 7
+	FURNITURE         = "furniture"           // id 8
+	KITCHENSET        = "kitchen set"         // id 9
+	VENTURECAPITAL    = "venture capital"     // id 10
 )
 
 func IsSupportedCategoryCredit(status string) bool {
 	switch status {
-	case ELECTRONIC, SMARTPHONE, LAPTOP, COMPUTER, MOTORCYCLE, CAR, PROPERTY, FURNITURE, KITCHENSET, VENTURECAPITAL:
+	case ELECTRONIC, HANDTPHONE, COMPUTERANDLAPTOP, MOTORCYCLE, CAR, PROPERTY, FURNITURE, KITCHENSET, VENTURECAPITAL, OTHER:
 		return true
 	}
 	return false

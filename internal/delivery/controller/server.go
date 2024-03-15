@@ -75,6 +75,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		v.RegisterValidation("type_credit", util.ValidTypeCredit)
 		v.RegisterValidation("status_credit", util.ValidStatusHistoryCredit)
 		v.RegisterValidation("category_credit", util.ValidCategoryCredit)
+		v.RegisterValidation("category_expense", util.ValidCategoryExpense)
 	}
 
 	server.SetUpRoute()
