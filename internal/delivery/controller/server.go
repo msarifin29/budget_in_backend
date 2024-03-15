@@ -12,15 +12,16 @@ import (
 )
 
 type Server struct {
-	Log        *logrus.Logger
-	Engine     *gin.Engine
-	Con        config.Config
-	TokenMaker util.Maker
-	UserC      UserController
-	ExpenseC   ExpenseController
-	IncomeC    IncomeController
-	CreditC    CreditController
-	AccountC   AccountController
+	Log          *logrus.Logger
+	Engine       *gin.Engine
+	Con          config.Config
+	TokenMaker   util.Maker
+	UserC        UserController
+	ExpenseC     ExpenseController
+	IncomeC      IncomeController
+	CreditC      CreditController
+	AccountC     AccountController
+	MonthReportC MonthlyReportController
 }
 
 func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
@@ -38,6 +39,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	incomeRepo := repository.NewIncomeRepository()
 	creditRepo := repository.NewCreditRepository()
 	accountRepo := repository.NewAccountRepository()
+	monthlyRepo := repository.NewMonthlyRepository()
 
 	// Usecases
 	userUsecase := usecase.NewUserUsecase(userRepo, accountRepo, Log, db, Con)
@@ -45,6 +47,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, accountRepo, Log, db)
 	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, accountRepo, Log, db)
 	accountUsacase := usecase.NewAccountUsacase(accountRepo, Log, db)
+	monthlyUsecase := usecase.NewMonthlyReportUsecase(monthlyRepo, Log, db)
 
 	// Controller
 	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
@@ -52,16 +55,18 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	incomeController := NewIncomeController(incomeUsecase, Log)
 	creditController := NewCreditController(creditUsecase, Log)
 	accountController := NewAccountController(accountUsacase, Log)
+	monthlyController := NewMonthlyController(monthlyUsecase, Log)
 
 	server := &Server{
-		Log:        Log,
-		Con:        Con,
-		TokenMaker: tokenMaker,
-		UserC:      *userController,
-		ExpenseC:   *expenseController,
-		IncomeC:    *incomeController,
-		CreditC:    *creditController,
-		AccountC:   *accountController,
+		Log:          Log,
+		Con:          Con,
+		TokenMaker:   tokenMaker,
+		UserC:        *userController,
+		ExpenseC:     *expenseController,
+		IncomeC:      *incomeController,
+		CreditC:      *creditController,
+		AccountC:     *accountController,
+		MonthReportC: *monthlyController,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {

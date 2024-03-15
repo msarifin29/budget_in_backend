@@ -23,6 +23,8 @@ func (server *Server) SetUpRoute() {
 
 	autRoutes.GET("/api/user/:uid", server.UserC.GetById)
 	autRoutes.PUT("/api/update", server.UserC.UpdateUser)
+	// Monthly reports
+	autRoutes.GET("/api/user/monthly_report/", server.MonthReportC.GetMonthlyReport)
 
 	// Expense
 	autRoutes.POST("api/expenses/create", server.ExpenseC.CreateExpense)
@@ -30,12 +32,12 @@ func (server *Server) SetUpRoute() {
 	autRoutes.PUT("api/expenses/update", server.ExpenseC.UpdateExpense)
 	autRoutes.DELETE("api/expenses/:id", server.ExpenseC.DeleteExpense)
 	autRoutes.GET("api/expenses/", server.ExpenseC.GetExpenses)
-	autRoutes.GET("api/expenses/monthly_report/", server.ExpenseC.GetExpensesByMonth)
+	autRoutes.GET("api/expenses/monthly_report/", server.ExpenseC.GetExpensesByMonth) //not used will be remove later
 
 	// Incomes
 	autRoutes.POST("/api/incomes/create", server.IncomeC.CreateIncome)
 	autRoutes.GET("/api/incomes/", server.IncomeC.GetIncomes)
-	autRoutes.GET("/api/incomes/monthly_report/", server.IncomeC.GetIncomesByMonth)
+	autRoutes.GET("/api/incomes/monthly_report/", server.IncomeC.GetIncomesByMonth) //not used will be remove later
 
 	// Credits
 	autRoutes.POST("/api/credits/create", server.CreditC.CreateCredit)
