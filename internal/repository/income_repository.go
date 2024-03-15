@@ -78,7 +78,7 @@ func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params 
 	defer rows.Close()
 	incomes := []model.Income{}
 	var i model.Income
-	update := zero.TimeFromPtr(&i.UpdatedAt)
+	update := zero.TimeFromPtr(i.UpdatedAt)
 	for rows.Next() {
 		err := rows.Scan(
 			&i.Uid,

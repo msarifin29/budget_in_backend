@@ -3,17 +3,17 @@ package model
 import "time"
 
 type Credit struct {
-	Uid            string    `json:"uid"`
-	Id             float64   `json:"id"`
-	CategoryCredit string    `json:"category_credit"`
-	TypeCredit     string    `json:"type_credit"`
-	Total          float64   `json:"total"`
-	LoanTerm       float64   `json:"loan_term"`
-	PaymentTime    int       `json:"payment_time"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-	StatusCredit   string    `json:"status_credit"`
-	Installment    float64   `json:"installment"`
+	Uid            string     `json:"uid"`
+	Id             float64    `json:"id"`
+	CategoryCredit string     `json:"category_credit"`
+	TypeCredit     string     `json:"type_credit"`
+	Total          float64    `json:"total"`
+	LoanTerm       float64    `json:"loan_term"`
+	PaymentTime    int        `json:"payment_time"`
+	CreatedAt      *time.Time `json:"created_at"`
+	UpdatedAt      *time.Time `json:"updated_at"`
+	StatusCredit   string     `json:"status_credit"`
+	Installment    float64    `json:"installment"`
 }
 type CreateCreditRequest struct {
 	Uid            string  `json:"uid" binding:"required"`

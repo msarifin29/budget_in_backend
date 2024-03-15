@@ -3,15 +3,15 @@ package model
 import "time"
 
 type HistoryCredit struct {
-	CreditId    float64   `json:"credit_id"`
-	Id          float64   `json:"id"`
-	Th          float64   `json:"th"`
-	Total       float64   `json:"total"`
-	Status      string    `json:"status"`
-	TypePayment string    `json:"type_payment"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	PaymentTime int       `json:"payment_time"`
+	CreditId    float64    `json:"credit_id"`
+	Id          float64    `json:"id"`
+	Th          float64    `json:"th"`
+	Total       float64    `json:"total"`
+	Status      string     `json:"status"`
+	TypePayment string     `json:"type_payment"`
+	CreatedAt   *time.Time `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
+	PaymentTime int        `json:"payment_time"`
 }
 type CreateHistoryCredit struct {
 	CreditId    float64 `json:"credit_id" binding:"required"`
@@ -52,12 +52,12 @@ type GetHistoriesCreditsRequest struct {
 }
 
 type UpdateHistoryResponse struct {
-	Id          float64   `json:"id"`
-	Th          float64   `json:"th"`
-	Total       float64   `json:"total"`
-	Status      string    `json:"status"`
-	TypePayment string    `json:"type_payment"`
-	CreatedAt   time.Time `json:"created_at"`
+	Id          float64    `json:"id"`
+	Th          float64    `json:"th"`
+	Total       float64    `json:"total"`
+	Status      string     `json:"status"`
+	TypePayment string     `json:"type_payment"`
+	CreatedAt   *time.Time `json:"created_at"`
 }
 
 func NewHistoryCredit(history HistoryCredit) *HistoryCredit {

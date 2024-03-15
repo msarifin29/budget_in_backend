@@ -71,7 +71,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		v.RegisterValidation("category", util.ValidCategoryType)
 		v.RegisterValidation("status", util.ValidStatusType)
 		v.RegisterValidation("type_income", util.ValidIncomeType)
-		v.RegisterValidation("category_income", util.ValidCategoryIncome)
+		v.RegisterValidation("category_income", util.ValidCategoryType)
 		v.RegisterValidation("type_credit", util.ValidTypeCredit)
 		v.RegisterValidation("status_credit", util.ValidStatusHistoryCredit)
 		v.RegisterValidation("category_credit", util.ValidCategoryCredit)

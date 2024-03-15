@@ -5,15 +5,15 @@ import (
 )
 
 type Expense struct {
-	Uid         string    `json:"uid" binding:"required"`
-	Id          float64   `json:"id"`
-	ExpenseType string    `json:"expense_type"`
-	Total       float64   `json:"total"`
-	Category    string    `json:"category"`
-	Status      string    `json:"status"`
-	Notes       string    `json:"notes"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Uid         string     `json:"uid" binding:"required"`
+	Id          float64    `json:"id"`
+	ExpenseType string     `json:"expense_type"`
+	Total       float64    `json:"total"`
+	Category    string     `json:"category"`
+	Status      string     `json:"status"`
+	Notes       string     `json:"notes"`
+	CreatedAt   *time.Time `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
 }
 
 type CreateExpenseRequest struct {
@@ -51,15 +51,15 @@ type GetExpenseRequest struct {
 }
 
 type ExpenseResponse struct {
-	Uid         string    `json:"uid" binding:"required"`
-	Id          float64   `json:"id"`
-	ExpenseType string    `json:"expense_type"`
-	Total       float64   `json:"total"`
-	Category    string    `json:"category"`
-	Status      string    `json:"status"`
-	Notes       string    `json:"notes"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Uid         string     `json:"uid" binding:"required"`
+	Id          float64    `json:"id"`
+	ExpenseType string     `json:"expense_type"`
+	Total       float64    `json:"total"`
+	Category    string     `json:"category"`
+	Status      string     `json:"status"`
+	Notes       string     `json:"notes"`
+	CreatedAt   *time.Time `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
 }
 
 type ExpensesResponse struct {

@@ -14,7 +14,7 @@ type MonthlyRequest struct {
 }
 
 type MonthlyResponse struct {
-	Date          time.Time `json:"date"`
-	TotalIncomes  float64   `json:"total_incomes"`
-	TotalExpenses float64   `json:"total_expenses"`
+	Date          *time.Time `json:"date"`
+	TotalIncomes  float64    `json:"total_incomes"`
+	TotalExpenses float64    `json:"total_expenses"`
 }

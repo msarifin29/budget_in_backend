@@ -51,7 +51,7 @@ func (CreditRepositoryImpl) GetAllCredit(ctx context.Context, tx *sql.Tx, credit
 	credits := []model.Credit{}
 	for rows.Next() {
 		var i model.Credit
-		update := zero.TimeFromPtr(&i.UpdatedAt)
+		update := zero.TimeFromPtr(i.UpdatedAt)
 
 		err := rows.Scan(
 			&i.Uid,
@@ -88,7 +88,7 @@ func (CreditRepositoryImpl) GetAllHistoryCredit(ctx context.Context, tx *sql.Tx,
 	credits := []model.HistoryCredit{}
 	for rows.Next() {
 		var i model.HistoryCredit
-		update := zero.TimeFromPtr(&i.UpdatedAt)
+		update := zero.TimeFromPtr(i.UpdatedAt)
 
 		err := rows.Scan(
 			&i.CreditId,
@@ -127,7 +127,7 @@ func (CreditRepositoryImpl) GetCreditById(ctx context.Context, tx *sql.Tx, credi
 	script := `select * from credits where uid = ? && id = ?`
 	rows := tx.QueryRowContext(ctx, script, credit.Uid, credit.Id)
 	var i model.Credit
-	update := zero.TimeFromPtr(&i.UpdatedAt)
+	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := rows.Scan(
 		&i.Uid,
 		&i.Id,
@@ -149,7 +149,7 @@ func (CreditRepositoryImpl) GetHistoryCreditById(ctx context.Context, tx *sql.Tx
 	script := `select * from history_credit where id = ?`
 	rows := tx.QueryRowContext(ctx, script, credit.Id)
 	var i model.HistoryCredit
-	update := zero.TimeFromPtr(&i.UpdatedAt)
+	update := zero.TimeFromPtr(i.UpdatedAt)
 	typePayment := zero.StringFromPtr(&i.TypePayment)
 	err := rows.Scan(
 		&i.CreditId,

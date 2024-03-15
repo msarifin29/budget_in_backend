@@ -72,7 +72,7 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 	for rows.Next() {
 		var i model.Expense
 		notes := zero.StringFromPtr(&i.Notes)
-		update := zero.TimeFromPtr(&i.UpdatedAt)
+		update := zero.TimeFromPtr(i.UpdatedAt)
 		if err := rows.Scan(
 			&i.Id,
 			&i.ExpenseType,
@@ -102,7 +102,7 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 
 	var i model.Expense
 	notes := zero.StringFromPtr(&i.Notes)
-	update := zero.TimeFromPtr(&i.UpdatedAt)
+	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := rows.Scan(
 		&i.Id,
 		&i.ExpenseType,

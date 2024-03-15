@@ -102,7 +102,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		return model.Expense{}, err
 	}
 
-	update := zero.TimeFromPtr(&res.UpdatedAt)
+	update := zero.TimeFromPtr(res.UpdatedAt)
 	return model.Expense{
 		Uid:         res.Uid,
 		Id:          res.Id,
@@ -111,8 +111,8 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		Category:    res.Category,
 		Status:      res.Status,
 		Notes:       notes.String,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   update.Time,
+		CreatedAt:   &time.Time{},
+		UpdatedAt:   &update.Time,
 	}, nil
 }
 
@@ -136,7 +136,7 @@ func (u *ExpenseUsecaseImpl) GetExpenseById(ctx context.Context, request model.E
 		return model.Expense{}, err
 	}
 	notes := zero.StringFromPtr(&x.Notes)
-	update := zero.TimeFromPtr(&x.UpdatedAt)
+	update := zero.TimeFromPtr(x.UpdatedAt)
 	res := model.Expense{
 		Uid:         x.Uid,
 		Id:          x.Id,
@@ -146,7 +146,7 @@ func (u *ExpenseUsecaseImpl) GetExpenseById(ctx context.Context, request model.E
 		Status:      x.Status,
 		Notes:       notes.String,
 		CreatedAt:   x.CreatedAt,
-		UpdatedAt:   update.Time,
+		UpdatedAt:   &update.Time,
 	}
 	return res, nil
 }

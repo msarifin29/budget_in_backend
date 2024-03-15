@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
@@ -64,15 +63,15 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		u.Log.Errorf("failed create income %v", err)
 		return model.IncomeResponse{}, err
 	}
-	update := zero.TimeFromPtr(&res.UpdatedAt)
+	update := zero.TimeFromPtr(res.UpdatedAt)
 	return model.IncomeResponse{
 		Uid:            res.Uid,
 		Id:             res.Id,
 		CategoryIncome: res.CategoryIncome,
 		TypeIncome:     res.TypeIncome,
 		Total:          req.Total,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      update.Time,
+		CreatedAt:      res.CreatedAt,
+		UpdatedAt:      &update.Time,
 	}, nil
 }
 

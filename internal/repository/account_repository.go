@@ -48,7 +48,7 @@ func (AccountRepositoryImpl) GetAccountByUserId(ctx context.Context, tx *sql.Tx,
 	script := `select * from accounts where account_id = ?`
 	row := tx.QueryRowContext(ctx, script, account.AccountId)
 	var i model.Account
-	update := zero.TimeFrom(i.UpdatedAt)
+	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := row.Scan(
 		&i.UserId,
 		&i.AccountId,
@@ -74,7 +74,7 @@ func (AccountRepositoryImpl) GetAllAccount(ctx context.Context, tx *sql.Tx, user
 	var accounts []model.Account
 	for rows.Next() {
 		var i model.Account
-		update := zero.TimeFromPtr(&i.UpdatedAt)
+		update := zero.TimeFromPtr(i.UpdatedAt)
 		err := rows.Scan(
 			&i.UserId,
 			&i.AccountId,

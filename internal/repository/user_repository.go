@@ -84,7 +84,7 @@ func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email stri
 	row := tx.QueryRowContext(ctx, sqlScript, email)
 
 	var i model.User
-	update := zero.TimeFromPtr(&i.UpdatedAt)
+	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := row.Scan(
 		&i.Uid,
 		&i.UserName,
@@ -108,7 +108,7 @@ func (u *UserRepositoryImpl) GetById(ctx context.Context, tx *sql.Tx, uid string
 	row := tx.QueryRowContext(ctx, sqlScript, uid)
 
 	var i model.User
-	update := zero.TimeFromPtr(&i.UpdatedAt)
+	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := row.Scan(
 		&i.Uid,
 		&i.UserName,

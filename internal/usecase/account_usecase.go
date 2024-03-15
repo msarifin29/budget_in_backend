@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
@@ -44,7 +43,7 @@ func (u *AccountUsacaseImpl) CreateAccount(ctx context.Context, account model.Cr
 		err = errors.New("failed create new account")
 		return model.Account{}, err
 	}
-	update := zero.TimeFromPtr(&res.UpdatedAt)
+	update := zero.TimeFromPtr(res.UpdatedAt)
 	return model.Account{
 		UserId:      res.UserId,
 		AccountId:   res.AccountId,
@@ -54,8 +53,8 @@ func (u *AccountUsacaseImpl) CreateAccount(ctx context.Context, account model.Cr
 		Debts:       res.Debts,
 		Savings:     res.Savings,
 		Currency:    res.Currency,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   update.Time,
+		CreatedAt:   req.CreatedAt,
+		UpdatedAt:   &update.Time,
 	}, nil
 }
 

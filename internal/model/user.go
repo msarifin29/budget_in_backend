@@ -5,19 +5,19 @@ import (
 )
 
 type User struct {
-	Uid       string    `json:"uid"`
-	UserName  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	Photo     string    `json:"photo"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	TypeUser  string    `json:"type_user"`
-	Balance   float64   `json:"balance"`
-	Savings   float64   `json:"savings"`
-	Cash      float64   `json:"cash"`
-	Debts     float64   `json:"debts"`
-	Currency  string    `json:"currency"`
+	Uid       string     `json:"uid"`
+	UserName  string     `json:"username"`
+	Email     string     `json:"email"`
+	Password  string     `json:"password"`
+	Photo     string     `json:"photo"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
+	TypeUser  string     `json:"type_user"`
+	Balance   float64    `json:"balance"`
+	Savings   float64    `json:"savings"`
+	Cash      float64    `json:"cash"`
+	Debts     float64    `json:"debts"`
+	Currency  string     `json:"currency"`
 }
 
 type CreateUserRequest struct {
@@ -53,15 +53,15 @@ type UserProfileResponse struct {
 	Email    string `json:"email"`
 	// Regency    Regencies   `json:"regency"`
 	// Occupation Occupations `json:"occupation"`
-	Photo     string    `json:"photo"`
-	TypeUser  string    `json:"type_user"`
-	Balance   float64   `json:"balance"`
-	Savings   float64   `json:"savings"`
-	Cash      float64   `json:"cash"`
-	Debts     float64   `json:"debts"`
-	Currency  string    `json:"currency"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Photo     string     `json:"photo"`
+	TypeUser  string     `json:"type_user"`
+	Balance   float64    `json:"balance"`
+	Savings   float64    `json:"savings"`
+	Cash      float64    `json:"cash"`
+	Debts     float64    `json:"debts"`
+	Currency  string     `json:"currency"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 }
 type AccountUser struct {
 	Uid       string    `json:"uid"`

@@ -32,20 +32,20 @@ var ValidCategoryType validator.Func = func(fieldLevel validator.FieldLevel) boo
 	return false
 }
 
-func IsSupportedCategoryIncome(status string) bool {
-	switch status {
-	case OTHER, DAILY, WEEKLY, MONTHLY:
-		return true
-	}
-	return false
-}
+// func IsSupportedCategoryIncome(status string) bool {
+// 	switch status {
+// 	case OTHER, DAILY, WEEKLY, MONTHLY:
+// 		return true
+// 	}
+// 	return false
+// }
 
-var ValidCategoryIncome validator.Func = func(fieldLevel validator.FieldLevel) bool {
-	if category, ok := fieldLevel.Field().Interface().(string); ok {
-		return IsSupportedCategoryIncome(category)
-	}
-	return false
-}
+// var ValidCategoryIncome validator.Func = func(fieldLevel validator.FieldLevel) bool {
+// 	if category, ok := fieldLevel.Field().Interface().(string); ok {
+// 		return IsSupportedCategoryIncome(category)
+// 	}
+// 	return false
+// }
 
 // Category expense
 const ( // other id 1

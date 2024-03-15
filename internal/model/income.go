@@ -3,13 +3,13 @@ package model
 import "time"
 
 type Income struct {
-	Uid            string    `json:"uid" `
-	Id             float64   `json:"id"`
-	CategoryIncome string    `json:"category_income"`
-	TypeIncome     string    `json:"type_income"`
-	Total          float64   `json:"total"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	Uid            string     `json:"uid" `
+	Id             float64    `json:"id"`
+	CategoryIncome string     `json:"category_income"`
+	TypeIncome     string     `json:"type_income"`
+	Total          float64    `json:"total"`
+	CreatedAt      *time.Time `json:"created_at"`
+	UpdatedAt      *time.Time `json:"updated_at"`
 }
 type CreateIncomeRequest struct {
 	Uid            string  `json:"uid" binding:"required"`
@@ -30,13 +30,13 @@ type GetIncomeRequest struct {
 	TotalPage      int32  `form:"total_page" binding:"required,min=5,max=10"`
 }
 type IncomeResponse struct {
-	Uid            string    `json:"uid" `
-	Id             float64   `json:"id"`
-	CategoryIncome string    `json:"category_income"`
-	TypeIncome     string    `json:"type_income"`
-	Total          float64   `json:"total"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	Uid            string     `json:"uid" `
+	Id             float64    `json:"id"`
+	CategoryIncome string     `json:"category_income"`
+	TypeIncome     string     `json:"type_income"`
+	Total          float64    `json:"total"`
+	CreatedAt      *time.Time `json:"created_at"`
+	UpdatedAt      *time.Time `json:"updated_at"`
 }
 type IncomesResponse struct {
 	Page      int32    `json:"page"`

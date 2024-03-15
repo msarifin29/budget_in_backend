@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
@@ -78,7 +77,7 @@ func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.Creat
 		u.Log.Errorf("failed update depts %v", err)
 		return model.Credit{}, err
 	}
-	update := zero.TimeFromPtr(&creditRes.UpdatedAt)
+	update := zero.TimeFromPtr(creditRes.UpdatedAt)
 	res := model.Credit{
 		Uid:            creditRes.Uid,
 		Id:             creditRes.Id,
@@ -88,8 +87,8 @@ func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.Creat
 		LoanTerm:       creditRes.LoanTerm,
 		StatusCredit:   util.ACTIVE,
 		Installment:    creditRes.Installment,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      update.Time,
+		CreatedAt:      creditRes.CreatedAt,
+		UpdatedAt:      &update.Time,
 		PaymentTime:    creditRes.PaymentTime,
 	}
 	return res, nil
@@ -183,7 +182,7 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		Total:       historyC.Total,
 		Status:      params.Status,
 		TypePayment: params.TypePayment,
-		CreatedAt:   time.Now(),
+		CreatedAt:   historyC.CreatedAt,
 	}, nil
 }
 

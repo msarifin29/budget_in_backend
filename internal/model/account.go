@@ -3,16 +3,16 @@ package model
 import "time"
 
 type Account struct {
-	UserId      string    `json:"user_id"`
-	AccountId   string    `json:"account_id"`
-	AccountName string    `json:"account_name"`
-	Balance     float64   `json:"balance"`
-	Cash        float64   `json:"cash"`
-	Debts       float64   `json:"debts"`
-	Savings     float64   `json:"savings"`
-	Currency    string    `json:"currency"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	UserId      string     `json:"user_id"`
+	AccountId   string     `json:"account_id"`
+	AccountName string     `json:"account_name"`
+	Balance     float64    `json:"balance"`
+	Cash        float64    `json:"cash"`
+	Debts       float64    `json:"debts"`
+	Savings     float64    `json:"savings"`
+	Currency    string     `json:"currency"`
+	CreatedAt   *time.Time `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
 }
 type CreateAccountRequest struct {
 	UserId      string  `json:"user_id" binding:"required"`

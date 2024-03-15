@@ -33,6 +33,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
+	fmt.Println(string(bytes))
 	assert.Nil(t, err)
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)
@@ -81,7 +82,7 @@ func TestCreateExpenseUnAuthorized(t *testing.T) {
 func TestGetExpenseByIdSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
-	params := model.ExpenseParamWithId{Id: 10}
+	params := model.ExpenseParamWithId{Id: 87}
 	w := httptest.NewRecorder()
 	url := fmt.Sprintf("/api/expenses/%v", params.Id)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -91,7 +92,7 @@ func TestGetExpenseByIdSuccess(t *testing.T) {
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
-
+	fmt.Println(string(bytes))
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)
 	assert.Nil(t, err)
