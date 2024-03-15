@@ -81,9 +81,9 @@ func TestGetIncomesSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetIncomeRequest{
-		CategoryIncome: util.DAILY,
-		Page:           1,
-		TotalPage:      10,
+		// CategoryIncome: util.DAILY,
+		Page:      1,
+		TotalPage: 10,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/incomes/", nil)

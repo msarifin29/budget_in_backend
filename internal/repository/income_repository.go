@@ -70,8 +70,8 @@ func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, incom
 
 // GetIncomes implements IncomeRepository.
 func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.Income, error) {
-	script := `select * from incomes where uid = ? && category_income = ? order by id limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, params.CategoryIncome, params.Limit, params.Offset)
+	script := `select * from incomes where uid = ? && (category_income LIKE ?) order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, params.Uid, `%`+params.CategoryIncome+`%`, params.Limit, params.Offset)
 	if err != nil {
 		return nil, err
 	}

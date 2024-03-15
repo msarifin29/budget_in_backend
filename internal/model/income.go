@@ -25,7 +25,7 @@ type GetIncomeParams struct {
 	Offset         int32  `json:"offset"`
 }
 type GetIncomeRequest struct {
-	CategoryIncome string `form:"category_income" binding:"category_income"`
+	CategoryIncome string `form:"category_income"`
 	Page           int32  `form:"page" binding:"required,min=1"`
 	TotalPage      int32  `form:"total_page" binding:"required,min=5,max=10"`
 }
