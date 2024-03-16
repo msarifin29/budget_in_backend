@@ -157,6 +157,7 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 	params := model.GetExpenseParams{
 		Uid:         authPayload.Uid,
 		Status:      req.Status,
+		Category:    req.Category,
 		ExpenseType: req.ExpenseType,
 		Limit:       req.TotalPage,
 		Offset:      (req.Page - 1) * req.TotalPage,

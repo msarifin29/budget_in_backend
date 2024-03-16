@@ -198,6 +198,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 	params := model.GetExpenseRequest{
 		Status:      "success",
 		ExpenseType: "",
+		Category:    "other",
 		Page:        1,
 		TotalPage:   5,
 	}
@@ -206,6 +207,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 	// Add query parameters to request URL
 	q := req.URL.Query()
 	q.Add("expense_type", fmt.Sprintf("%v", params.ExpenseType))
+	q.Add("category", fmt.Sprintf("%v", params.Category))
 	q.Add("status", fmt.Sprintf("%v", params.Status))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))

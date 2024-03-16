@@ -14,7 +14,7 @@ type ExpenseRepository interface {
 	UpdateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense, id float64) (model.Expense, error)
 	DeleteExpense(ctx context.Context, tx *sql.Tx, id float64) error
 	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error)
-	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string) (float64, error)
+	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, category string) (float64, error)
 	GetExpensesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Expense, error)
 }
 
@@ -53,17 +53,19 @@ func (*ExpenseRepositoryImpl) GetExpensesByMonth(ctx context.Context, tx *sql.Tx
 }
 
 // GetTotalExpenses implements ExpenseRepository.
-func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string) (float64, error) {
+func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, category string) (float64, error) {
 	var total float64
-	script := `SELECT COUNT(*)from expenses where uid = ? and status = ? and (expense_type LIKE ?)`
-	err := tx.QueryRowContext(ctx, script, uid, status, "%"+expenseType+"%").Scan(&total)
+	script := `SELECT COUNT(*)from expenses where uid = ? and status = ? and expense_type LIKE ? and category LIKE ?`
+	err := tx.QueryRowContext(ctx, script, uid, status, "%"+expenseType+"%", "%"+category+"%").Scan(&total)
 	return total, err
 }
 
 // GetExpenses implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error) {
-	script := `select * from expenses where uid = ? and status = ? and (expense_type LIKE ?) order by id limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status, "%"+params.ExpenseType+"%", params.Limit, params.Offset)
+	script := `select * from expenses where uid = ? and status = ? 
+	and expense_type LIKE ?
+	and category LIKE ? order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status, "%"+params.ExpenseType+"%", "%"+params.Category+"%", params.Limit, params.Offset)
 	if err != nil {
 		return nil, err
 	}
