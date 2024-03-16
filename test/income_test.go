@@ -82,19 +82,21 @@ func TestGetIncomesSuccess(t *testing.T) {
 
 	params := model.GetIncomeRequest{
 		// CategoryIncome: util.DAILY,
-		Page:      1,
-		TotalPage: 10,
+		TypeIncome: "Debit",
+		Page:       1,
+		TotalPage:  10,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/incomes/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
 	q.Add("category_income", fmt.Sprintf("%v", params.CategoryIncome))
+	q.Add("type_income", fmt.Sprintf("%v", params.TypeIncome))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "boy", "a0ea433a-13b2-4414-aa8a-6369acd2b547", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))

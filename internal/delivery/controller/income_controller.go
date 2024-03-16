@@ -69,6 +69,7 @@ func (c *IncomeController) GetIncomes(ctx *gin.Context) {
 	params := model.GetIncomeParams{
 		Uid:            authPayload.Uid,
 		CategoryIncome: req.CategoryIncome,
+		TypeIncome:     req.TypeIncome,
 		Limit:          req.TotalPage,
 		Offset:         (req.Page - 1) * req.TotalPage,
 	}

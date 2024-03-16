@@ -21,11 +21,13 @@ type CreateIncomeRequest struct {
 type GetIncomeParams struct {
 	Uid            string `json:"uid" binding:"required"`
 	CategoryIncome string `json:"category_income"`
+	TypeIncome     string `json:"type_income"`
 	Limit          int32  `json:"limit"`
 	Offset         int32  `json:"offset"`
 }
 type GetIncomeRequest struct {
 	CategoryIncome string `form:"category_income"`
+	TypeIncome     string `form:"type_income"`
 	Page           int32  `form:"page" binding:"required,min=1"`
 	TotalPage      int32  `form:"total_page" binding:"required,min=5,max=10"`
 }

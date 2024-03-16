@@ -79,7 +79,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 func (u *IncomeUsecaseImpl) GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.Income, float64, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
-	total, err := u.IncomeRepo.GetTotalIncomes(ctx, tx, params.Uid, params.CategoryIncome)
+	total, err := u.IncomeRepo.GetTotalIncomes(ctx, tx, params.Uid, params.CategoryIncome, params.TypeIncome)
 	if err != nil {
 		u.Log.Errorf("failed get total incomes %v ", err)
 		return []model.Income{}, 0, err

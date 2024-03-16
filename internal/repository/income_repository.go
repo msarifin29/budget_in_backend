@@ -11,13 +11,13 @@ import (
 type IncomeRepository interface {
 	CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error)
 	GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.Income, error)
-	GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string) (float64, error)
+	GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string, typeIncome string) (float64, error)
 	GetIncomesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Income, error)
 }
 
 type IncomeRepositoryImpl struct{}
 
-// GetIncomesByMonth implements IncomeRepository.
+// Deprecated: GetIncomesByMonth implements IncomeRepository.
 func (*IncomeRepositoryImpl) GetIncomesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Income, error) {
 	script := `SELECT uid,id,category_income,total,created_at,type_income
 	from incomes where uid = ?
@@ -49,10 +49,10 @@ func (*IncomeRepositoryImpl) GetIncomesByMonth(ctx context.Context, tx *sql.Tx, 
 }
 
 // GetTotalIncomes implements IncomeRepository.
-func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string) (float64, error) {
+func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string, typeIncome string) (float64, error) {
 	var total float64
-	script := `SELECT COUNT(*)from incomes where uid = ? && category_income = ?`
-	err := tx.QueryRowContext(ctx, script, uid, CategoryIncome).Scan(&total)
+	script := `SELECT COUNT(*)from incomes where uid = ? && category_income LIKE ? and type_income LIKE ?`
+	err := tx.QueryRowContext(ctx, script, uid, `%`+CategoryIncome+`%`, `%`+typeIncome+`%`).Scan(&total)
 	return total, err
 }
 
@@ -70,8 +70,9 @@ func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, incom
 
 // GetIncomes implements IncomeRepository.
 func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.Income, error) {
-	script := `select * from incomes where uid = ? && (category_income LIKE ?) order by id limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, `%`+params.CategoryIncome+`%`, params.Limit, params.Offset)
+	script := `select * from incomes where uid = ? && category_income LIKE ? 
+	and type_income LIKE ? order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, params.Uid, `%`+params.CategoryIncome+`%`, `%`+params.TypeIncome+`%`, params.Limit, params.Offset)
 	if err != nil {
 		return nil, err
 	}
