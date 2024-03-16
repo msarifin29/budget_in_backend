@@ -29,7 +29,6 @@ type MonthlyReport struct {
 	TotalExpense sql.NullFloat64 `json:"total_expense"`
 }
 type MonthlyReportResponse struct {
-	Uid          string  `json:"uid"`
 	Month        float64 `json:"month"`
 	Year         float64 `json:"year"`
 	TotalIncome  float64 `json:"total_income"`

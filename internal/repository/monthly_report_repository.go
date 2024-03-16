@@ -53,7 +53,6 @@ ORDER BY YEAR(e.created_at), MONTH(e.created_at);`
 			return nil, e
 		}
 		r := model.MonthlyReportResponse{
-			Uid:          i.Uid.String,
 			Month:        i.Month.Float64,
 			Year:         i.Year.Float64,
 			TotalExpense: i.TotalExpense.Float64,

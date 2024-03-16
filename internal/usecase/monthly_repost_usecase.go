@@ -30,7 +30,29 @@ func (u *MonthlyReportUsecaseImpl) GetMonthlyReport(ctx context.Context, uid str
 		err = errors.New("failed get monthly report")
 		return []model.MonthlyReportResponse{}, err
 	}
-	return res, nil
+	reports := []model.MonthlyReportResponse{}
+	for i := 1; i < 13; i++ {
+		var m model.MonthlyReportResponse
+		for _, v := range res {
+			if len(res) != 0 {
+				m.Year = v.Year
+				m.Month = float64(i)
+				if int(v.Month) == i {
+					m.TotalExpense = v.TotalExpense
+					m.TotalIncome = v.TotalIncome
+				}
+			} else {
+				m.Year = 0
+				m.Month = 0
+				m.TotalExpense = 0
+				m.TotalIncome = 0
+			}
+
+		}
+		reports = append(reports, m)
+
+	}
+	return reports, nil
 }
 
 func NewMonthlyReportUsecase(MonthlyRepo repository.MonthlyReportRepository, Log *logrus.Logger, db *sql.DB) MonthlyReportUsecase {
