@@ -53,6 +53,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		CategoryIncome: params.CategoryIncome,
 		TypeIncome:     params.TypeIncome,
 		Total:          params.Total,
+		CreatedAt:      util.CreatedAt(params.CreatedAt),
 	}
 	err := NewIncome(ctx, tx, u.AccountRepo, u.Log, params.TypeIncome, params.AccountId, params.Total)
 	if err != nil {
@@ -70,7 +71,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		CategoryIncome: res.CategoryIncome,
 		TypeIncome:     res.TypeIncome,
 		Total:          req.Total,
-		CreatedAt:      res.CreatedAt,
+		CreatedAt:      req.CreatedAt,
 		UpdatedAt:      &update.Time,
 	}, nil
 }

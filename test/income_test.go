@@ -20,10 +20,11 @@ func TestCreateIncomeSuccess(t *testing.T) {
 
 	params := model.CreateIncomeRequest{
 		Uid:            "fadab647-cf23-46fc-bd4d-e7d06d32d753",
-		CategoryIncome: util.DAILY,
+		CategoryIncome: util.SALARY,
 		TypeIncome:     util.CASH,
 		Total:          2000,
 		AccountId:      "b857228c-a750-47ef-85ef-5cf1e6150362",
+		CreatedAt:      "", // 2015-09-02T08:00:00Z
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -33,6 +34,7 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
+	fmt.Println(string(bytes))
 	assert.Nil(t, err)
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)

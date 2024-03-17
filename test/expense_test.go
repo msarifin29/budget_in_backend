@@ -24,6 +24,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 		Total:       2500,
 		Category:    util.OTHER,
 		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
+		CreatedAt:   "2015-09-02T08:00:00Z",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

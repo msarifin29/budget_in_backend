@@ -23,6 +23,7 @@ type CreateExpenseRequest struct {
 	Total       float64 `json:"total" binding:"required,min=2000"`
 	Notes       string  `json:"notes"`
 	AccountId   string  `json:"account_id" binding:"required"`
+	CreatedAt   string  `json:"created_at"`
 }
 
 type UpdateExpenseRequest struct {

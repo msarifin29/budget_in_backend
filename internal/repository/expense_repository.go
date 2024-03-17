@@ -121,8 +121,12 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 
 // CreateExpense implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) CreateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense) (model.Expense, error) {
-	script := `insert into expenses (expense_type,total,notes,uid,category,status) values (?,?,?,?,?,?)`
-	result, errX := tx.ExecContext(ctx, script, &expense.ExpenseType, &expense.Total, &expense.Notes, &expense.Uid, &expense.Category, &expense.Status)
+	script := `insert into expenses (expense_type,total,notes,uid,category,status,created_at) values (?,?,?,?,?,?,?)`
+	result, errX := tx.ExecContext(ctx, script,
+		&expense.ExpenseType, &expense.Total,
+		&expense.Notes, &expense.Uid,
+		&expense.Category, &expense.Status,
+		&expense.CreatedAt)
 	if errX != nil {
 		return model.Expense{}, errX
 	}

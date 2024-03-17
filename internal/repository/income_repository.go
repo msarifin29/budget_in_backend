@@ -58,8 +58,8 @@ func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, ui
 
 // CreateIncome implements IncomeRepository.
 func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error) {
-	script := `insert into incomes (uid,category_income,type_income,total) values (?,?,?,?)`
-	result, errX := tx.ExecContext(ctx, script, income.Uid, income.CategoryIncome, income.TypeIncome, income.Total)
+	script := `insert into incomes (uid,category_income,type_income,total,created_at) values (?,?,?,?,?)`
+	result, errX := tx.ExecContext(ctx, script, income.Uid, income.CategoryIncome, income.TypeIncome, income.Total, income.CreatedAt)
 	if errX != nil {
 		return model.Income{}, errX
 	}
