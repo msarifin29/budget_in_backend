@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"net/smtp"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/config"
@@ -14,11 +12,6 @@ import (
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/util"
 	"github.com/sirupsen/logrus"
-)
-
-const (
-	CONFIG_SMTP_HOST = "smtp.gmail.com"
-	CONFIG_SMTP_PORT = 587
 )
 
 type UserUsecase interface {
@@ -159,13 +152,13 @@ func (u *UserUsecaseImpl) ResetPassword(ctx context.Context, req model.EmailUser
 		u.Log.Error(err)
 		return false, err
 	}
-	to := []string{emailUser}
-	cc := []string{}
-	subject := "New Password"
+	subject := "Reset Password"
 	newPassword := subject + " : " + util.RandomString(6)
-	err = sendMail(to, cc, subject, newPassword, u.conf)
+
+	receiver := emailUser
+	r := util.NewRequest([]string{receiver}, subject, u.conf, u.Log)
+	err = r.Send("../templates/email.html", map[string]string{"password": util.RandomString(6)})
 	if err != nil {
-		u.Log.Errorf("failed send email %v:", err)
 		return false, err
 	}
 	password, hashErr := util.HashPassword(newPassword)
@@ -180,22 +173,4 @@ func (u *UserUsecaseImpl) ResetPassword(ctx context.Context, req model.EmailUser
 		return false, errSetPass
 	}
 	return true, nil
-}
-
-func sendMail(to []string, cc []string, subject, message string, conf config.Config) error {
-	body := "From: " + conf.SenderName + "\n" +
-		"To: " + strings.Join(to, ",") + "\n" +
-		"Cc: " + strings.Join(cc, ",") + "\n" +
-		"Subject: " + subject + "\n\n" +
-		message
-
-	auth := smtp.PlainAuth("", conf.AuthEmail, conf.AuthPassword, CONFIG_SMTP_HOST)
-	smtpAddr := fmt.Sprintf("%s:%d", CONFIG_SMTP_HOST, CONFIG_SMTP_PORT)
-
-	err := smtp.SendMail(smtpAddr, auth, conf.AuthEmail, append(to, cc...), []byte(body))
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
