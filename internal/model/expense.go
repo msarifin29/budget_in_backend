@@ -5,18 +5,29 @@ import (
 )
 
 type Expense struct {
-	Uid         string     `json:"uid" binding:"required"`
-	Id          float64    `json:"id"`
-	ExpenseType string     `json:"expense_type"`
-	Total       float64    `json:"total"`
-	Category    string     `json:"category"`
-	Status      string     `json:"status"`
-	Notes       string     `json:"notes"`
-	CreatedAt   *time.Time `json:"created_at"`
-	UpdatedAt   *time.Time `json:"updated_at"`
+	Uid           string     `json:"uid" binding:"required"`
+	Id            float64    `json:"id"`
+	ExpenseType   string     `json:"expense_type"`
+	Total         float64    `json:"total"`
+	Category      string     `json:"category"`
+	Status        string     `json:"status"`
+	Notes         string     `json:"notes"`
+	TransactionId string     `json:"transaction_id"`
+	CreatedAt     *time.Time `json:"created_at"`
+	UpdatedAt     *time.Time `json:"updated_at"`
 }
 
 type CreateExpenseRequest struct {
+	Uid           string  `json:"uid" binding:"required"`
+	ExpenseType   string  `json:"expense_type" binding:"required,expense_type"`
+	Category      string  `json:"category" binding:"required,category_expense"`
+	Total         float64 `json:"total" binding:"required,min=2000"`
+	Notes         string  `json:"notes"`
+	AccountId     string  `json:"account_id" binding:"required"`
+	TransactionId string  `json:"transaction_id"`
+	CreatedAt     string  `json:"created_at"`
+}
+type CreateExpenseParams struct {
 	Uid         string  `json:"uid" binding:"required"`
 	ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
 	Category    string  `json:"category" binding:"required,category_expense"`
@@ -54,15 +65,16 @@ type GetExpenseRequest struct {
 }
 
 type ExpenseResponse struct {
-	Uid         string     `json:"uid" binding:"required"`
-	Id          float64    `json:"id"`
-	ExpenseType string     `json:"expense_type"`
-	Total       float64    `json:"total"`
-	Category    string     `json:"category"`
-	Status      string     `json:"status"`
-	Notes       string     `json:"notes"`
-	CreatedAt   *time.Time `json:"created_at"`
-	UpdatedAt   *time.Time `json:"updated_at"`
+	Uid           string     `json:"uid" binding:"required"`
+	Id            float64    `json:"id"`
+	ExpenseType   string     `json:"expense_type"`
+	Total         float64    `json:"total"`
+	Category      string     `json:"category"`
+	Status        string     `json:"status"`
+	Notes         string     `json:"notes"`
+	TransactionId string     `json:"transaction_id"`
+	CreatedAt     *time.Time `json:"created_at"`
+	UpdatedAt     *time.Time `json:"updated_at"`
 }
 
 type ExpensesResponse struct {

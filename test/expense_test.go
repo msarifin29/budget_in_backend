@@ -18,7 +18,7 @@ import (
 func TestCreateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
-	params := model.CreateExpenseRequest{
+	params := model.CreateExpenseParams{
 		Uid:         "fadab647-cf23-46fc-bd4d-e7d06d32d753",
 		ExpenseType: util.DEBIT,
 		Total:       2500,

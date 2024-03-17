@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/util"
@@ -13,7 +14,7 @@ import (
 )
 
 type IncomeUsecase interface {
-	CreateIncome(ctx context.Context, params model.CreateIncomeRequest) (model.IncomeResponse, error)
+	CreateIncome(ctx context.Context, params model.CreateIncomeParams) (model.IncomeResponse, error)
 	GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.Income, float64, error)
 	GetIncomesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error)
 }
@@ -45,7 +46,7 @@ func (u *IncomeUsecaseImpl) GetIncomesByMonth(ctx context.Context, params model.
 }
 
 // CreateIncome implements IncomeUsecase.
-func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.CreateIncomeRequest) (model.IncomeResponse, error) {
+func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.CreateIncomeParams) (model.IncomeResponse, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 	req := model.Income{
@@ -53,6 +54,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		CategoryIncome: params.CategoryIncome,
 		TypeIncome:     params.TypeIncome,
 		Total:          params.Total,
+		TransactionId:  uuid.NewString(),
 		CreatedAt:      util.CreatedAt(params.CreatedAt),
 	}
 	err := NewIncome(ctx, tx, u.AccountRepo, u.Log, params.TypeIncome, params.AccountId, params.Total)
@@ -71,6 +73,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		CategoryIncome: res.CategoryIncome,
 		TypeIncome:     res.TypeIncome,
 		Total:          req.Total,
+		TransactionId:  res.TransactionId,
 		CreatedAt:      req.CreatedAt,
 		UpdatedAt:      &update.Time,
 	}, nil

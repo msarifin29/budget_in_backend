@@ -58,8 +58,8 @@ func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, ui
 
 // CreateIncome implements IncomeRepository.
 func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error) {
-	script := `insert into incomes (uid,category_income,type_income,total,created_at) values (?,?,?,?,?)`
-	result, errX := tx.ExecContext(ctx, script, income.Uid, income.CategoryIncome, income.TypeIncome, income.Total, income.CreatedAt)
+	script := `insert into incomes (uid,category_income,type_income,total,created_at,transaction_id) values (?,?,?,?,?,?)`
+	result, errX := tx.ExecContext(ctx, script, income.Uid, income.CategoryIncome, income.TypeIncome, income.Total, income.CreatedAt, income.TransactionId)
 	if errX != nil {
 		return model.Income{}, errX
 	}
@@ -80,6 +80,7 @@ func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params 
 	incomes := []model.Income{}
 	var i model.Income
 	update := zero.TimeFromPtr(i.UpdatedAt)
+	transaction := zero.StringFromPtr(&i.TransactionId)
 	for rows.Next() {
 		err := rows.Scan(
 			&i.Uid,
@@ -89,6 +90,7 @@ func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params 
 			&i.CreatedAt,
 			&update,
 			&i.TypeIncome,
+			&transaction,
 		)
 		if err != nil {
 			return nil, err

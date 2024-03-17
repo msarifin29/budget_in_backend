@@ -75,6 +75,7 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 		var i model.Expense
 		notes := zero.StringFromPtr(&i.Notes)
 		update := zero.TimeFromPtr(i.UpdatedAt)
+		transaction := zero.StringFromPtr(&i.TransactionId)
 		if err := rows.Scan(
 			&i.Id,
 			&i.ExpenseType,
@@ -85,6 +86,7 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 			&i.Uid,
 			&i.Category,
 			&i.Status,
+			&transaction,
 		); err != nil {
 			return nil, err
 		}
@@ -104,6 +106,7 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 
 	var i model.Expense
 	notes := zero.StringFromPtr(&i.Notes)
+	transaction := zero.StringFromPtr(&i.TransactionId)
 	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := rows.Scan(
 		&i.Id,
@@ -115,18 +118,19 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 		&i.Uid,
 		&i.Category,
 		&i.Status,
+		&transaction,
 	)
 	return i, err
 }
 
 // CreateExpense implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) CreateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense) (model.Expense, error) {
-	script := `insert into expenses (expense_type,total,notes,uid,category,status,created_at) values (?,?,?,?,?,?,?)`
+	script := `insert into expenses (expense_type,total,notes,uid,category,status,created_at,transaction_id) values (?,?,?,?,?,?,?,?)`
 	result, errX := tx.ExecContext(ctx, script,
 		&expense.ExpenseType, &expense.Total,
 		&expense.Notes, &expense.Uid,
 		&expense.Category, &expense.Status,
-		&expense.CreatedAt)
+		&expense.CreatedAt, &expense.TransactionId)
 	if errX != nil {
 		return model.Expense{}, errX
 	}

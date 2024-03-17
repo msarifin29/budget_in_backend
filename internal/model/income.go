@@ -8,6 +8,7 @@ type Income struct {
 	CategoryIncome string     `json:"category_income"`
 	TypeIncome     string     `json:"type_income"`
 	Total          float64    `json:"total"`
+	TransactionId  string     `json:"transaction_id"`
 	CreatedAt      *time.Time `json:"created_at"`
 	UpdatedAt      *time.Time `json:"updated_at"`
 }
@@ -17,6 +18,16 @@ type CreateIncomeRequest struct {
 	TypeIncome     string  `json:"type_income" binding:"required,type_income"`
 	Total          float64 `json:"total" binding:"required,min=2000"`
 	AccountId      string  `json:"account_id" binding:"required"`
+	TransactionId  string  `json:"transaction_id" binding:"required"`
+	CreatedAt      string  `json:"created_at"`
+}
+type CreateIncomeParams struct {
+	Uid            string  `json:"uid" binding:"required"`
+	CategoryIncome string  `json:"category_income" binding:"required,category_income"`
+	TypeIncome     string  `json:"type_income" binding:"required,type_income"`
+	Total          float64 `json:"total" binding:"required,min=2000"`
+	AccountId      string  `json:"account_id" binding:"required"`
+	TransactionId  string  `json:"transaction_id"`
 	CreatedAt      string  `json:"created_at"`
 }
 type GetIncomeParams struct {
@@ -38,6 +49,7 @@ type IncomeResponse struct {
 	CategoryIncome string     `json:"category_income"`
 	TypeIncome     string     `json:"type_income"`
 	Total          float64    `json:"total"`
+	TransactionId  string     `json:"transaction_id"`
 	CreatedAt      *time.Time `json:"created_at"`
 	UpdatedAt      *time.Time `json:"updated_at"`
 }

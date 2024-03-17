@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/util"
@@ -13,7 +14,7 @@ import (
 )
 
 type ExpenseUsecase interface {
-	CreateExpense(ctx context.Context, expense model.CreateExpenseRequest) (model.Expense, error)
+	CreateExpense(ctx context.Context, expense model.CreateExpenseParams) (model.Expense, error)
 	GetExpenseById(ctx context.Context, request model.ExpenseParamWithId) (model.Expense, error)
 	UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (bool, error)
 	DeleteExpense(ctx context.Context, id float64) error
@@ -66,19 +67,20 @@ func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetEx
 }
 
 // CreateExpense implements ExpenseUsecase.
-func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.CreateExpenseRequest) (model.Expense, error) {
+func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.CreateExpenseParams) (model.Expense, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 
 	notes := zero.StringFromPtr(&expense.Notes)
 	req := model.Expense{
-		ExpenseType: expense.ExpenseType,
-		Total:       expense.Total,
-		Category:    expense.Category,
-		Status:      util.SUCCESS,
-		Notes:       notes.String,
-		Uid:         expense.Uid,
-		CreatedAt:   util.CreatedAt(expense.CreatedAt),
+		ExpenseType:   expense.ExpenseType,
+		Total:         expense.Total,
+		Category:      expense.Category,
+		Status:        util.SUCCESS,
+		Notes:         notes.String,
+		Uid:           expense.Uid,
+		TransactionId: uuid.NewString(),
+		CreatedAt:     util.CreatedAt(expense.CreatedAt),
 	}
 	if req.Total < 2000 {
 		u.Log.Errorf("Invalid input total min 2000 , actually %v", req.Total)
@@ -104,15 +106,16 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 
 	update := zero.TimeFromPtr(res.UpdatedAt)
 	return model.Expense{
-		Uid:         res.Uid,
-		Id:          res.Id,
-		ExpenseType: res.ExpenseType,
-		Total:       res.Total,
-		Category:    res.Category,
-		Status:      res.Status,
-		Notes:       notes.String,
-		CreatedAt:   res.CreatedAt,
-		UpdatedAt:   &update.Time,
+		Uid:           res.Uid,
+		Id:            res.Id,
+		ExpenseType:   res.ExpenseType,
+		Total:         res.Total,
+		Category:      res.Category,
+		Status:        res.Status,
+		Notes:         notes.String,
+		TransactionId: res.TransactionId,
+		CreatedAt:     res.CreatedAt,
+		UpdatedAt:     &update.Time,
 	}, nil
 }
 
@@ -136,17 +139,19 @@ func (u *ExpenseUsecaseImpl) GetExpenseById(ctx context.Context, request model.E
 		return model.Expense{}, err
 	}
 	notes := zero.StringFromPtr(&x.Notes)
+	transaction := zero.StringFromPtr(&x.TransactionId)
 	update := zero.TimeFromPtr(x.UpdatedAt)
 	res := model.Expense{
-		Uid:         x.Uid,
-		Id:          x.Id,
-		ExpenseType: x.ExpenseType,
-		Total:       x.Total,
-		Category:    x.Category,
-		Status:      x.Status,
-		Notes:       notes.String,
-		CreatedAt:   x.CreatedAt,
-		UpdatedAt:   &update.Time,
+		Uid:           x.Uid,
+		Id:            x.Id,
+		ExpenseType:   x.ExpenseType,
+		Total:         x.Total,
+		Category:      x.Category,
+		Status:        x.Status,
+		Notes:         notes.String,
+		TransactionId: transaction.String,
+		CreatedAt:     x.CreatedAt,
+		UpdatedAt:     &update.Time,
 	}
 	return res, nil
 }

@@ -22,7 +22,7 @@ func NewExpenseController(Usecase usecase.ExpenseUsecase, Log *logrus.Logger) *E
 }
 
 func (c *ExpenseController) CreateExpense(ctx *gin.Context) {
-	var req model.CreateExpenseRequest
+	var req model.CreateExpenseParams
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		c.Log.Errorf("failed binding request %t:", err)
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{

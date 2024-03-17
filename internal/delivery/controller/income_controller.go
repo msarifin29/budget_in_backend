@@ -22,7 +22,7 @@ func NewIncomeController(IncomeUsecase usecase.IncomeUsecase, Log *logrus.Logger
 }
 
 func (c *IncomeController) CreateIncome(ctx *gin.Context) {
-	var req model.CreateIncomeRequest
+	var req model.CreateIncomeParams
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		c.Log.Errorf("failed binding request %t:", err)
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{

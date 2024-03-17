@@ -67,25 +67,27 @@ CREATE TABLE `history_credit` (
 
 -- ALTER TABLE occupations add CONSTRAINT fk_occupations_users FOREIGN KEY (user_id) REFERENCES users (uid)
 
-ALTER TABLE `users` ADD COLUMN `type_user` varchar(10) DEFAULT 'personal'
-ALTER TABLE `users` ADD COLUMN `balance` INT DEFAULT 0,
-ALTER TABLE `users` ADD COLUMN `savings` INT DEFAULT 0,
-ALTER TABLE `users` ADD COLUMN `cash` INT DEFAULT 0,
-ALTER TABLE `users` ADD COLUMN `debts` INT DEFAULT 0,
-ALTER TABLE `users` ADD COLUMN `currency` varchar(10) DEFAULT 'IDR',
+ALTER TABLE `users` ADD COLUMN `type_user` varchar(10) DEFAULT 'personal';
+ALTER TABLE `users` ADD COLUMN `balance` INT DEFAULT 0;
+ALTER TABLE `users` ADD COLUMN `savings` INT DEFAULT 0;
+ALTER TABLE `users` ADD COLUMN `cash` INT DEFAULT 0;
+ALTER TABLE `users` ADD COLUMN `debts` INT DEFAULT 0;
+ALTER TABLE `users` ADD COLUMN `currency` varchar(10) DEFAULT 'IDR';
 
-ALTER TABLE `espenses` ADD COLUMN `uid` varchar(255) NOT NULL,
-ALTER TABLE `espenses` ADD COLUMN `category` varchar(50) DEFAULT 'other',
-ALTER TABLE `espenses` ADD COLUMN `status` varchar(10) DEFAULT 'success',
+ALTER TABLE `expenses` ADD COLUMN `uid` varchar(255) NOT NULL;
+ALTER TABLE `expenses` ADD COLUMN `category` varchar(50) DEFAULT 'other';
+ALTER TABLE `expenses` ADD COLUMN `status` varchar(10) DEFAULT 'success';
+ALTER TABLE `expenses` ADD COLUMN `transaction_id` varchar(255) NOT NULL;
 
-ALTER TABLE `incomes` ADD COLUMN `type_income` VARCHAR(15) not NULL DEFAULT 'debit',
+ALTER TABLE `incomes` ADD COLUMN `type_income` VARCHAR(15) not NULL DEFAULT 'debit';
+ALTER TABLE `incomes` ADD COLUMN `transaction_id` varchar(255) NOT NULL;
 
 ALTER TABLE `credits` ADD CONSTRAINT fk_credits_users FOREIGN KEY (`uid`) REFERENCES `users` (`uid`);
 
 ALTER TABLE `history_credit` ADD CONSTRAINT fk_historycredit_credits FOREIGN KEY (`credit_id`) REFERENCES `credits` (`id`);
 
-ALTER TABLE `credits` ADD COLUMN `installment` INT NOT NULL
-ALTER TABLE `credits` ADD COLUMN `payment_time` INT NOT NULL
+ALTER TABLE `credits` ADD COLUMN `installment` INT NOT NULL;
+ALTER TABLE `credits` ADD COLUMN `payment_time` INT NOT NULL;
 
-ALTER TABLE `history_credit` ADD COLUMN `type_payment` VARCHAR(10) not NULL DEFAULT 'cash'
-ALTER TABLE `history_credit` ADD COLUMN `payment_time` int NOT NULL
+ALTER TABLE `history_credit` ADD COLUMN `type_payment` VARCHAR(10) not NULL DEFAULT 'cash';
+ALTER TABLE `history_credit` ADD COLUMN `payment_time` int NOT NULL;
