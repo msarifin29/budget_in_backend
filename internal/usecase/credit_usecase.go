@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/util"
@@ -24,6 +26,7 @@ type CreditUsecaseImpl struct {
 	CreditRepo  repository.CreditRepository
 	BalanceRepo repository.BalanceRepository
 	AccountRepo repository.AccountRepository
+	ExpenseRepo repository.ExpenseRepository
 	Log         *logrus.Logger
 	db          *sql.DB
 }
@@ -175,7 +178,22 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 			return model.UpdateHistoryResponse{}, err
 		}
 	}
-
+	now := time.Now()
+	expense := model.Expense{
+		ExpenseType:   params.TypePayment,
+		Total:         historyC.Total,
+		Category:      util.COSTANDBILL,
+		Status:        util.SUCCESS,
+		Uid:           params.Uid,
+		TransactionId: uuid.NewString(),
+		CreatedAt:     &now,
+	}
+	_, er := u.ExpenseRepo.CreateExpense(ctx, tx, expense)
+	if er != nil {
+		u.Log.Error(er)
+		er = errors.New("failed create expense")
+		return model.UpdateHistoryResponse{}, er
+	}
 	return model.UpdateHistoryResponse{
 		Id:          historyC.Id,
 		Th:          historyC.Th,
@@ -186,8 +204,9 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 	}, nil
 }
 
-func NewCreditUsecase(CreditRepo repository.CreditRepository, BalanceRepo repository.BalanceRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB) CreditUsecase {
-	return &CreditUsecaseImpl{CreditRepo: CreditRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db}
+func NewCreditUsecase(CreditRepo repository.CreditRepository, BalanceRepo repository.BalanceRepository,
+	AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, ExpenseRepo repository.ExpenseRepository) CreditUsecase {
+	return &CreditUsecaseImpl{CreditRepo: CreditRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db, ExpenseRepo: ExpenseRepo}
 }
 
 func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.CreditRepository, credit model.Credit) error {
