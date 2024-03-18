@@ -24,7 +24,7 @@ SUM(e.total) AS total_expense,
 SUM(i.total) AS total_income
 FROM expenses AS e
 LEFT JOIN incomes AS i ON e.uid = i.uid AND YEAR(e.created_at) = YEAR(i.created_at) AND MONTH(e.created_at) = MONTH(i.created_at)
-WHERE e.uid = ? 
+WHERE e.uid = ? and e.status = 'success'
 GROUP BY YEAR(e.created_at), MONTH(e.created_at), e.uid
 ORDER BY YEAR(e.created_at), MONTH(e.created_at);`
 	rows, err := tx.QueryContext(ctx, script, uid)
