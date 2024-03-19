@@ -19,12 +19,13 @@ func TestCreateCreditSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateCreditRequest{
-		Uid:            "f1687230-49d3-4657-96be-9b934ed0387f",
-		CategoryCredit: util.ELECTRONIC,
-		TypeCredit:     util.MONTHLY,
-		LoanTerm:       3,
-		Installment:    2500,
-		PaymentTime:    time.Now().Day(),
+		Uid: "f1687230-49d3-4657-96be-9b934ed0387f",
+		// CategoryCredit: util.ELECTRONIC,
+		CategoryId:  5,
+		TypeCredit:  util.MONTHLY,
+		LoanTerm:    3,
+		Installment: 2555,
+		PaymentTime: time.Now().Day(),
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

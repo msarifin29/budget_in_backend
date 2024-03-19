@@ -15,9 +15,24 @@ type Credit struct {
 	StatusCredit   string     `json:"status_credit"`
 	Installment    float64    `json:"installment"`
 }
+type CreditResponse struct {
+	Uid            string          `json:"uid"`
+	Id             float64         `json:"id"`
+	CategoryCredit string          `json:"category_credit"`
+	TypeCredit     string          `json:"type_credit"`
+	Total          float64         `json:"total"`
+	LoanTerm       float64         `json:"loan_term"`
+	PaymentTime    int             `json:"payment_time"`
+	CreatedAt      *time.Time      `json:"created_at"`
+	UpdatedAt      *time.Time      `json:"updated_at"`
+	StatusCredit   string          `json:"status_credit"`
+	Installment    float64         `json:"installment"`
+	TCategory      CategoryReponse `json:"t_category"`
+}
 type CreateCreditRequest struct {
 	Uid            string  `json:"uid" binding:"required"`
-	CategoryCredit string  `json:"category_credit" binding:"required,category_credit"`
+	CategoryCredit string  `json:"category_credit"`
+	CategoryId     int32   `json:"category_id" binding:"required"`
 	TypeCredit     string  `json:"type_credit" binding:"required,type_credit"`
 	LoanTerm       float64 `json:"loan_term" binding:"required,min=1"`
 	Installment    float64 `json:"installment" binding:"required,min=2000"`
@@ -59,9 +74,9 @@ func NewCredit(credit Credit) *Credit {
 }
 
 type CreditsResponse struct {
-	Page      int32    `json:"page"`
-	TotalPage int32    `json:"total_page"`
-	LastPage  int32    `json:"last_page"`
-	Total     int32    `json:"total"`
-	Data      []Credit `json:"data"`
+	Page      int32            `json:"page"`
+	TotalPage int32            `json:"total_page"`
+	LastPage  int32            `json:"last_page"`
+	Total     int32            `json:"total"`
+	Data      []CreditResponse `json:"data"`
 }

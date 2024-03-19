@@ -17,18 +17,19 @@ import (
 
 type CreditUsecase interface {
 	CreateCredit(ctx context.Context, params model.CreateCreditRequest) (model.Credit, error)
-	GetAllCredit(ctx context.Context, params model.GetCreditParams) ([]model.Credit, float64, error)
+	GetAllCredit(ctx context.Context, params model.GetCreditParams) ([]model.CreditResponse, float64, error)
 	GetAllHistoryCredit(ctx context.Context, params model.GetHistoriesCreditParams) ([]model.HistoryCredit, float64, error)
 	UpdateHistoryCredit(ctx context.Context, params model.UpdateHistoryCreditParams) (model.UpdateHistoryResponse, error)
 }
 
 type CreditUsecaseImpl struct {
-	CreditRepo  repository.CreditRepository
-	BalanceRepo repository.BalanceRepository
-	AccountRepo repository.AccountRepository
-	ExpenseRepo repository.ExpenseRepository
-	Log         *logrus.Logger
-	db          *sql.DB
+	CategoryRepo repository.CategoryRepository
+	CreditRepo   repository.CreditRepository
+	BalanceRepo  repository.BalanceRepository
+	AccountRepo  repository.AccountRepository
+	ExpenseRepo  repository.ExpenseRepository
+	Log          *logrus.Logger
+	db           *sql.DB
 }
 
 // GetAllHistoryCredit implements CreditUsecase.
@@ -80,11 +81,21 @@ func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.Creat
 		u.Log.Errorf("failed update depts %v", err)
 		return model.Credit{}, err
 	}
+	paramCategory := model.Category{
+		CategoryId: creditRes.Id,
+		Id:         float64(params.CategoryId),
+		Title:      util.InputCategoryCredit(float64(params.CategoryId)),
+	}
+	category, catErr := u.CategoryRepo.CreateCategoryCredits(ctx, tx, paramCategory)
+	if catErr != nil {
+		u.Log.Errorf("failed create category credit %v", catErr)
+		return model.Credit{}, catErr
+	}
 	update := zero.TimeFromPtr(creditRes.UpdatedAt)
 	res := model.Credit{
 		Uid:            creditRes.Uid,
 		Id:             creditRes.Id,
-		CategoryCredit: creditRes.CategoryCredit,
+		CategoryCredit: category.Title,
 		TypeCredit:     creditRes.TypeCredit,
 		Total:          creditRes.Total,
 		LoanTerm:       creditRes.LoanTerm,
@@ -98,21 +109,21 @@ func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.Creat
 }
 
 // UpdateCredit implements CreditUsecase.
-func (u *CreditUsecaseImpl) GetAllCredit(ctx context.Context, params model.GetCreditParams) ([]model.Credit, float64, error) {
+func (u *CreditUsecaseImpl) GetAllCredit(ctx context.Context, params model.GetCreditParams) ([]model.CreditResponse, float64, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 
 	credits, err := u.CreditRepo.GetAllCredit(ctx, tx, params)
 	if err != nil {
-		u.Log.Error()
+		u.Log.Errorf("failed get all credit %v", err)
 		err = errors.New("failed get all credit")
-		return []model.Credit{}, 0, err
+		return []model.CreditResponse{}, 0, err
 	}
 	count, err := u.CreditRepo.GetCountCredit(ctx, tx, params.Uid)
 	if err != nil {
-		u.Log.Error()
+		u.Log.Errorf("failed get count credit %v", err)
 		err = errors.New("failed get count credit")
-		return []model.Credit{}, 0, err
+		return []model.CreditResponse{}, 0, err
 	}
 	return credits, count, nil
 }
@@ -205,8 +216,10 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 }
 
 func NewCreditUsecase(CreditRepo repository.CreditRepository, BalanceRepo repository.BalanceRepository,
-	AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, ExpenseRepo repository.ExpenseRepository) CreditUsecase {
-	return &CreditUsecaseImpl{CreditRepo: CreditRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db, ExpenseRepo: ExpenseRepo}
+	AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, ExpenseRepo repository.ExpenseRepository,
+	CategoryRepo repository.CategoryRepository) CreditUsecase {
+	return &CreditUsecaseImpl{CreditRepo: CreditRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db,
+		ExpenseRepo: ExpenseRepo, CategoryRepo: CategoryRepo}
 }
 
 func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.CreditRepository, credit model.Credit) error {
