@@ -67,11 +67,12 @@ func (c *IncomeController) GetIncomes(ctx *gin.Context) {
 	}
 	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
 	params := model.GetIncomeParams{
-		Uid:            authPayload.Uid,
-		CategoryIncome: req.CategoryIncome,
-		TypeIncome:     req.TypeIncome,
-		Limit:          req.TotalPage,
-		Offset:         (req.Page - 1) * req.TotalPage,
+		Uid: authPayload.Uid,
+		// CategoryIncome: req.CategoryIncome,
+		TypeIncome: req.TypeIncome,
+		CategoryId: req.CategoryId,
+		Limit:      req.TotalPage,
+		Offset:     (req.Page - 1) * req.TotalPage,
 	}
 	incomes, total, err := c.IncomeUsecase.GetIncomes(ctx, params)
 	if err != nil {

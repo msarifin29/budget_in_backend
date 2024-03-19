@@ -110,7 +110,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		Id:    expense.CategoryId,
 		Title: util.InputCategoryexpense(expense.CategoryId),
 	}
-	category, categoryErr := u.CategoryRepo.CreateCategoryExpense(&ctx, tx, paramCategory)
+	category, categoryErr := u.CategoryRepo.CreateCategoryExpense(ctx, tx, paramCategory)
 	if categoryErr != nil {
 		u.Log.Errorf("failed add category expense %e :", categoryErr)
 		return model.Expense{}, categoryErr

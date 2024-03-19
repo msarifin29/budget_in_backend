@@ -10,8 +10,8 @@ import (
 
 type IncomeRepository interface {
 	CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error)
-	GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.Income, error)
-	GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string, typeIncome string) (float64, error)
+	GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.IncomeResponse, error)
+	GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, Id int32, typeIncome string) (float64, error)
 	GetIncomesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Income, error)
 }
 
@@ -49,10 +49,13 @@ func (*IncomeRepositoryImpl) GetIncomesByMonth(ctx context.Context, tx *sql.Tx, 
 }
 
 // GetTotalIncomes implements IncomeRepository.
-func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, CategoryIncome string, typeIncome string) (float64, error) {
+func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, uid string, Id int32, typeIncome string) (float64, error) {
 	var total float64
-	script := `SELECT COUNT(*)from incomes where uid = ? && category_income LIKE ? and type_income LIKE ?`
-	err := tx.QueryRowContext(ctx, script, uid, `%`+CategoryIncome+`%`, `%`+typeIncome+`%`).Scan(&total)
+	cId := categoryId(Id)
+	script := `SELECT COUNT(*)as total from incomes i
+	LEFT JOIN t_category_incomes t ON i.id = t.category_id
+	where uid = ? && t.id LIKE ? and type_income LIKE ?`
+	err := tx.QueryRowContext(ctx, script, uid, `%`+cId+`%`, `%`+typeIncome+`%`).Scan(&total)
 	return total, err
 }
 
@@ -69,31 +72,36 @@ func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, incom
 }
 
 // GetIncomes implements IncomeRepository.
-func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.Income, error) {
-	script := `select * from incomes where uid = ? && category_income LIKE ? 
-	and type_income LIKE ? order by id limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, `%`+params.CategoryIncome+`%`, `%`+params.TypeIncome+`%`, params.Limit, params.Offset)
+func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.IncomeResponse, error) {
+	cId := categoryId(params.CategoryId)
+	script := `
+	select i.*, t.category_id, t.id as t_id, t.title
+	from incomes i
+	LEFT JOIN t_category_incomes t ON i.id = t.category_id
+	where uid = ? and i.type_income LIKE ? and t.id LIKE ?
+	order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, params.Uid, `%`+params.TypeIncome+`%`, `%`+cId+`%`, params.Limit, params.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	incomes := []model.Income{}
-	var i model.Income
+	incomes := []model.IncomeResponse{}
+	var i model.IncomeResponse
 	update := zero.TimeFromPtr(i.UpdatedAt)
-	transaction := zero.StringFromPtr(&i.TransactionId)
 	for rows.Next() {
 		err := rows.Scan(
-			&i.Uid,
-			&i.Id,
-			&i.CategoryIncome,
-			&i.Total,
-			&i.CreatedAt,
-			&update,
-			&i.TypeIncome,
-			&transaction,
+			&i.Uid, &i.Id,
+			&i.CategoryIncome, &i.Total,
+			&i.CreatedAt, &update,
+			&i.TypeIncome, &i.TransactionId,
+			&i.TCategory.CategoryId,
+			&i.TCategory.Id, &i.TCategory.Title,
 		)
 		if err != nil {
 			return nil, err
+		}
+		if i.TransactionId == "" {
+			i.TransactionId = ""
 		}
 		incomes = append(incomes, i)
 	}

@@ -19,12 +19,13 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateIncomeRequest{
-		Uid:            "fadab647-cf23-46fc-bd4d-e7d06d32d753",
-		CategoryIncome: util.SALARY,
-		TypeIncome:     util.DEBIT,
-		Total:          2000000,
-		AccountId:      "b857228c-a750-47ef-85ef-5cf1e6150362",
-		CreatedAt:      "", // 2015-09-02T08:00:00Z
+		Uid: "fadab647-cf23-46fc-bd4d-e7d06d32d753",
+		// CategoryIncome: util.SALARY,
+		TypeIncome: util.DEBIT,
+		Total:      20000,
+		CategoryId: 2,
+		AccountId:  "b857228c-a750-47ef-85ef-5cf1e6150362",
+		CreatedAt:  "", // 2015-09-02T08:00:00Z
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -84,7 +85,8 @@ func TestGetIncomesSuccess(t *testing.T) {
 
 	params := model.GetIncomeRequest{
 		// CategoryIncome: util.DAILY,
-		TypeIncome: "Debit",
+		// TypeIncome: "Cash",
+		CategoryId: 1,
 		Page:       1,
 		TotalPage:  10,
 	}
@@ -93,6 +95,7 @@ func TestGetIncomesSuccess(t *testing.T) {
 	// Add query parameters to request URL
 	q := req.URL.Query()
 	q.Add("category_income", fmt.Sprintf("%v", params.CategoryIncome))
+	q.Add("category_id", fmt.Sprintf("%v", params.CategoryId))
 	q.Add("type_income", fmt.Sprintf("%v", params.TypeIncome))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))

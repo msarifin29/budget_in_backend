@@ -15,16 +15,17 @@ import (
 
 type IncomeUsecase interface {
 	CreateIncome(ctx context.Context, params model.CreateIncomeParams) (model.IncomeResponse, error)
-	GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.Income, float64, error)
+	GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.IncomeResponse, float64, error)
 	GetIncomesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error)
 }
 
 type IncomeUsecaseImpl struct {
-	IncomeRepo  repository.IncomeRepository
-	BalanceRepo repository.BalanceRepository
-	AccountRepo repository.AccountRepository
-	Log         *logrus.Logger
-	db          *sql.DB
+	CategoryRepo repository.CategoryRepository
+	IncomeRepo   repository.IncomeRepository
+	BalanceRepo  repository.BalanceRepository
+	AccountRepo  repository.AccountRepository
+	Log          *logrus.Logger
+	db           *sql.DB
 }
 
 // GetIncomesByMonth implements IncomeUsecase.
@@ -66,11 +67,23 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		u.Log.Errorf("failed create income %v", err)
 		return model.IncomeResponse{}, err
 	}
+	paramCategory := model.Category{
+		CategoryId: res.Id,
+		Id:         float64(params.CategoryId),
+		Title:      util.InputCategoryIncome(float64(params.CategoryId)),
+	}
+
+	category, catErr := u.CategoryRepo.CreateCategoryIncomes(ctx, tx, paramCategory)
+	if catErr != nil {
+		u.Log.Errorf("failed create catgory income %v", catErr)
+		return model.IncomeResponse{}, catErr
+	}
+
 	update := zero.TimeFromPtr(res.UpdatedAt)
 	return model.IncomeResponse{
 		Uid:            res.Uid,
 		Id:             res.Id,
-		CategoryIncome: res.CategoryIncome,
+		CategoryIncome: category.Title,
 		TypeIncome:     res.TypeIncome,
 		Total:          req.Total,
 		TransactionId:  res.TransactionId,
@@ -80,24 +93,25 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 }
 
 // GetIncomes implements IncomeUsecase.
-func (u *IncomeUsecaseImpl) GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.Income, float64, error) {
+func (u *IncomeUsecaseImpl) GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.IncomeResponse, float64, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
-	total, err := u.IncomeRepo.GetTotalIncomes(ctx, tx, params.Uid, params.CategoryIncome, params.TypeIncome)
+	total, err := u.IncomeRepo.GetTotalIncomes(ctx, tx, params.Uid, params.CategoryId, params.TypeIncome)
 	if err != nil {
 		u.Log.Errorf("failed get total incomes %v ", err)
-		return []model.Income{}, 0, err
+		return []model.IncomeResponse{}, 0, err
 	}
 	incomes, err := u.IncomeRepo.GetIncomes(ctx, tx, params)
 	if err != nil {
 		u.Log.Errorf("failed get incomes %v ", err)
-		return []model.Income{}, 0, err
+		return []model.IncomeResponse{}, 0, err
 	}
 	return incomes, total, nil
 }
 
-func NewIncomeUsecase(IncomeRepo repository.IncomeRepository, BalanceRepo repository.BalanceRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB) IncomeUsecase {
-	return &IncomeUsecaseImpl{IncomeRepo: IncomeRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db}
+func NewIncomeUsecase(IncomeRepo repository.IncomeRepository, BalanceRepo repository.BalanceRepository,
+	AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, CategoryRepo repository.CategoryRepository) IncomeUsecase {
+	return &IncomeUsecaseImpl{IncomeRepo: IncomeRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db, CategoryRepo: CategoryRepo}
 }
 
 func NewIncome(ctx context.Context, tx *sql.Tx, accountRepo repository.AccountRepository, Log *logrus.Logger, typeIncome string, accountId string, input float64) error {

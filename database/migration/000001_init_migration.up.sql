@@ -35,7 +35,7 @@ CREATE TABLE `expenses` (
 CREATE TABLE `incomes` (
   `uid` VARCHAR(255) NOT NULL,
   `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `category_income` VARCHAR(15) not NULL DEFAULT 'monthly',
+  `category_income` VARCHAR(15) DEFAULT 'other',
   `total` INT NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
