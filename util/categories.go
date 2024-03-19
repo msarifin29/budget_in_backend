@@ -32,6 +32,23 @@ var ValidCategoryType validator.Func = func(fieldLevel validator.FieldLevel) boo
 	return false
 }
 
+func InputCategoryIncome(id float64) string {
+	switch id {
+	case 1:
+		return OTHER
+	case 2:
+		return BUSINES
+	case 3:
+		return SALARY
+	case 4:
+		return ADDITIONALiNCOME
+	case 5:
+		return LOAN
+	default:
+		return OTHER
+	}
+}
+
 // func IsSupportedCategoryIncome(status string) bool {
 // 	switch status {
 // 	case OTHER, DAILY, WEEKLY, MONTHLY:
@@ -76,4 +93,37 @@ var ValidCategoryExpense validator.Func = func(fieldLevel validator.FieldLevel) 
 		return IsSupportedCategoryExpense(category)
 	}
 	return false
+}
+
+func InputCategoryexpense(id float64) string {
+	switch id {
+	case 1:
+		return OTHER
+	case 2:
+		return FOODANDDRINK
+	case 3:
+		return SHOPPING
+	case 4:
+		return TRANSPORT
+	case 5:
+		return MOTORCYCLEORCAR
+	case 6:
+		return TRAVELING
+	case 7:
+		return HEALTY
+	case 8:
+		return COSTANDBILL
+	case 9:
+		return EDUCATION
+	case 10:
+		return SPORTANDHOBBY
+	case 11:
+		return BEAUTY
+	case 12:
+		return WORK
+	case 13:
+		return FOODINGREDIENTS
+	default:
+		return OTHER
+	}
 }

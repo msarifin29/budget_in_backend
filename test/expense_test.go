@@ -21,8 +21,9 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	params := model.CreateExpenseParams{
 		Uid:         "fadab647-cf23-46fc-bd4d-e7d06d32d753",
 		ExpenseType: util.DEBIT,
-		Total:       2500,
+		Total:       2551,
 		Category:    util.OTHER,
+		CategoryId:  2,
 		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
 		CreatedAt:   "2015-09-02T08:00:00Z",
 	}
@@ -198,23 +199,25 @@ func TestGetExpensesSuccess(t *testing.T) {
 
 	params := model.GetExpenseRequest{
 		Status:      "success",
-		ExpenseType: "",
-		Category:    "other",
-		Page:        1,
-		TotalPage:   5,
+		ExpenseType: "Debit",
+		// Category:    "other",
+		// Id:        2,
+		Page:      1,
+		TotalPage: 5,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
 	q.Add("expense_type", fmt.Sprintf("%v", params.ExpenseType))
-	q.Add("category", fmt.Sprintf("%v", params.Category))
+	// q.Add("category", fmt.Sprintf("%v", params.Category))
+	q.Add("id", fmt.Sprintf("%v", params.Id))
 	q.Add("status", fmt.Sprintf("%v", params.Status))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "akainu", "deb3823d-5581-4e98-896c-06e5aa3bac4a", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))

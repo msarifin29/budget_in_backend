@@ -18,11 +18,12 @@ type ExpenseUsecase interface {
 	GetExpenseById(ctx context.Context, request model.ExpenseParamWithId) (model.Expense, error)
 	UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (bool, error)
 	DeleteExpense(ctx context.Context, id float64) error
-	GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.Expense, float64, error)
+	GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.ExpenseResponse, float64, error)
 	GetExpensesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error)
 }
 
 type ExpenseUsecaseImpl struct {
+	CategoryRepo      repository.CategoryRepository
 	ExpenseRepository repository.ExpenseRepository
 	BalanceRepository repository.BalanceRepository
 	AccountRepo       repository.AccountRepository
@@ -49,19 +50,19 @@ func (u *ExpenseUsecaseImpl) GetExpensesByMonth(ctx context.Context, params mode
 }
 
 // GetExpensez implements ExpenseUsecase.
-func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.Expense, float64, error) {
+func (u *ExpenseUsecaseImpl) GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.ExpenseResponse, float64, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 
-	total, err := u.ExpenseRepository.GetTotalExpenses(ctx, tx, params.Uid, params.Status, params.ExpenseType, params.Category)
+	total, err := u.ExpenseRepository.GetTotalExpenses(ctx, tx, params.Uid, params.Status, params.ExpenseType, params.Id)
 	if err != nil {
 		u.Log.Errorf("failed get count expenses %v ", err)
-		return []model.Expense{}, 0, errors.New("failed get count expenses")
+		return []model.ExpenseResponse{}, 0, errors.New("failed get count expenses")
 	}
 	expenses, err := u.ExpenseRepository.GetExpenses(ctx, tx, params)
 	if err != nil {
 		u.Log.Errorf("failed get expenses %v ", err)
-		return []model.Expense{}, 0, errors.New("failed get expenses")
+		return []model.ExpenseResponse{}, 0, errors.New("failed get expenses")
 	}
 	return expenses, total, nil
 }
@@ -103,14 +104,24 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		u.Log.Errorf("failed create expense %e :", err)
 		return model.Expense{}, err
 	}
+	paramCategory := model.Category{
+		CategoryId: res.Id,
 
+		Id:    expense.CategoryId,
+		Title: util.InputCategoryexpense(expense.CategoryId),
+	}
+	category, categoryErr := u.CategoryRepo.CreateCategoryExpense(&ctx, tx, paramCategory)
+	if categoryErr != nil {
+		u.Log.Errorf("failed add category expense %e :", categoryErr)
+		return model.Expense{}, categoryErr
+	}
 	update := zero.TimeFromPtr(res.UpdatedAt)
 	return model.Expense{
 		Uid:           res.Uid,
 		Id:            res.Id,
 		ExpenseType:   res.ExpenseType,
 		Total:         res.Total,
-		Category:      res.Category,
+		Category:      category.Title,
 		Status:        res.Status,
 		Notes:         notes.String,
 		TransactionId: res.TransactionId,
@@ -200,12 +211,14 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 }
 
 func NewExpenseUsecase(
+	CategoryRepo repository.CategoryRepository,
 	ExpenseRepository repository.ExpenseRepository,
 	BalanceRepository repository.BalanceRepository,
 	AccountRepo repository.AccountRepository,
 	Log *logrus.Logger,
 	db *sql.DB) ExpenseUsecase {
 	return &ExpenseUsecaseImpl{
+		CategoryRepo:      CategoryRepo,
 		ExpenseRepository: ExpenseRepository,
 		BalanceRepository: BalanceRepository,
 		AccountRepo:       AccountRepo,

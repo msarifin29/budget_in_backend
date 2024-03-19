@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/util/zero"
@@ -13,8 +14,8 @@ type ExpenseRepository interface {
 	GetExpenseById(ctx context.Context, tx *sql.Tx, id float64) (model.Expense, error)
 	UpdateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense, id float64) (model.Expense, error)
 	DeleteExpense(ctx context.Context, tx *sql.Tx, id float64) error
-	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error)
-	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, category string) (float64, error)
+	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error)
+	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id int32) (float64, error)
 	GetExpensesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Expense, error)
 }
 
@@ -53,42 +54,50 @@ func (*ExpenseRepositoryImpl) GetExpensesByMonth(ctx context.Context, tx *sql.Tx
 }
 
 // GetTotalExpenses implements ExpenseRepository.
-func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, category string) (float64, error) {
+func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id int32) (float64, error) {
 	var total float64
-	script := `SELECT COUNT(*)from expenses where uid = ? and status = ? and expense_type LIKE ? and category LIKE ?`
-	err := tx.QueryRowContext(ctx, script, uid, status, "%"+expenseType+"%", "%"+category+"%").Scan(&total)
+	cId := categoryId(Id)
+	script := `SELECT COUNT(*) AS total
+	FROM expenses e
+	LEFT JOIN t_category_expenses t ON e.id = t.category_id
+	where uid = ? and e.status = ? and e.expense_type LIKE ? and t.id LIKE ?`
+	err := tx.QueryRowContext(ctx, script, uid, status, "%"+expenseType+"%", "%"+cId+"%").Scan(&total)
 	return total, err
 }
 
 // GetExpenses implements ExpenseRepository.
-func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.Expense, error) {
-	script := `select * from expenses where uid = ? and status = ? 
-	and expense_type LIKE ?
-	and category LIKE ? order by id limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status, "%"+params.ExpenseType+"%", "%"+params.Category+"%", params.Limit, params.Offset)
+func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error) {
+	cId := categoryId(params.Id)
+	script := `select e.*, t.category_id, t.id as t_id, t.title
+	from expenses e
+	LEFT JOIN t_category_expenses t ON e.id = t.category_id
+	where uid = ? and status = ? 
+	and e.expense_type LIKE ? and t.id LIKE ?
+	order by id limit ? offset ?`
+	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status,
+		"%"+params.ExpenseType+"%", "%"+cId+"%", params.Limit, params.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	expenses := []model.Expense{}
+	expenses := []model.ExpenseResponse{}
 	for rows.Next() {
-		var i model.Expense
-		notes := zero.StringFromPtr(&i.Notes)
+		var i model.ExpenseResponse
 		update := zero.TimeFromPtr(i.UpdatedAt)
 		transaction := zero.StringFromPtr(&i.TransactionId)
 		if err := rows.Scan(
-			&i.Id,
-			&i.ExpenseType,
-			&i.Total,
-			&notes,
-			&i.CreatedAt,
-			&update,
-			&i.Uid,
-			&i.Category,
-			&i.Status,
-			&transaction,
+			&i.Id, &i.ExpenseType,
+			&i.Total, &i.Notes,
+			&i.CreatedAt, &update,
+			&i.Uid, &i.Category,
+			&i.Status, &transaction,
+			&i.TCategory.CategoryId,
+			&i.TCategory.Id, &i.TCategory.Title,
 		); err != nil {
 			return nil, err
+		}
+		if i.Notes == "" {
+			i.Notes = ""
 		}
 		expenses = append(expenses, i)
 	}
@@ -155,4 +164,11 @@ func (*ExpenseRepositoryImpl) UpdateExpense(ctx context.Context, tx *sql.Tx, exp
 
 func NewExpenseRepository() ExpenseRepository {
 	return &ExpenseRepositoryImpl{}
+}
+
+func categoryId(id int32) string {
+	if id == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%v", int(id))
 }

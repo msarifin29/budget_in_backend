@@ -50,6 +50,33 @@ const ( // other id 1
 	VENTURECAPITAL    = "venture capital"     // id 10
 )
 
+func InputCategoryCredit(id float64) string {
+	switch id {
+	case 1:
+		return OTHER
+	case 2:
+		return ELECTRONIC
+	case 3:
+		return HANDTPHONE
+	case 4:
+		return COMPUTERANDLAPTOP
+	case 5:
+		return MOTORCYCLE
+	case 6:
+		return CAR
+	case 7:
+		return PROPERTY
+	case 8:
+		return FURNITURE
+	case 9:
+		return KITCHENSET
+	case 10:
+		return VENTURECAPITAL
+	default:
+		return OTHER
+	}
+}
+
 func IsSupportedCategoryCredit(status string) bool {
 	switch status {
 	case ELECTRONIC, HANDTPHONE, COMPUTERANDLAPTOP, MOTORCYCLE, CAR, PROPERTY, FURNITURE, KITCHENSET, VENTURECAPITAL, OTHER:

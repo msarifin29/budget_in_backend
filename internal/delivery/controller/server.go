@@ -40,10 +40,11 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	creditRepo := repository.NewCreditRepository()
 	accountRepo := repository.NewAccountRepository()
 	monthlyRepo := repository.NewMonthlyRepository()
+	categoryRepo := repository.NewCategoryRepository()
 
 	// Usecases
 	userUsecase := usecase.NewUserUsecase(userRepo, accountRepo, Log, db, Con)
-	expenseUseCase := usecase.NewExpenseUsecase(expenseRepo, balanceRepo, accountRepo, Log, db)
+	expenseUseCase := usecase.NewExpenseUsecase(categoryRepo, expenseRepo, balanceRepo, accountRepo, Log, db)
 	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, accountRepo, Log, db)
 	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, accountRepo, Log, db, expenseRepo)
 	accountUsacase := usecase.NewAccountUsacase(accountRepo, Log, db)

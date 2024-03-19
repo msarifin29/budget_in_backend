@@ -21,8 +21,8 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	params := model.CreateIncomeRequest{
 		Uid:            "fadab647-cf23-46fc-bd4d-e7d06d32d753",
 		CategoryIncome: util.SALARY,
-		TypeIncome:     util.CASH,
-		Total:          2000,
+		TypeIncome:     util.DEBIT,
+		Total:          2000000,
 		AccountId:      "b857228c-a750-47ef-85ef-5cf1e6150362",
 		CreatedAt:      "", // 2015-09-02T08:00:00Z
 	}

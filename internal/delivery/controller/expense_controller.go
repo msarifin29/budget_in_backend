@@ -155,10 +155,11 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 	}
 	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
 	params := model.GetExpenseParams{
-		Uid:         authPayload.Uid,
-		Status:      req.Status,
-		Category:    req.Category,
+		Uid:    authPayload.Uid,
+		Status: req.Status,
+		// Category:    req.Category,
 		ExpenseType: req.ExpenseType,
+		Id:          req.Id,
 		Limit:       req.TotalPage,
 		Offset:      (req.Page - 1) * req.TotalPage,
 	}

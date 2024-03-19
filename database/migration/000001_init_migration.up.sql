@@ -63,6 +63,30 @@ CREATE TABLE `history_credit` (
   `updated_at` timestamp DEFAULT null ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE `t_category_expenses` (
+  `category_id` int PRIMARY KEY UNIQUE NOT NULL,
+  `id` int NOT NULL,
+  `title` varchar(50) NOT NULL
+);
+
+CREATE TABLE `t_category_incomes` (
+  `category_id` int PRIMARY KEY UNIQUE NOT NULL,
+  `id` int NOT NULL,
+  `title` varchar(50) NOT NULL
+);
+
+CREATE TABLE `t_category_credits` (
+  `category_id` int PRIMARY KEY UNIQUE NOT NULL,
+  `id` int NOT NULL,
+  `title` varchar(50) NOT NULL
+);
+
+ALTER TABLE t_category_expenses add CONSTRAINT fk_t_category_expenses_expenses FOREIGN KEY (category_id) REFERENCES expenses (id);
+
+ALTER TABLE t_category_incomes add CONSTRAINT fk_t_category_incomes_incomes FOREIGN KEY (category_id) REFERENCES incomes (id);
+
+ALTER TABLE t_category_credits add CONSTRAINT fk_t_category_credits_credits FOREIGN KEY (category_id) REFERENCES credits (id);
+
 -- ALTER TABLE regencies add CONSTRAINT fk_regencies_users FOREIGN KEY (user_id) REFERENCES users (uid)
 
 -- ALTER TABLE occupations add CONSTRAINT fk_occupations_users FOREIGN KEY (user_id) REFERENCES users (uid)
