@@ -72,7 +72,7 @@ func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserR
 	reqAccount := model.Account{
 		UserId:      req.Uid,
 		AccountId:   uuid.NewString(),
-		AccountName: "",
+		AccountName: req.UserName,
 		Balance:     user.Balance,
 		Cash:        user.Cash,
 		Debts:       0,
