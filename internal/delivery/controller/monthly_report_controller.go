@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,9 +21,25 @@ func NewMonthlyController(Usecase usecase.MonthlyReportUsecase, Log *logrus.Logg
 	return &MonthlyReportController{Usecase: Usecase, Log: Log}
 }
 func (c *MonthlyReportController) GetMonthlyReport(ctx *gin.Context) {
-
+	var req model.ParamMonthlyReport
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		c.Log.Errorf("failed binding request %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
-	res, err := c.Usecase.GetMonthlyReport(ctx, authPayload.Uid)
+	if req.Uid != authPayload.Uid {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, model.MetaErrorResponse{
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+	res, err := c.Usecase.GetMonthlyReport(ctx, req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
 			Code:    http.StatusBadRequest,

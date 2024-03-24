@@ -16,9 +16,9 @@ func TestGetMonthlyReportSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/user/monthly_report/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/user/monthly_report/b9beed09-e6bb-403d-ad3b-cb6560fa2dba", nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("monthly_report :", string(bytes))

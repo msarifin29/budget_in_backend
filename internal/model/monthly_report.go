@@ -15,7 +15,9 @@ type MonthlyRequest struct {
 	Year  string `form:"year" binding:"required"`
 	Month string `form:"month" binding:"required"`
 }
-
+type ParamMonthlyReport struct {
+	Uid string `uri:"uid" json:"uid" binding:"required"`
+}
 type MonthlyResponse struct {
 	Date          *time.Time `json:"date"`
 	TotalIncomes  float64    `json:"total_incomes"`
