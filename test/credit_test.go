@@ -93,18 +93,18 @@ func TestUpdateHistoryCreditSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateHistoryCreditRequest{
-		Uid:         "a0ea433a-13b2-4414-aa8a-6369acd2b547",
-		Id:          29,
-		CreditId:    8,
+		Uid:         "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
+		Id:          41,
+		CreditId:    13,
 		TypePayment: util.CASH,
-		AccountId:   "aa8a-6369acd2b547",
+		AccountId:   "8dc08329-f468-4532-b942-52301d3cd1c2",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/credits/update_history", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "boy", "a0ea433a-13b2-4414-aa8a-6369acd2b547", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body =>", string(bytes))

@@ -199,12 +199,13 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		TransactionId: uuid.NewString(),
 		CreatedAt:     &now,
 	}
-	_, er := u.ExpenseRepo.CreateExpense(ctx, tx, expense)
+	newEx, er := u.ExpenseRepo.CreateExpense(ctx, tx, expense)
 	if er != nil {
 		u.Log.Error(er)
 		er = errors.New("failed create expense")
 		return model.UpdateHistoryResponse{}, er
 	}
+	u.Log.Infof("expense :%v", newEx)
 	return model.UpdateHistoryResponse{
 		Id:          historyC.Id,
 		Th:          historyC.Th,

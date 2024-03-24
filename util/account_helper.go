@@ -92,11 +92,6 @@ func NewDebts(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, accountRepo r
 		}
 		newDebt = debts + input
 	case COMPLETED:
-		if debts <= 0 {
-			err = fmt.Errorf("min debts is 0 %v ", debts)
-			Log.Error(err)
-			return err
-		}
 		newDebt = debts - input
 	}
 
