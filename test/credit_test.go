@@ -19,20 +19,22 @@ func TestCreateCreditSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateCreditRequest{
-		Uid: "f1687230-49d3-4657-96be-9b934ed0387f",
+		Uid: "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
 		// CategoryCredit: util.ELECTRONIC,
-		CategoryId:  5,
-		TypeCredit:  util.MONTHLY,
-		LoanTerm:    3,
-		Installment: 2555,
-		PaymentTime: time.Now().Day(),
+		CategoryId: 1,
+		TypeCredit: util.MONTHLY,
+		// LoanTerm:    3,
+		Installment: 5000,
+		// PaymentTime: time.Now().Day(),
+		StartDate: "2024-12-29",
+		EndDate:   "2025-03-30",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/credits/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body =>", string(bytes))
@@ -51,9 +53,10 @@ func TestCreateCreditFailed(t *testing.T) {
 		Uid:            "f1687230-49d3-4657-96be-9b934ed0387f",
 		CategoryCredit: util.ELECTRONIC,
 		TypeCredit:     util.MONTHLY,
-		LoanTerm:       0,
-		Installment:    1000,
-		PaymentTime:    time.Now().Day(),
+		// LoanTerm:       0,
+		Installment: 1000,
+		// PaymentTime:    time.Now().Day(),
+
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -94,8 +97,8 @@ func TestUpdateHistoryCreditSuccess(t *testing.T) {
 
 	params := model.UpdateHistoryCreditRequest{
 		Uid:         "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
-		Id:          41,
-		CreditId:    13,
+		Id:          87,
+		CreditId:    34,
 		TypePayment: util.CASH,
 		AccountId:   "8dc08329-f468-4532-b942-52301d3cd1c2",
 	}

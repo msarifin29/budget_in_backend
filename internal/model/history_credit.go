@@ -12,14 +12,16 @@ type HistoryCredit struct {
 	CreatedAt   *time.Time `json:"created_at"`
 	UpdatedAt   *time.Time `json:"updated_at"`
 	PaymentTime int        `json:"payment_time"`
+	Date        *time.Time `json:"date"`
 }
 type CreateHistoryCredit struct {
-	CreditId    float64 `json:"credit_id" binding:"required"`
-	Th          float64 `json:"th" binding:"required,min=1"`
-	Total       float64 `json:"total" binding:"required,min=2000"`
-	Status      string  `json:"status" binding:"required,status_credit"`
-	TypePayment string  `json:"type_payment"`
-	PaymentTime int     `json:"payment_time"`
+	CreditId    float64    `json:"credit_id" binding:"required"`
+	Th          float64    `json:"th"`
+	Total       float64    `json:"total" binding:"required,min=2000"`
+	Status      string     `json:"status" binding:"required,status_credit"`
+	TypePayment string     `json:"type_payment"`
+	PaymentTime int        `json:"payment_time"`
+	Date        *time.Time `json:"date"`
 }
 type UpdateHistoryCreditParams struct {
 	Uid         string  `json:"uid" binding:"required"`
@@ -58,6 +60,7 @@ type UpdateHistoryResponse struct {
 	Status      string     `json:"status"`
 	TypePayment string     `json:"type_payment"`
 	CreatedAt   *time.Time `json:"created_at"`
+	Date        *time.Time `json:"date"`
 }
 
 func NewHistoryCredit(history HistoryCredit) *HistoryCredit {
@@ -71,6 +74,7 @@ func NewHistoryCredit(history HistoryCredit) *HistoryCredit {
 		PaymentTime: history.PaymentTime,
 		CreatedAt:   history.CreatedAt,
 		UpdatedAt:   history.UpdatedAt,
+		Date:        history.Date,
 	}
 }
 

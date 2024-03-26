@@ -54,28 +54,32 @@ func (u *CreditUsecaseImpl) GetAllHistoryCredit(ctx context.Context, params mode
 
 // CreateCredit implements CreditUsecase.
 func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.CreateCreditRequest) (model.Credit, error) {
+	loanTerm := util.GetTotalMonth(util.Date(params.StartDate), util.Date(params.EndDate))
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 	req := model.Credit{
 		Uid:            params.Uid,
 		CategoryCredit: params.CategoryCredit,
 		TypeCredit:     params.TypeCredit,
-		Total:          params.LoanTerm * params.Installment,
-		LoanTerm:       params.LoanTerm,
+		Total:          float64(loanTerm) * params.Installment,
+		LoanTerm:       float64(loanTerm),
 		StatusCredit:   util.ACTIVE,
 		Installment:    params.Installment,
-		PaymentTime:    params.PaymentTime,
+		PaymentTime:    util.Date(params.StartDate).Day(),
+		StartDate:      util.Date(params.StartDate),
+		EndDate:        util.Date(params.EndDate),
 	}
 	creditRes, err := u.CreditRepo.CreateCredit(ctx, tx, req)
 	if err != nil {
 		u.Log.Errorf("failed create credit %v", err)
 		return model.Credit{}, err
 	}
-	err = NewHistoryCredit(ctx, tx, u.CreditRepo, creditRes)
+	err = NewHistoryCredit(ctx, tx, u.CreditRepo, creditRes, u.Log)
 	if err != nil {
 		u.Log.Errorf("failed create history credit %v", err)
 		return model.Credit{}, err
 	}
+
 	err = NewDebts(ctx, tx, u.Log, u.BalanceRepo, util.ACTIVE, creditRes.Uid, creditRes.Total)
 	if err != nil {
 		u.Log.Errorf("failed update depts %v", err)
@@ -98,7 +102,7 @@ func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.Creat
 		CategoryCredit: category.Title,
 		TypeCredit:     creditRes.TypeCredit,
 		Total:          creditRes.Total,
-		LoanTerm:       creditRes.LoanTerm,
+		LoanTerm:       float64(loanTerm),
 		StatusCredit:   util.ACTIVE,
 		Installment:    creditRes.Installment,
 		CreatedAt:      creditRes.CreatedAt,
@@ -223,18 +227,24 @@ func NewCreditUsecase(CreditRepo repository.CreditRepository, BalanceRepo reposi
 		ExpenseRepo: ExpenseRepo, CategoryRepo: CategoryRepo}
 }
 
-func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.CreditRepository, credit model.Credit) error {
-	for i := 0; i < int(credit.LoanTerm); i++ {
+func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.CreditRepository, credit model.Credit, log *logrus.Logger) error {
+	dates := util.GenerateDates(*credit.StartDate, *credit.EndDate)
+	for i := 0; i < len(dates); i++ {
+		date := util.Date(dates[i])
+		log.Info(date)
 		req := model.HistoryCredit{
 			CreditId:    credit.Id,
 			Th:          float64(i + 1),
 			Total:       credit.Installment,
 			Status:      util.ACTIVE,
 			TypePayment: "",
-			PaymentTime: credit.PaymentTime,
+			PaymentTime: credit.StartDate.Day(),
+			Date:        date,
 		}
-		_, err := creditRepo.CreateHistoryCredit(ctx, tx, req)
+		hc, err := creditRepo.CreateHistoryCredit(ctx, tx, req)
+		log.Printf("history credit %v ", hc)
 		if err != nil {
+			log.Errorf("history error %v ", err)
 			return err
 		}
 	}

@@ -138,6 +138,8 @@ func (CreditRepositoryImpl) GetCreditById(ctx context.Context, tx *sql.Tx, credi
 		&update,
 		&i.Installment,
 		&i.PaymentTime,
+		&i.StartDate,
+		&i.EndDate,
 	)
 	return i, err
 }
@@ -159,20 +161,19 @@ func (CreditRepositoryImpl) GetHistoryCreditById(ctx context.Context, tx *sql.Tx
 		&update,
 		&typePayment,
 		&i.PaymentTime,
+		&i.Date,
 	)
 	return i, err
 }
 
 // CreateHistoryCredit implements CreditRepository.
 func (CreditRepositoryImpl) CreateHistoryCredit(ctx context.Context, tx *sql.Tx, historyC model.HistoryCredit) (model.HistoryCredit, error) {
-	script := `insert into history_credit (credit_id,th,total,status,type_payment,payment_time) values (?,?,?,?,?,?)`
+	script := `insert into history_credit (credit_id,th,total,status,type_payment,payment_time,date) values (?,?,?,?,?,?,?)`
 	result, errC := tx.ExecContext(ctx, script,
-		historyC.CreditId,
-		historyC.Th,
-		historyC.Total,
-		historyC.Status,
-		historyC.TypePayment,
-		historyC.PaymentTime)
+		historyC.CreditId, historyC.Th,
+		historyC.Total, historyC.Status,
+		historyC.TypePayment, historyC.PaymentTime,
+		historyC.Date)
 
 	if errC != nil {
 		return model.HistoryCredit{}, errC
@@ -209,16 +210,13 @@ func (CreditRepositoryImpl) UpdateHistoryCredit(ctx context.Context, tx *sql.Tx,
 
 // Create implements CreditRepository.
 func (CreditRepositoryImpl) CreateCredit(ctx context.Context, tx *sql.Tx, credit model.Credit) (model.Credit, error) {
-	script := `insert into credits (uid,category_credit,type_credit,total,loan_term,status_credit,installment,payment_time) values (?,?,?,?,?,?,?,?)`
+	script := `insert into credits (uid,category_credit,type_credit,total,loan_term,status_credit,installment,payment_time,start_date,end_date) values (?,?,?,?,?,?,?,?,?,?)`
 	result, errC := tx.ExecContext(ctx, script,
-		credit.Uid,
-		credit.CategoryCredit,
-		credit.TypeCredit,
-		credit.Total,
-		credit.LoanTerm,
-		credit.StatusCredit,
-		credit.Installment,
-		credit.PaymentTime)
+		credit.Uid, credit.CategoryCredit,
+		credit.TypeCredit, credit.Total,
+		credit.LoanTerm, credit.StatusCredit,
+		credit.Installment, credit.PaymentTime,
+		credit.StartDate, credit.EndDate)
 	if errC != nil {
 		return model.Credit{}, errC
 	}

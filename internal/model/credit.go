@@ -14,6 +14,8 @@ type Credit struct {
 	UpdatedAt      *time.Time `json:"updated_at"`
 	StatusCredit   string     `json:"status_credit"`
 	Installment    float64    `json:"installment"`
+	StartDate      *time.Time `json:"start_date"`
+	EndDate        *time.Time `json:"end_date"`
 }
 type CreditResponse struct {
 	Uid            string          `json:"uid"`
@@ -28,15 +30,19 @@ type CreditResponse struct {
 	StatusCredit   string          `json:"status_credit"`
 	Installment    float64         `json:"installment"`
 	TCategory      CategoryReponse `json:"t_category"`
+	StartDate      *time.Time      `json:"start_date"`
+	EndDate        *time.Time      `json:"end_date"`
 }
 type CreateCreditRequest struct {
 	Uid            string  `json:"uid" binding:"required"`
 	CategoryCredit string  `json:"category_credit"`
 	CategoryId     int32   `json:"category_id" binding:"required"`
 	TypeCredit     string  `json:"type_credit" binding:"required,type_credit"`
-	LoanTerm       float64 `json:"loan_term" binding:"required,min=1"`
+	LoanTerm       float64 `json:"loan_term"`
 	Installment    float64 `json:"installment" binding:"required,min=2000"`
-	PaymentTime    int     `json:"payment_time" binding:"required,min=1,max=31"`
+	PaymentTime    int     `json:"payment_time"`
+	StartDate      string  `json:"start_date" binding:"required"`
+	EndDate        string  `json:"end_date" binding:"required"`
 }
 type UpdateCreditRequest struct {
 	Uid          string  `json:"uid" binding:"required"`
@@ -70,6 +76,8 @@ func NewCredit(credit Credit) *Credit {
 		PaymentTime:    credit.PaymentTime,
 		CreatedAt:      credit.CreatedAt,
 		UpdatedAt:      credit.UpdatedAt,
+		StartDate:      credit.StartDate,
+		EndDate:        credit.EndDate,
 	}
 }
 

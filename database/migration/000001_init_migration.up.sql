@@ -112,6 +112,9 @@ ALTER TABLE `history_credit` ADD CONSTRAINT fk_historycredit_credits FOREIGN KEY
 
 ALTER TABLE `credits` ADD COLUMN `installment` INT NOT NULL;
 ALTER TABLE `credits` ADD COLUMN `payment_time` INT NOT NULL;
+ALTER TABLE `credits` ADD COLUMN `start_date` TIMESTAMP NOT NULL;
+ALTER TABLE `credits` ADD COLUMN `end_date` TIMESTAMP NOT NULL;
 
 ALTER TABLE `history_credit` ADD COLUMN `type_payment` VARCHAR(10) not NULL DEFAULT 'cash';
 ALTER TABLE `history_credit` ADD COLUMN `payment_time` int NOT NULL;
+ALTER TABLE `history_credit` ADD COLUMN `date` TIMESTAMP NOT NULL;
