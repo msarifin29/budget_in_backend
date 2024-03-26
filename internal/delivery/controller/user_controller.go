@@ -214,3 +214,41 @@ func (c *UserController) ForgotPassword(ctx *gin.Context) {
 		Data:    ok,
 	})
 }
+
+func (c *UserController) NonActivatedUser(ctx *gin.Context) {
+	var req model.NonActiveUserRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.Log.Errorf("binding %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	if authPayload.Uid != req.Uid {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, model.MetaErrorResponse{
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+	params := model.NonActiveUserParams{Uid: authPayload.Uid}
+	ok, err := c.UserUsecase.NonActivatedUser(ctx, params)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    ok,
+	})
+}

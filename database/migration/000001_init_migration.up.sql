@@ -97,6 +97,7 @@ ALTER TABLE `users` ADD COLUMN `savings` INT DEFAULT 0;
 ALTER TABLE `users` ADD COLUMN `cash` INT DEFAULT 0;
 ALTER TABLE `users` ADD COLUMN `debts` INT DEFAULT 0;
 ALTER TABLE `users` ADD COLUMN `currency` varchar(10) DEFAULT 'IDR';
+ALTER TABLE `users` ADD COLUMN `status` varchar(15) DEFAULT 'active';
 
 ALTER TABLE `expenses` ADD COLUMN `uid` varchar(255) NOT NULL;
 ALTER TABLE `expenses` ADD COLUMN `category` varchar(50) DEFAULT 'other';

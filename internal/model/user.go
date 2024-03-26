@@ -18,6 +18,7 @@ type User struct {
 	Cash      float64    `json:"cash"`
 	Debts     float64    `json:"debts"`
 	Currency  string     `json:"currency"`
+	Status    string     `json:"status"`
 }
 
 type CreateUserRequest struct {
@@ -60,6 +61,7 @@ type UserProfileResponse struct {
 	Cash      float64    `json:"cash"`
 	Debts     float64    `json:"debts"`
 	Currency  string     `json:"currency"`
+	Status    string     `json:"status"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 }
@@ -81,11 +83,19 @@ type AccountUser struct {
 
 type UpdateUserRequest struct {
 	Uid      string `json:"uid" binding:"required"`
-	UserName string `json:"username"`
+	UserName string `json:"username" binding:"required"`
 }
 
 type UserRequest struct {
 	Uid string `uri:"uid"`
+}
+
+type NonActiveUserParams struct {
+	Uid    string `json:"uid" binding:"required"`
+	Status string `json:"status" binding:"required"`
+}
+type NonActiveUserRequest struct {
+	Uid string `json:"uid"`
 }
 
 type Regencies struct {

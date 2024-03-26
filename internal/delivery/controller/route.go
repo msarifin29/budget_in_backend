@@ -23,6 +23,8 @@ func (server *Server) SetUpRoute() {
 
 	autRoutes.GET("/api/user/:uid", server.UserC.GetById)
 	autRoutes.PUT("/api/update", server.UserC.UpdateUser)
+	autRoutes.PUT("/api/user/delete", server.UserC.NonActivatedUser)
+
 	// Monthly reports
 	autRoutes.GET("/api/user/monthly_report/:uid", server.MonthReportC.GetMonthlyReport)
 

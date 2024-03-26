@@ -20,6 +20,7 @@ type UserUsecase interface {
 	UpdateUser(ctx context.Context, user model.UpdateUserRequest) error
 	GetById(ctx context.Context, uid string) (model.AccountUser, error)
 	ResetPassword(ctx context.Context, req model.EmailUserRequest) (bool, error)
+	NonActivatedUser(ctx context.Context, req model.NonActiveUserParams) (bool, error)
 }
 
 type UserUsecaseImpl struct {
@@ -32,6 +33,29 @@ type UserUsecaseImpl struct {
 
 func NewUserUsecase(UserRepository repository.UserRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, conf config.Config) UserUsecase {
 	return &UserUsecaseImpl{UserRepository: UserRepository, AccountRepo: AccountRepo, Log: Log, db: db, conf: conf}
+}
+
+// NonActivatedUser implements UserUsecase.
+func (u *UserUsecaseImpl) NonActivatedUser(ctx context.Context, req model.NonActiveUserParams) (bool, error) {
+	tx, err := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+	if err != nil {
+		u.Log.Errorf("failed start transaction %e :", err)
+		return false, err
+	}
+	user, err := u.UserRepository.GetUserAccount(ctx, tx, req.Uid)
+	if err != nil {
+		u.Log.Errorf("user not found with id %s :", err)
+		message := "user not found with id :" + req.Uid
+		return false, errors.New(message)
+	}
+	ok, err := u.UserRepository.NonActivatedUser(ctx, tx, user.Uid, util.NonActive)
+	if !ok || err != nil {
+		u.Log.Errorf("failed delete account %s :", err)
+		err = errors.New("failed delete account")
+		return false, err
+	}
+	return ok, nil
 }
 
 func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserRequest) (model.UserResponse, error) {

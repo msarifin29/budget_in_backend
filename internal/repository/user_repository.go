@@ -16,9 +16,24 @@ type UserRepository interface {
 	UpdateUserName(ctx context.Context, tx *sql.Tx, user model.UpdateUserRequest) error
 	GetUserByEmail(ctx context.Context, tx *sql.Tx, req model.EmailUserRequest) (string, error)
 	UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error)
+	NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, status string) (bool, error)
 }
 
 type UserRepositoryImpl struct{}
+
+func NewUserRepository() UserRepository {
+	return &UserRepositoryImpl{}
+}
+
+// NonActivatedUser implements UserRepository.
+func (*UserRepositoryImpl) NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, status string) (bool, error) {
+	sqlScript := `update users set status = ? where uid = ?`
+	_, err := tx.ExecContext(ctx, sqlScript, status, uid)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
 // GetUserAccount implements UserRepository.
 func (*UserRepositoryImpl) GetUserAccount(ctx context.Context, tx *sql.Tx, uid string) (model.AccountUser, error) {
@@ -32,37 +47,20 @@ func (*UserRepositoryImpl) GetUserAccount(ctx context.Context, tx *sql.Tx, uid s
 	var i model.AccountUser
 	update := zero.TimeFromPtr(&i.UpdatedAt)
 	err := row.Scan(
-		&i.Uid,
-		&i.AccountId,
-		&i.UserName,
-		&i.Email,
-		&i.Balance,
-		&i.Cash,
-		&i.Debts,
-		&i.Savings,
-		&i.Currency,
-		&i.CreatedAt,
-		&update,
+		&i.Uid, &i.AccountId, &i.UserName,
+		&i.Email, &i.Balance, &i.Cash,
+		&i.Debts, &i.Savings, &i.Currency,
+		&i.CreatedAt, &update,
 	)
 	return i, err
-}
-
-func NewUserRepository() UserRepository {
-	return &UserRepositoryImpl{}
 }
 
 func (u *UserRepositoryImpl) CreateUser(ctx context.Context, tx *sql.Tx, user model.User) (model.User, error) {
 	sqlScript := `INSERT INTO users (uid, username, email, password, type_user, balance, savings, cash, debts, currency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	_, err := tx.ExecContext(ctx, sqlScript,
-		&user.Uid,
-		&user.UserName,
-		&user.Email,
-		&user.Password,
-		&user.TypeUser,
-		&user.Balance,
-		&user.Savings,
-		&user.Cash,
-		&user.Debts,
+		&user.Uid, &user.UserName, &user.Email,
+		&user.Password, &user.TypeUser, &user.Balance,
+		&user.Savings, &user.Cash, &user.Debts,
 		&user.Currency)
 
 	return model.User{
@@ -86,19 +84,12 @@ func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email stri
 	var i model.User
 	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := row.Scan(
-		&i.Uid,
-		&i.UserName,
-		&i.Email,
-		&i.Password,
-		&i.Photo,
-		&i.CreatedAt,
-		&update,
-		&i.TypeUser,
-		&i.Balance,
-		&i.Savings,
-		&i.Cash,
-		&i.Debts,
-		&i.Currency,
+		&i.Uid, &i.UserName,
+		&i.Email, &i.Password,
+		&i.Photo, &i.CreatedAt,
+		&update, &i.TypeUser,
+		&i.Balance, &i.Savings, &i.Cash,
+		&i.Debts, &i.Currency,
 	)
 	return i, err
 }
@@ -110,19 +101,11 @@ func (u *UserRepositoryImpl) GetById(ctx context.Context, tx *sql.Tx, uid string
 	var i model.User
 	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := row.Scan(
-		&i.Uid,
-		&i.UserName,
-		&i.Email,
-		&i.Password,
-		&i.Photo,
-		&i.CreatedAt,
-		&update,
-		&i.TypeUser,
-		&i.Balance,
-		&i.Savings,
-		&i.Cash,
-		&i.Debts,
-		&i.Currency,
+		&i.Uid, &i.UserName, &i.Email,
+		&i.Password, &i.Photo, &i.CreatedAt,
+		&update, &i.TypeUser, &i.Balance,
+		&i.Savings, &i.Cash, &i.Debts,
+		&i.Currency, &i.Status,
 	)
 	return i, err
 }

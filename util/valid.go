@@ -2,6 +2,8 @@ package util
 
 import "time"
 
+const NonActive = "non active"
+
 func IsValidYearMonth(year string, month string) bool {
 	// Attempt to parse the input string as a date in YYYY-MM format
 	_, err := time.Parse("2006-01", year+"-"+month)

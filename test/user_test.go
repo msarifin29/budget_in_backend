@@ -18,8 +18,8 @@ func TestCreateUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateUserRequest{
-		UserName: "jaya",
-		Email:    "jaya@mail.com",
+		UserName: "gara",
+		Email:    "gara@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  20000,
@@ -275,4 +275,27 @@ func TestForgotPasswordFailed(t *testing.T) {
 	assert.NoError(t, err)
 	fmt.Println(string(bytes))
 	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestDeleteUserSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.NonActiveUserRequest{
+		Uid: "3d691e6e-4b0e-4d60-97f3-3b98758a061b",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/user/delete", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "gara", "3d691e6e-4b0e-4d60-97f3-3b98758a061b", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("response : ", string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
 }
