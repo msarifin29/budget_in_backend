@@ -18,8 +18,8 @@ func TestCreateUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateUserRequest{
-		UserName: "gara",
-		Email:    "gara@mail.com",
+		UserName: "samsul",
+		Email:    "ms.arifin29@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  20000,
@@ -243,7 +243,7 @@ func TestGetUserNoAuthorization(t *testing.T) {
 func TestForgotPasswordSuccess(t *testing.T) {
 	router := NewTestServer(t)
 	params := model.EmailUserRequest{
-		Email: "asamsul474@gmail.com",
+		Email: "ms.arifin29@mail.com",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

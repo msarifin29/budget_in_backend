@@ -170,7 +170,7 @@ func (u *UserUsecaseImpl) ResetPassword(ctx context.Context, req model.EmailUser
 	tx, _ := u.db.Begin()
 
 	defer util.CommitOrRollback(tx)
-	emailUser, err := u.UserRepository.GetUserByEmail(ctx, tx, req)
+	emailUser, username, err := u.UserRepository.GetUserByEmail(ctx, tx, req)
 	if err != nil {
 		err = fmt.Errorf("user not found with email %v", req.Email)
 		u.Log.Error(err)
@@ -181,7 +181,7 @@ func (u *UserUsecaseImpl) ResetPassword(ctx context.Context, req model.EmailUser
 
 	receiver := emailUser
 	r := util.NewRequest([]string{receiver}, subject, u.conf, u.Log)
-	err = r.Send("../templates/email.html", map[string]string{"password": util.RandomString(6)})
+	err = r.Send("../templates/email.html", map[string]string{"name": username, "password": util.RandomString(6)})
 	if err != nil {
 		return false, err
 	}
