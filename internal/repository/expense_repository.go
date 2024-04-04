@@ -17,9 +17,19 @@ type ExpenseRepository interface {
 	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error)
 	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id int32) (float64, error)
 	GetExpensesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Expense, error)
+	GetExpenseThisMonth(ctx context.Context, tx *sql.Tx, uid string) (float64, error)
 }
 
 type ExpenseRepositoryImpl struct{}
+
+// GetExpenseThisMonth implements ExpenseRepository.
+func (*ExpenseRepositoryImpl) GetExpenseThisMonth(ctx context.Context, tx *sql.Tx, uid string) (float64, error) {
+	script := `select SUM(total) from expenses where uid = ?`
+	var total float64
+	row := tx.QueryRowContext(ctx, script, uid)
+	err := row.Scan(&total)
+	return total, err
+}
 
 // GetExpensesByMonth implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpensesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Expense, error) {

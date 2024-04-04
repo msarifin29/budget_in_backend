@@ -47,7 +47,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	expenseUseCase := usecase.NewExpenseUsecase(categoryRepo, expenseRepo, balanceRepo, accountRepo, Log, db)
 	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, accountRepo, Log, db, categoryRepo)
 	creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, accountRepo, Log, db, expenseRepo, categoryRepo)
-	accountUsacase := usecase.NewAccountUsacase(accountRepo, Log, db)
+	accountUsacase := usecase.NewAccountUsacase(accountRepo, expenseRepo, Log, db)
 	monthlyUsecase := usecase.NewMonthlyReportUsecase(monthlyRepo, Log, db)
 
 	// Controller

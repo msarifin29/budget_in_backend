@@ -53,21 +53,17 @@ func (AccountRepositoryImpl) CreateAccount(ctx context.Context, tx *sql.Tx, acco
 
 // GetAccountByUserId implements AccountRepository.
 func (AccountRepositoryImpl) GetAccountByUserId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error) {
-	script := `select user_id, account_id, account_name, balance, cash, debts, savings, currency, created_at, updated_at
+	script := `select user_id, account_id, account_name, balance, cash, debts, savings, currency,max_budget, created_at, updated_at
 	 from accounts where account_id = ?`
 	row := tx.QueryRowContext(ctx, script, account.AccountId)
 	var i model.Account
 	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := row.Scan(
-		&i.UserId,
-		&i.AccountId,
-		&i.AccountName,
-		&i.Balance,
-		&i.Cash,
-		&i.Debts,
-		&i.Savings,
-		&i.Currency,
-		&i.CreatedAt,
+		&i.UserId, &i.AccountId,
+		&i.AccountName, &i.Balance,
+		&i.Cash, &i.Debts,
+		&i.Savings, &i.Currency,
+		&i.MaxBudget, &i.CreatedAt,
 		&update,
 	)
 	return i, err

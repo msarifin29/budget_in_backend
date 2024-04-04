@@ -84,3 +84,30 @@ func TestUpdateMaxBudgetSuccess(t *testing.T) {
 	assert.Equal(t, "Success", res["message"])
 	assert.NotEmpty(t, res["data"])
 }
+func TestGetMaxBudgetSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.GetMaxBudgetRequest{
+		Uid:       "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
+		AccountId: "8dc08329-f468-4532-b942-52301d3cd1c2",
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/accounts/max_budget/", nil)
+
+	q := req.URL.Query()
+	q.Add("uid", fmt.Sprintf("%v", params.Uid))
+	q.Add("account_id", fmt.Sprintf("%v", params.AccountId))
+	req.URL.RawQuery = q.Encode()
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println(string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+	assert.NotEmpty(t, res["data"])
+}

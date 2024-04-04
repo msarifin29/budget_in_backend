@@ -47,9 +47,19 @@ type UpdateMaxBudgetRequest struct {
 	AccountId string  `json:"account_id" binding:"required"`
 	MaxBudget float64 `json:"max_budget" binding:"min=10000"`
 }
-type UpdateMaxBudgetParam struct {
-	AccountId string  `json:"account_id" binding:"required"`
-	MaxBudget float64 `json:"max_budget" binding:"min=10000"`
+type GetMaxBudgetParam struct {
+	Uid       string `json:"uid"`
+	AccountId string `json:"account_id"`
+}
+type GetMaxBudgetRequest struct {
+	Uid       string `form:"uid" binding:"required"`
+	AccountId string `form:"account_id" binding:"required"`
+}
+type MaxBudgetResponse struct {
+	Uid          string  `json:"uid"`
+	AccountId    string  `json:"account_id"`
+	MaxBudget    float64 `json:"max_budget"`
+	TotalExpense float64 `json:"total_expense"`
 }
 
 func NewAccount(account Account) *Account {

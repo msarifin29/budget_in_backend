@@ -12,3 +12,4 @@ CREATE TABLE `accounts` (
 );
 
 ALTER TABLE `accounts` ADD CONSTRAINT fk_accounts_users FOREIGN KEY (`user_id`) REFERENCES `users` (`uid`);
+alter table `accounts` add `column max_budget` int default 0 after `currency`;
