@@ -16,9 +16,17 @@ type AccountRepository interface {
 	UpdateAccountBalance(ctx context.Context, tx *sql.Tx, account model.UpdateAccountBalance) error
 	UpdateAccountCash(ctx context.Context, tx *sql.Tx, account model.UpdateAccountCash) error
 	UpdateAccountDebts(ctx context.Context, tx *sql.Tx, account model.UpdateAccountDebts) error
+	UpdateMaxBudget(ctx context.Context, tx *sql.Tx, account model.UpdateMaxBudgetRequest) error
 }
 
 type AccountRepositoryImpl struct{}
+
+// UpdateMaxBudget implements AccountRepository.
+func (AccountRepositoryImpl) UpdateMaxBudget(ctx context.Context, tx *sql.Tx, account model.UpdateMaxBudgetRequest) error {
+	script := `update accounts set max_budget = ? where account_id = ? and user_id = ?`
+	_, err := tx.ExecContext(ctx, script, account.MaxBudget, account.AccountId, account.Uid)
+	return err
+}
 
 // UpdateAccountDebts implements AccountRepository.
 func (AccountRepositoryImpl) UpdateAccountDebts(ctx context.Context, tx *sql.Tx, account model.UpdateAccountDebts) error {
@@ -45,7 +53,8 @@ func (AccountRepositoryImpl) CreateAccount(ctx context.Context, tx *sql.Tx, acco
 
 // GetAccountByUserId implements AccountRepository.
 func (AccountRepositoryImpl) GetAccountByUserId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error) {
-	script := `select * from accounts where account_id = ?`
+	script := `select user_id, account_id, account_name, balance, cash, debts, savings, currency, created_at, updated_at
+	 from accounts where account_id = ?`
 	row := tx.QueryRowContext(ctx, script, account.AccountId)
 	var i model.Account
 	update := zero.TimeFromPtr(i.UpdatedAt)
@@ -66,7 +75,8 @@ func (AccountRepositoryImpl) GetAccountByUserId(ctx context.Context, tx *sql.Tx,
 
 // GetAllAccount implements AccountRepository.
 func (AccountRepositoryImpl) GetAllAccount(ctx context.Context, tx *sql.Tx, userId string) ([]model.Account, error) {
-	script := `select * from accounts where user_id = ?`
+	script := `select user_id, account_id, account_name, balance, cash, debts, savings, currency, created_at, updated_at 
+	from accounts where user_id = ?`
 	rows, err := tx.QueryContext(ctx, script, userId)
 	if err != nil {
 		return nil, err

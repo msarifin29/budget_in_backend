@@ -15,12 +15,27 @@ import (
 
 type AccountUsacase interface {
 	CreateAccount(ctx context.Context, account model.CreateAccountRequest) (model.Account, error)
+	UpdateMaxBudget(ctx context.Context, account model.UpdateMaxBudgetRequest) (bool, error)
 }
 
 type AccountUsacaseImpl struct {
 	AccountRepo repository.AccountRepository
 	Log         *logrus.Logger
 	db          *sql.DB
+}
+
+// UpdateMaxBudget implements AccountUsacase.
+func (u *AccountUsacaseImpl) UpdateMaxBudget(ctx context.Context, account model.UpdateMaxBudgetRequest) (bool, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	err := u.AccountRepo.UpdateMaxBudget(ctx, tx, account)
+	if err != nil {
+		u.Log.Errorf("Failed update max budget %e", err)
+		err = errors.New("failed update max budget")
+		return false, err
+	}
+	return true, nil
 }
 
 // CreateAccount implements AccountUsacase.

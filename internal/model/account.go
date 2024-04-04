@@ -11,6 +11,7 @@ type Account struct {
 	Debts       float64    `json:"debts"`
 	Savings     float64    `json:"savings"`
 	Currency    string     `json:"currency"`
+	MaxBudget   float64    `json:"max_budget"`
 	CreatedAt   *time.Time `json:"created_at"`
 	UpdatedAt   *time.Time `json:"updated_at"`
 }
@@ -41,6 +42,16 @@ type UpdateAccountName struct {
 	AccountName string `json:"account_name" binding:"required"`
 }
 
+type UpdateMaxBudgetRequest struct {
+	Uid       string  `json:"uid" binding:"required"`
+	AccountId string  `json:"account_id" binding:"required"`
+	MaxBudget float64 `json:"max_budget" binding:"min=10000"`
+}
+type UpdateMaxBudgetParam struct {
+	AccountId string  `json:"account_id" binding:"required"`
+	MaxBudget float64 `json:"max_budget" binding:"min=10000"`
+}
+
 func NewAccount(account Account) *Account {
 	return &Account{
 		UserId:      account.UserId,
@@ -51,6 +62,7 @@ func NewAccount(account Account) *Account {
 		Debts:       account.Debts,
 		Savings:     account.Savings,
 		Currency:    account.Currency,
+		MaxBudget:   account.MaxBudget,
 		CreatedAt:   account.CreatedAt,
 		UpdatedAt:   account.UpdatedAt,
 	}

@@ -195,14 +195,14 @@ func TestUnAuthorizationUser(t *testing.T) {
 func TestGetUserByIdSuccess(t *testing.T) {
 	router := NewTestServer(t)
 	user := model.UserRequest{
-		Uid: "9b9821be-a211-46f1-b07e-c53181068f09",
+		Uid: "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
 	}
 
 	w := httptest.NewRecorder()
 	url := fmt.Sprintf("/api/user/%s", user.Uid)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "9b9821be-a211-46f1-b07e-c53181068f09", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("account :", string(bytes))
