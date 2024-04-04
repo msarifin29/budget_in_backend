@@ -189,7 +189,7 @@ func TestGetHistoriesCreditsSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetHistoriesCreditsRequest{
-		CreditId:  3,
+		CreditId:  37,
 		Page:      1,
 		TotalPage: 5,
 	}
@@ -202,7 +202,7 @@ func TestGetHistoriesCreditsSuccess(t *testing.T) {
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))

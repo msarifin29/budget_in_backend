@@ -77,7 +77,8 @@ func (CreditRepositoryImpl) GetAllCredit(ctx context.Context, tx *sql.Tx, credit
 
 // GetAllHistoryCredit implements CreditRepository.
 func (CreditRepositoryImpl) GetAllHistoryCredit(ctx context.Context, tx *sql.Tx, credit model.GetHistoriesCreditParams) ([]model.HistoryCredit, error) {
-	script := `select * from history_credit where credit_id = ? order by id limit ? offset ?`
+	script := `select credit_id, id, th, total, status, created_at, updated_at, type_payment, payment_time, date 
+	from history_credit where credit_id = ? order by id limit ? offset ?`
 	rows, err := tx.QueryContext(ctx, script, credit.CreditId, credit.Limit, credit.Offset)
 	if err != nil {
 		return nil, err
@@ -89,15 +90,10 @@ func (CreditRepositoryImpl) GetAllHistoryCredit(ctx context.Context, tx *sql.Tx,
 		update := zero.TimeFromPtr(i.UpdatedAt)
 
 		err := rows.Scan(
-			&i.CreditId,
-			&i.Id,
-			&i.Th,
-			&i.Total,
-			&i.Status,
-			&i.CreatedAt,
-			&update,
-			&i.TypePayment,
-			&i.PaymentTime,
+			&i.CreditId, &i.Id, &i.Th,
+			&i.Total, &i.Status, &i.CreatedAt,
+			&update, &i.TypePayment,
+			&i.PaymentTime, &i.Date,
 		)
 		if err != nil {
 			return nil, err
