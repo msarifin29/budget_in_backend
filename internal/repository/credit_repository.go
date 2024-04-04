@@ -60,8 +60,8 @@ func (CreditRepositoryImpl) GetAllCredit(ctx context.Context, tx *sql.Tx, credit
 			&i.TypeCredit, &i.Total, &i.LoanTerm,
 			&i.StatusCredit, &i.CreatedAt, &update,
 			&i.Installment, &i.PaymentTime,
-			&i.TCategory.CategoryId,
-			&i.TCategory.Id,
+			&i.StartDate, &i.EndDate,
+			&i.TCategory.CategoryId, &i.TCategory.Id,
 			&i.TCategory.Title,
 		)
 		if err != nil {
