@@ -19,20 +19,20 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateExpenseParams{
-		Uid:         "fadab647-cf23-46fc-bd4d-e7d06d32d753",
-		ExpenseType: util.DEBIT,
+		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
+		ExpenseType: util.CASH,
 		Total:       2551,
 		Category:    util.OTHER,
 		CategoryId:  2,
-		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
-		CreatedAt:   "2015-09-02T08:00:00Z",
+		AccountId:   "faae4ed7-f719-45a5-b259-3e6bf7407ba0",
+		// CreatedAt:   "2015-09-02T08:00:00Z",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))

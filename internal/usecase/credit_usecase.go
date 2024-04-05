@@ -235,7 +235,7 @@ func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.Cre
 		req := model.HistoryCredit{
 			CreditId:    credit.Id,
 			Th:          float64(i + 1),
-			Total:       credit.Installment,
+			Total:       credit.Total,
 			Status:      util.ACTIVE,
 			TypePayment: "",
 			PaymentTime: credit.StartDate.Day(),
