@@ -260,7 +260,7 @@ func UpdateTotalBalanceOrCash(ctx context.Context, tx *sql.Tx,
 ) error {
 	switch typePayment {
 	case util.DEBIT:
-		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		account, err := accountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
 		balance := account.Balance
 		if err != nil {
 			err = fmt.Errorf("failed get balance from user id %v", account.UserId)
@@ -278,7 +278,7 @@ func UpdateTotalBalanceOrCash(ctx context.Context, tx *sql.Tx,
 			return err
 		}
 	case util.CASH:
-		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		account, err := accountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
 		cash := account.Cash
 		if err != nil {
 			err = fmt.Errorf("failed get cash from user id %v", account.UserId)

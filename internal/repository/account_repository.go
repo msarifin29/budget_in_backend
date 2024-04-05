@@ -10,16 +10,35 @@ import (
 
 type AccountRepository interface {
 	CreateAccount(ctx context.Context, tx *sql.Tx, account model.Account) (model.Account, error)
-	GetAccountByUserId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error)
+	GetAccountByAccountId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error)
 	GetAllAccount(ctx context.Context, tx *sql.Tx, userId string) ([]model.Account, error)
 	UpdateAccountName(ctx context.Context, tx *sql.Tx, account model.UpdateAccountName) error
 	UpdateAccountBalance(ctx context.Context, tx *sql.Tx, account model.UpdateAccountBalance) error
 	UpdateAccountCash(ctx context.Context, tx *sql.Tx, account model.UpdateAccountCash) error
 	UpdateAccountDebts(ctx context.Context, tx *sql.Tx, account model.UpdateAccountDebts) error
 	UpdateMaxBudget(ctx context.Context, tx *sql.Tx, account model.UpdateMaxBudgetRequest) error
+	GetAccountByUserId(ctx context.Context, tx *sql.Tx, userId string) (model.Account, error)
 }
 
 type AccountRepositoryImpl struct{}
+
+// GetAccountByUserId implements AccountRepository.
+func (AccountRepositoryImpl) GetAccountByUserId(ctx context.Context, tx *sql.Tx, userId string) (model.Account, error) {
+	script := `select user_id, account_id, account_name, balance, cash, debts, savings, currency,max_budget, created_at, updated_at
+	 from accounts where user_id = ?`
+	row := tx.QueryRowContext(ctx, script, userId)
+	var i model.Account
+	update := zero.TimeFromPtr(i.UpdatedAt)
+	err := row.Scan(
+		&i.UserId, &i.AccountId,
+		&i.AccountName, &i.Balance,
+		&i.Cash, &i.Debts,
+		&i.Savings, &i.Currency,
+		&i.MaxBudget, &i.CreatedAt,
+		&update,
+	)
+	return i, err
+}
 
 // UpdateMaxBudget implements AccountRepository.
 func (AccountRepositoryImpl) UpdateMaxBudget(ctx context.Context, tx *sql.Tx, account model.UpdateMaxBudgetRequest) error {
@@ -51,8 +70,8 @@ func (AccountRepositoryImpl) CreateAccount(ctx context.Context, tx *sql.Tx, acco
 	return account, err
 }
 
-// GetAccountByUserId implements AccountRepository.
-func (AccountRepositoryImpl) GetAccountByUserId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error) {
+// GetAccountByAccountId implements AccountRepository.
+func (AccountRepositoryImpl) GetAccountByAccountId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error) {
 	script := `select user_id, account_id, account_name, balance, cash, debts, savings, currency,max_budget, created_at, updated_at
 	 from accounts where account_id = ?`
 	row := tx.QueryRowContext(ctx, script, account.AccountId)

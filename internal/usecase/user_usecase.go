@@ -103,12 +103,12 @@ func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserR
 		Savings:     0,
 		Currency:    "IDR",
 	}
-	_, err = u.AccountRepo.CreateAccount(ctx, tx, reqAccount)
-	if err != nil {
-		u.Log.Errorf("failed create account %e :", err)
-		return res, err
+	account, errAc := u.AccountRepo.CreateAccount(ctx, tx, reqAccount)
+	if errAc != nil {
+		u.Log.Errorf("failed create account %e :", errAc)
+		return res, errAc
 	}
-	return model.UserResponse{Uid: req.Uid, UserName: req.UserName}, nil
+	return model.UserResponse{Uid: req.Uid, UserName: req.UserName, AccountId: account.AccountId}, nil
 }
 
 func (u *UserUsecaseImpl) GetUser(ctx context.Context, user model.LoginUserRequest) (model.UserResponse, error) {
@@ -132,8 +132,12 @@ func (u *UserUsecaseImpl) GetUser(ctx context.Context, user model.LoginUserReque
 		u.Log.Errorf("invalid password %e :", passErr)
 		return res, passErr
 	}
-
-	rum := model.UserResponse{Uid: ru.Uid, UserName: ru.UserName}
+	account, errAcc := u.AccountRepo.GetAccountByUserId(ctx, tx, ru.Uid)
+	if errAcc != nil {
+		u.Log.Errorf("failed get account %e :", errAcc)
+		return res, errAcc
+	}
+	rum := model.UserResponse{Uid: ru.Uid, UserName: ru.UserName, AccountId: account.AccountId}
 
 	return rum, nil
 }

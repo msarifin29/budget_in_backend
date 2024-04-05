@@ -119,7 +119,7 @@ func NewIncome(ctx context.Context, tx *sql.Tx, accountRepo repository.AccountRe
 
 	switch typeIncome {
 	case util.CASH:
-		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		account, err := accountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
 		cash := account.Cash
 		if err != nil {
 			err = errors.New("failed get cash")
@@ -140,7 +140,7 @@ func NewIncome(ctx context.Context, tx *sql.Tx, accountRepo repository.AccountRe
 			return err
 		}
 	case util.DEBIT:
-		account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+		account, err := accountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
 		debit := account.Balance
 		if err != nil {
 			err = errors.New("failed get debit")

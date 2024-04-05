@@ -38,7 +38,7 @@ func (u *AccountUsacaseImpl) GetMaxBudget(ctx context.Context, account model.Get
 		err = errors.New("failed get expense")
 		return model.MaxBudgetResponse{}, err
 	}
-	maxBudget, er := u.AccountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: account.AccountId})
+	maxBudget, er := u.AccountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: account.AccountId})
 	if er != nil {
 		u.Log.Errorf("Failed get max budget %e", er)
 		er = errors.New("failed get max budget")

@@ -39,8 +39,9 @@ type LoginUserRequest struct {
 }
 
 type UserResponse struct {
-	Uid      string `json:"uid"`
-	UserName string `json:"username"`
+	Uid       string `json:"uid"`
+	UserName  string `json:"username"`
+	AccountId string `json:"account_id"`
 }
 
 type TokenUserResponse struct {

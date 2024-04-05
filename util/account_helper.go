@@ -13,7 +13,7 @@ import (
 
 func NewBalance(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, accountRepo repository.AccountRepository, status string, accountId string, input float64) error {
 	var newBalance float64
-	account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+	account, err := accountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
 	balance := account.Balance
 	if err != nil {
 		err = errors.New("failed get balance")
@@ -45,7 +45,7 @@ func NewBalance(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, accountRepo
 
 func NewCash(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, accountRepo repository.AccountRepository, status string, accountId string, input float64) error {
 	var newCash float64
-	account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+	account, err := accountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
 	cash := account.Cash
 	if err != nil {
 		err = errors.New("failed get cash")
@@ -76,7 +76,7 @@ func NewCash(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, accountRepo re
 
 func NewDebts(ctx context.Context, tx *sql.Tx, Log *logrus.Logger, accountRepo repository.AccountRepository, status string, accountId string, input float64) error {
 	var newDebt float64
-	account, err := accountRepo.GetAccountByUserId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
+	account, err := accountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: accountId})
 	debts := account.Debts
 	if err != nil {
 		err = errors.New("failed get debts")

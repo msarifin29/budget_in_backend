@@ -18,8 +18,8 @@ func TestCreateUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateUserRequest{
-		UserName: "samsul",
-		Email:    "ms.arifin29@mail.com",
+		UserName: "jaya",
+		Email:    "jaya@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  20000,
@@ -33,6 +33,7 @@ func TestCreateUserSuccess(t *testing.T) {
 
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
+
 	assert.Nil(t, err)
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)
@@ -87,7 +88,7 @@ func TestLoginUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.LoginUserRequest{
-		Email:    "test@mail.com",
+		Email:    "jaya@mail.com",
 		Password: "123456",
 	}
 	body, err := json.Marshal(params)
@@ -97,6 +98,7 @@ func TestLoginUserSuccess(t *testing.T) {
 
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
+	fmt.Println(string(bytes))
 	assert.Nil(t, err)
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)
