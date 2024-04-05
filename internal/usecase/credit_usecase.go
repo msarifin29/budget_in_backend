@@ -177,21 +177,19 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		return model.UpdateHistoryResponse{}, err
 	}
 
-	if newCredit <= 0 {
-		ok, err := u.CreditRepo.UpdateCredit(ctx, tx, model.UpdateCreditRequest{Uid: params.Uid, Id: params.CreditId, StatusCredit: util.COMPLETED})
-		if !ok || err != nil {
-			u.Log.Error(err)
-			err = errors.New("failed update credit")
-			return model.UpdateHistoryResponse{}, err
-		}
-		// Update debts from user
-		newCreditCompletted := credit.Installment * credit.LoanTerm
-		err = util.NewDebts(ctx, tx, u.Log, u.AccountRepo, util.COMPLETED, params.AccountId, newCreditCompletted)
-		if err != nil {
-			u.Log.Error(err)
-			err = errors.New("failed update debts user")
-			return model.UpdateHistoryResponse{}, err
-		}
+	ok, errUp := u.CreditRepo.UpdateCredit(ctx, tx, model.UpdateCreditRequest{Uid: params.Uid, Id: params.CreditId, StatusCredit: util.COMPLETED})
+	if !ok || err != nil {
+		u.Log.Error(errUp)
+		errUp = errors.New("failed update credit")
+		return model.UpdateHistoryResponse{}, errUp
+	}
+	// Update debts from user
+	newCreditCompletted := credit.Installment * credit.LoanTerm
+	err = util.NewDebts(ctx, tx, u.Log, u.AccountRepo, util.COMPLETED, params.AccountId, newCreditCompletted)
+	if err != nil {
+		u.Log.Error(err)
+		err = errors.New("failed update debts user")
+		return model.UpdateHistoryResponse{}, err
 	}
 	now := time.Now()
 	expense := model.Expense{

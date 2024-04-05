@@ -96,18 +96,18 @@ func TestUpdateHistoryCreditSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateHistoryCreditRequest{
-		Uid:         "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
-		Id:          87,
-		CreditId:    34,
+		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
+		Id:          6,
+		CreditId:    2,
 		TypePayment: util.CASH,
-		AccountId:   "8dc08329-f468-4532-b942-52301d3cd1c2",
+		AccountId:   "faae4ed7-f719-45a5-b259-3e6bf7407ba0",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/credits/update_history", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body =>", string(bytes))
@@ -123,7 +123,7 @@ func TestUpdateHistoryCreditFailed(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateHistoryCreditRequest{
-		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
+		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
 		Id:          3,
 		TypePayment: util.ELECTRONIC,
 	}
@@ -132,7 +132,7 @@ func TestUpdateHistoryCreditFailed(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/credits/update_history", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.NoError(t, err)
