@@ -62,7 +62,7 @@ func (r *Request) Send(templateName string, items interface{}) error {
 		return err
 	}
 	if ok := r.sendMail(); ok {
-		r.Log.Errorf("Email has been sent to %s\n", r.to)
+		r.Log.Infof("Email has been sent to %s\n", r.to)
 		return nil
 	} else {
 		r.Log.Errorf("Failed to send the email to %s\n", r.to)
