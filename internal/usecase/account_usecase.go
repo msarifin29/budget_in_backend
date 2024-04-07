@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
@@ -31,25 +30,28 @@ type AccountUsacaseImpl struct {
 func (u *AccountUsacaseImpl) GetMaxBudget(ctx context.Context, account model.GetMaxBudgetParam) (model.MaxBudgetResponse, error) {
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
-
-	totalEx, err := u.ExpenseRepo.GetExpenseThisMonth(ctx, tx, account.Uid)
-	if err != nil {
-		u.Log.Errorf("Failed get expense %e", err)
-		err = errors.New("failed get expense")
-		return model.MaxBudgetResponse{}, err
-	}
-	maxBudget, er := u.AccountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: account.AccountId})
+	totalExpense := 0
+	resAccount, er := u.AccountRepo.GetAccountByUserId(ctx, tx, account.Uid)
 	if er != nil {
 		u.Log.Errorf("Failed get max budget %e", er)
 		er = errors.New("failed get max budget")
 		return model.MaxBudgetResponse{}, er
 	}
-	fmt.Println("=======", maxBudget.MaxBudget)
+	if resAccount.MaxBudget != 0 {
+		totalEx, err := u.ExpenseRepo.GetExpenseThisMonth(ctx, tx, account.Uid)
+		if err != nil {
+			u.Log.Errorf("Failed get expense %e", err)
+			err = errors.New("failed get expense")
+			return model.MaxBudgetResponse{}, err
+		}
+		totalExpense = int(totalEx)
+	}
+
 	return model.MaxBudgetResponse{
-		Uid:          maxBudget.UserId,
-		AccountId:    maxBudget.AccountId,
-		TotalExpense: totalEx,
-		MaxBudget:    maxBudget.MaxBudget}, nil
+		Uid:          resAccount.UserId,
+		AccountId:    resAccount.AccountId,
+		TotalExpense: float64(totalExpense),
+		MaxBudget:    resAccount.MaxBudget}, nil
 }
 
 // UpdateMaxBudget implements AccountUsacase.

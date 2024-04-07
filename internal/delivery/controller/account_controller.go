@@ -102,11 +102,11 @@ func (c *AccountController) GetMaxBudget(ctx *gin.Context) {
 		Uid:       req.Uid,
 		AccountId: req.AccountId,
 	}
-	res, err := c.Usecase.GetMaxBudget(ctx, param)
-	if err != nil {
+	res, errGet := c.Usecase.GetMaxBudget(ctx, param)
+	if errGet != nil {
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
 			Code:    http.StatusBadRequest,
-			Message: errors.New("failed update maximal budget").Error(),
+			Message: errors.New("failed get maximal budget").Error(),
 		})
 		return
 	}
