@@ -83,7 +83,7 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 	LEFT JOIN t_category_expenses t ON e.id = t.category_id
 	where uid = ? and status = ? 
 	and e.expense_type LIKE ? and t.id LIKE ?
-	order by id limit ? offset ?`
+	order by id desc limit ? offset ?`
 	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status,
 		"%"+params.ExpenseType+"%", "%"+cId+"%", params.Limit, params.Offset)
 	if err != nil {

@@ -44,7 +44,7 @@ func (CreditRepositoryImpl) GetCountHistoryCredit(ctx context.Context, tx *sql.T
 func (CreditRepositoryImpl) GetAllCredit(ctx context.Context, tx *sql.Tx, credit model.GetCreditParams) ([]model.CreditResponse, error) {
 	script := `select c.*, t.category_id, t.id as t_id, t.title
 	from credits c LEFT JOIN t_category_credits t ON c.id = t.category_id
-	where uid = ? limit ? offset ?`
+	where uid = ? order by id desc limit ? offset ?`
 	rows, err := tx.QueryContext(ctx, script, credit.Uid, credit.Limit, credit.Offset)
 	if err != nil {
 		return nil, err
