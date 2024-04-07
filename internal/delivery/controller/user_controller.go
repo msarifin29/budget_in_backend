@@ -203,7 +203,7 @@ func (c *UserController) ForgotPassword(ctx *gin.Context) {
 		})
 		return
 	}
-	ok, err := c.UserUsecase.ResetPassword(ctx, req)
+	ok, err := c.UserUsecase.ForgotPassword(ctx, req)
 	if !ok || err != nil {
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
 			Code:    http.StatusBadRequest,
@@ -249,6 +249,40 @@ func (c *UserController) NonActivatedUser(ctx *gin.Context) {
 		return
 	}
 
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    ok,
+	})
+}
+
+func (c *UserController) ResetPassword(ctx *gin.Context) {
+	var req model.ResetPasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.Log.Error(err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	if authPayload.Uid != req.Uid {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, model.MetaErrorResponse{
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+	ok, err := c.UserUsecase.ResetPassword(ctx, req)
+	if !ok || err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 	ctx.JSON(http.StatusOK, model.MetaResponse{
 		Code:    http.StatusOK,
 		Message: "Success",

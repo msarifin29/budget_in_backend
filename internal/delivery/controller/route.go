@@ -23,9 +23,11 @@ func (server *Server) SetUpRoute() {
 	autRoutes.PUT("/api/accounts/update_max_budget", server.AccountC.UpdateMaxBudget)
 	autRoutes.GET("/api/accounts/max_budget/", server.AccountC.GetMaxBudget)
 
+	// Users
 	autRoutes.GET("/api/user/:uid", server.UserC.GetById)
 	autRoutes.PUT("/api/update", server.UserC.UpdateUser)
 	autRoutes.PUT("/api/user/delete", server.UserC.NonActivatedUser)
+	autRoutes.PUT("/api/user/reset_password", server.UserC.ResetPassword)
 
 	// Monthly reports
 	autRoutes.GET("/api/user/monthly_report/:uid", server.MonthReportC.GetMonthlyReport)

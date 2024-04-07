@@ -47,6 +47,11 @@ type TokenUserResponse struct {
 	Token   string       `json:"token"`
 	UserRes UserResponse `json:"user"`
 }
+type ResetPasswordRequest struct {
+	Uid         string `json:"uid"`
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
 
 type UserProfileResponse struct {
 	Uid      string `json:"uid"`

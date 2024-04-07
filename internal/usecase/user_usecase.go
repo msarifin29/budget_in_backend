@@ -19,7 +19,8 @@ type UserUsecase interface {
 	GetUser(ctx context.Context, user model.LoginUserRequest) (model.UserResponse, error)
 	UpdateUser(ctx context.Context, user model.UpdateUserRequest) error
 	GetById(ctx context.Context, uid string) (model.AccountUser, error)
-	ResetPassword(ctx context.Context, req model.EmailUserRequest) (bool, error)
+	ForgotPassword(ctx context.Context, req model.EmailUserRequest) (bool, error)
+	ResetPassword(ctx context.Context, req model.ResetPasswordRequest) (bool, error)
 	NonActivatedUser(ctx context.Context, req model.NonActiveUserParams) (bool, error)
 }
 
@@ -33,6 +34,40 @@ type UserUsecaseImpl struct {
 
 func NewUserUsecase(UserRepository repository.UserRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, conf config.Config) UserUsecase {
 	return &UserUsecaseImpl{UserRepository: UserRepository, AccountRepo: AccountRepo, Log: Log, db: db, conf: conf}
+}
+
+// ResetPassword implements UserUsecase.
+func (u *UserUsecaseImpl) ResetPassword(ctx context.Context, req model.ResetPasswordRequest) (bool, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	user, err := u.UserRepository.GetById(ctx, tx, req.Uid)
+	if err != nil {
+		u.Log.Error(err)
+		err = fmt.Errorf("user not found with uid %v", req.Uid)
+		return false, err
+	}
+	passErr := util.CheckPassword(req.OldPassword, user.Password)
+	if passErr != nil {
+		u.Log.Errorf("invalid password %e :", passErr)
+		return false, errors.New("invalid old password")
+	}
+	newPassword, hashErr := util.HashPassword(req.NewPassword)
+	if hashErr != nil {
+		u.Log.Errorf("failed hash password %e", hashErr)
+		return false, errors.New("failed hash password")
+	}
+	params := model.ResetPasswordRequest{
+		Uid:         req.Uid,
+		OldPassword: req.OldPassword,
+		NewPassword: newPassword,
+	}
+	ok, errRes := u.UserRepository.ResetPassword(ctx, tx, params)
+	if !ok || errRes != nil {
+		u.Log.Errorf("failed reset password %e", hashErr)
+		return false, errors.New("failed reset password")
+	}
+	return true, nil
 }
 
 // NonActivatedUser implements UserUsecase.
@@ -166,7 +201,7 @@ func (u *UserUsecaseImpl) GetById(ctx context.Context, uid string) (model.Accoun
 	return user, nil
 }
 
-func (u *UserUsecaseImpl) ResetPassword(ctx context.Context, req model.EmailUserRequest) (bool, error) {
+func (u *UserUsecaseImpl) ForgotPassword(ctx context.Context, req model.EmailUserRequest) (bool, error) {
 	tx, _ := u.db.Begin()
 
 	defer util.CommitOrRollback(tx)

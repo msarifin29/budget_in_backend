@@ -16,6 +16,7 @@ type UserRepository interface {
 	UpdateUserName(ctx context.Context, tx *sql.Tx, user model.UpdateUserRequest) error
 	GetUserByEmail(ctx context.Context, tx *sql.Tx, req model.EmailUserRequest) (string, string, error)
 	UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error)
+	ResetPassword(ctx context.Context, tx *sql.Tx, params model.ResetPasswordRequest) (bool, error)
 	NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, status string) (bool, error)
 }
 
@@ -23,6 +24,16 @@ type UserRepositoryImpl struct{}
 
 func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{}
+}
+
+// ResetPassword implements UserRepository.
+func (*UserRepositoryImpl) ResetPassword(ctx context.Context, tx *sql.Tx, params model.ResetPasswordRequest) (bool, error) {
+	sqlScript := `update users set password = ? where uid = ? and status = "active"`
+	_, err := tx.ExecContext(ctx, sqlScript, params.NewPassword, params.Uid)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // NonActivatedUser implements UserRepository.

@@ -323,3 +323,63 @@ func TestDeleteUserSuccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "Success", res["message"])
 }
+func TestResetPasswordSuccess(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.ResetPasswordRequest{
+		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
+		OldPassword: "112233",
+		NewPassword: "password",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/user/reset_password", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body :", string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+}
+func TestResetPasswordFailed(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.ResetPasswordRequest{
+		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
+		OldPassword: "112233",
+		NewPassword: "password",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/user/reset_password", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body :", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+func TestResetPasswordNoAuthorization(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.ResetPasswordRequest{
+		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
+		OldPassword: "112233",
+		NewPassword: "password",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/user/reset_password", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body :", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
