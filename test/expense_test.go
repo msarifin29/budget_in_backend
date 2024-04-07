@@ -24,6 +24,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 		Total:       2551,
 		Category:    util.OTHER,
 		CategoryId:  2,
+		Notes:       "bayar parkir",
 		AccountId:   "faae4ed7-f719-45a5-b259-3e6bf7407ba0",
 		// CreatedAt:   "2015-09-02T08:00:00Z",
 	}
@@ -201,7 +202,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 		Status: "success",
 		// ExpenseType: "Debit",
 		// Category:    "other",
-		// Id:        2,
+		Id:        8,
 		Page:      1,
 		TotalPage: 5,
 	}

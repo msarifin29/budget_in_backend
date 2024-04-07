@@ -97,8 +97,8 @@ func TestUpdateHistoryCreditSuccess(t *testing.T) {
 
 	params := model.UpdateHistoryCreditRequest{
 		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
-		Id:          6,
-		CreditId:    2,
+		Id:          3,
+		CreditId:    1,
 		TypePayment: util.CASH,
 		AccountId:   "faae4ed7-f719-45a5-b259-3e6bf7407ba0",
 	}

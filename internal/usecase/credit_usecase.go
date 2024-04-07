@@ -207,6 +207,16 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		er = errors.New("failed create expense")
 		return model.UpdateHistoryResponse{}, er
 	}
+	paramCategory := model.Category{
+		CategoryId: newEx.Id,
+		Id:         8,
+		Title:      util.COSTANDBILL,
+	}
+	_, categoryErr := u.CategoryRepo.CreateCategoryExpense(ctx, tx, paramCategory)
+	if categoryErr != nil {
+		u.Log.Errorf("failed add category expense %e :", categoryErr)
+		return model.UpdateHistoryResponse{}, categoryErr
+	}
 	u.Log.Infof("expense :%v", newEx)
 	return model.UpdateHistoryResponse{
 		Id:          historyC.Id,
