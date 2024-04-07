@@ -45,18 +45,24 @@ func TestCreateUserSuccess(t *testing.T) {
 func TestCreateUserDuplicate(t *testing.T) {
 	router := NewTestServer(t)
 	params := model.CreateUserRequest{
-		UserName: "kai",
-		Email:    "test@mail.com",
+		UserName: "testing",
+		Email:    "jaya@mail.com",
 		Password: "123456",
 		TypeUser: "personal",
+		Balance:  20000,
+		Cash:     20000,
+		Currency: "IDR",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/register", strings.NewReader(string(body)))
 	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	fmt.Println("body :", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
 }
 func TestCreateUserInvalidType(t *testing.T) {
 	router := NewTestServer(t)
@@ -87,7 +93,7 @@ func TestLoginUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.LoginUserRequest{
-		Email:    "test@mail.com",
+		Email:    "testing@mail.com",
 		Password: "123456",
 	}
 	body, err := json.Marshal(params)
@@ -127,6 +133,24 @@ func TestLoginUserInvalidPassword(t *testing.T) {
 	params := model.LoginUserRequest{
 		Email:    "test@mail.com",
 		Password: "password",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/login", strings.NewReader(string(body)))
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	assert.Nil(t, err)
+	fmt.Println("body :", string(bytes))
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+func TestLoginUserWithUserNonActive(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.LoginUserRequest{
+		Email:    "testing@mail.com",
+		Password: "123456",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -273,7 +297,7 @@ func TestForgotPasswordFailed(t *testing.T) {
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.NoError(t, err)
-	fmt.Println(string(bytes))
+	fmt.Println("body :", string(bytes))
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
@@ -281,14 +305,14 @@ func TestDeleteUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.NonActiveUserRequest{
-		Uid: "3d691e6e-4b0e-4d60-97f3-3b98758a061b",
+		Uid: "ea1b7ff6-e56b-4786-a585-e2ef07520370",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/user/delete", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "gara", "3d691e6e-4b0e-4d60-97f3-3b98758a061b", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "ea1b7ff6-e56b-4786-a585-e2ef07520370", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("response : ", string(bytes))

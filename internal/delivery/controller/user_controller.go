@@ -2,7 +2,9 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/msarifin29/be_budget_in/internal/config"
@@ -37,16 +39,17 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 	res, cErr := c.UserUsecase.CreateUser(ctx, userReq)
 
 	if cErr != nil {
-		e := errors.New("UNIQUE constraint failed")
-		if errors.As(cErr, &e) {
-			ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
-				Code:    http.StatusBadRequest,
+		if strings.Contains(cErr.Error(), " Duplicate") {
+			msg := fmt.Sprintf("The email address %s is already taken. Choose a unique email address to create your account.", userReq.Email)
+			cErr = errors.New(msg)
+			ctx.JSON(http.StatusUnprocessableEntity, model.MetaErrorResponse{
+				Code:    http.StatusUnprocessableEntity,
 				Message: cErr.Error(),
 			})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, model.MetaErrorResponse{
-			Code:    http.StatusInternalServerError,
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
 			Message: cErr.Error(),
 		})
 		return
@@ -55,8 +58,8 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 	token, _, ctErr := c.TokenMaker.CreateToken(res.UserName, c.Con.AccessTokenDuration, res.Uid)
 	if ctErr != nil {
 		c.Log.Error(ctErr)
-		ctx.JSON(http.StatusInternalServerError, model.MetaErrorResponse{
-			Code:    http.StatusInternalServerError,
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
 			Message: errors.New("cannot generate token").Error(),
 		})
 		return
