@@ -220,7 +220,7 @@ func (u *UserUsecaseImpl) ForgotPassword(ctx context.Context, req model.EmailUse
 
 	receiver := emailUser
 	r := util.NewRequest([]string{receiver}, subject, u.conf, u.Log)
-	err = r.Send("../templates/email.html", map[string]string{"name": username, "password": util.RandomString(6)})
+	err = r.Send("templates/email.html", map[string]string{"name": username, "password": util.RandomString(6)})
 	if err != nil {
 		return false, err
 	}
