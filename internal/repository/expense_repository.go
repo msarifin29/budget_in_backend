@@ -83,7 +83,7 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 	LEFT JOIN t_category_expenses t ON e.id = t.category_id
 	where uid = ? and status = ? 
 	and e.expense_type LIKE ? and t.id LIKE ?
-	order by id limit ? offset ?`
+	order by id desc limit ? offset ?`
 	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status,
 		"%"+params.ExpenseType+"%", "%"+cId+"%", params.Limit, params.Offset)
 	if err != nil {
@@ -94,20 +94,19 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 	for rows.Next() {
 		var i model.ExpenseResponse
 		update := zero.TimeFromPtr(i.UpdatedAt)
-		transaction := zero.StringFromPtr(&i.TransactionId)
 		if err := rows.Scan(
-			&i.Id, &i.ExpenseType,
-			&i.Total, &i.Notes,
-			&i.CreatedAt, &update,
-			&i.Uid, &i.Category,
-			&i.Status, &transaction,
-			&i.TCategory.CategoryId,
+			&i.Id, &i.ExpenseType, &i.Total, &i.Notes,
+			&i.CreatedAt, &update, &i.Uid, &i.Category,
+			&i.Status, &i.TransactionId, &i.TCategory.CategoryId,
 			&i.TCategory.Id, &i.TCategory.Title,
 		); err != nil {
 			return nil, err
 		}
 		if i.Notes == "" {
 			i.Notes = ""
+		}
+		if i.TransactionId == "" {
+			i.TransactionId = ""
 		}
 		expenses = append(expenses, i)
 	}
@@ -124,21 +123,18 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 	rows := tx.QueryRowContext(ctx, script, id)
 
 	var i model.Expense
-	notes := zero.StringFromPtr(&i.Notes)
-	transaction := zero.StringFromPtr(&i.TransactionId)
 	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := rows.Scan(
-		&i.Id,
-		&i.ExpenseType,
-		&i.Total,
-		&notes,
-		&i.CreatedAt,
-		&update,
-		&i.Uid,
-		&i.Category,
-		&i.Status,
-		&transaction,
+		&i.Id, &i.ExpenseType, &i.Total, &i.Notes,
+		&i.CreatedAt, &update, &i.Uid, &i.Category,
+		&i.Status, &i.TransactionId,
 	)
+	if i.Notes == "" {
+		i.Notes = ""
+	}
+	if i.TransactionId == "" {
+		i.TransactionId = ""
+	}
 	return i, err
 }
 

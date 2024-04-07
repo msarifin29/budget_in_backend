@@ -44,7 +44,7 @@ func (CreditRepositoryImpl) GetCountHistoryCredit(ctx context.Context, tx *sql.T
 func (CreditRepositoryImpl) GetAllCredit(ctx context.Context, tx *sql.Tx, credit model.GetCreditParams) ([]model.CreditResponse, error) {
 	script := `select c.*, t.category_id, t.id as t_id, t.title
 	from credits c LEFT JOIN t_category_credits t ON c.id = t.category_id
-	where uid = ? limit ? offset ?`
+	where uid = ? order by id desc limit ? offset ?`
 	rows, err := tx.QueryContext(ctx, script, credit.Uid, credit.Limit, credit.Offset)
 	if err != nil {
 		return nil, err
@@ -142,23 +142,19 @@ func (CreditRepositoryImpl) GetCreditById(ctx context.Context, tx *sql.Tx, credi
 
 // GetHistoryCreditById implements CreditRepository.
 func (CreditRepositoryImpl) GetHistoryCreditById(ctx context.Context, tx *sql.Tx, credit model.GetHistoryCreditRequest) (model.HistoryCredit, error) {
-	script := `select * from history_credit where id = ?`
+	script := `select credit_id, id, th, total, status, created_at, updated_at, type_payment, payment_time, date 
+	from history_credit where id = ?`
 	rows := tx.QueryRowContext(ctx, script, credit.Id)
 	var i model.HistoryCredit
 	update := zero.TimeFromPtr(i.UpdatedAt)
-	typePayment := zero.StringFromPtr(&i.TypePayment)
 	err := rows.Scan(
-		&i.CreditId,
-		&i.Id,
-		&i.Th,
-		&i.Total,
-		&i.Status,
-		&i.CreatedAt,
-		&update,
-		&typePayment,
-		&i.PaymentTime,
-		&i.Date,
+		&i.CreditId, &i.Id, &i.Th, &i.Total,
+		&i.Status, &i.CreatedAt, &update,
+		&i.TypePayment, &i.PaymentTime, &i.Date,
 	)
+	if i.TypePayment == "" {
+		i.TypePayment = ""
+	}
 	return i, err
 }
 

@@ -79,7 +79,7 @@ func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params 
 	from incomes i
 	LEFT JOIN t_category_incomes t ON i.id = t.category_id
 	where uid = ? and i.type_income LIKE ? and t.id LIKE ?
-	order by id limit ? offset ?`
+	order by id desc limit ? offset ?`
 	rows, err := tx.QueryContext(ctx, script, params.Uid, `%`+params.TypeIncome+`%`, `%`+cId+`%`, params.Limit, params.Offset)
 	if err != nil {
 		return nil, err

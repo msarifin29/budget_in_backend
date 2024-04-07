@@ -16,6 +16,7 @@ type UserRepository interface {
 	UpdateUserName(ctx context.Context, tx *sql.Tx, user model.UpdateUserRequest) error
 	GetUserByEmail(ctx context.Context, tx *sql.Tx, req model.EmailUserRequest) (string, string, error)
 	UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error)
+	ResetPassword(ctx context.Context, tx *sql.Tx, params model.ResetPasswordRequest) (bool, error)
 	NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, status string) (bool, error)
 }
 
@@ -23,6 +24,16 @@ type UserRepositoryImpl struct{}
 
 func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{}
+}
+
+// ResetPassword implements UserRepository.
+func (*UserRepositoryImpl) ResetPassword(ctx context.Context, tx *sql.Tx, params model.ResetPasswordRequest) (bool, error) {
+	sqlScript := `update users set password = ? where uid = ? and status = "active"`
+	_, err := tx.ExecContext(ctx, sqlScript, params.NewPassword, params.Uid)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // NonActivatedUser implements UserRepository.
@@ -78,7 +89,8 @@ func (u *UserRepositoryImpl) CreateUser(ctx context.Context, tx *sql.Tx, user mo
 }
 
 func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email string) (model.User, error) {
-	sqlScript := `select uid, username, email, password, photo, created_at, updated_at, type_user, balance, savings, cash, debts, currency from users where email = ? limit 1`
+	sqlScript := `select uid, username, email, password, photo, created_at, updated_at, type_user, balance, savings, cash, debts, currency 
+	from users where email = ? and status = "active" limit 1`
 	row := tx.QueryRowContext(ctx, sqlScript, email)
 
 	var i model.User
@@ -95,7 +107,7 @@ func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email stri
 }
 
 func (u *UserRepositoryImpl) GetById(ctx context.Context, tx *sql.Tx, uid string) (model.User, error) {
-	sqlScript := `select * from users where uid = ? limit 1`
+	sqlScript := `select * from users where uid = ? and status = "active" limit 1`
 	row := tx.QueryRowContext(ctx, sqlScript, uid)
 
 	var i model.User
@@ -111,14 +123,14 @@ func (u *UserRepositoryImpl) GetById(ctx context.Context, tx *sql.Tx, uid string
 }
 
 func (u *UserRepositoryImpl) UpdateUserName(ctx context.Context, tx *sql.Tx, user model.UpdateUserRequest) error {
-	sqlScript := `update users set username = ? where uid = ?`
+	sqlScript := `update users set username = ? where uid = ? and status = "active"`
 	_, err := tx.ExecContext(ctx, sqlScript, user.UserName, user.Uid)
 	return err
 }
 
 // GetUserByEmail implements UserRepository.
 func (*UserRepositoryImpl) GetUserByEmail(ctx context.Context, tx *sql.Tx, req model.EmailUserRequest) (string, string, error) {
-	sqlScript := `select email, username from users where email = ? limit 1`
+	sqlScript := `select email, username from users where email = ? and status = "active" limit 1`
 	row := tx.QueryRowContext(ctx, sqlScript, req.Email)
 	var email, username string
 	err := row.Scan(&email, &username)
@@ -127,7 +139,7 @@ func (*UserRepositoryImpl) GetUserByEmail(ctx context.Context, tx *sql.Tx, req m
 
 // UpdatePassword implements UserRepository.
 func (*UserRepositoryImpl) UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error) {
-	sqlScript := `update users set password = ? where email = ?`
+	sqlScript := `update users set password = ? where email = ? and status = "active"`
 	_, err := tx.ExecContext(ctx, sqlScript, newPassword, email)
 	if err != nil {
 		return false, err

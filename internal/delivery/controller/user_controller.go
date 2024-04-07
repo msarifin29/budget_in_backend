@@ -2,7 +2,9 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/msarifin29/be_budget_in/internal/config"
@@ -37,16 +39,17 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 	res, cErr := c.UserUsecase.CreateUser(ctx, userReq)
 
 	if cErr != nil {
-		e := errors.New("UNIQUE constraint failed")
-		if errors.As(cErr, &e) {
-			ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
-				Code:    http.StatusBadRequest,
+		if strings.Contains(cErr.Error(), " Duplicate") {
+			msg := fmt.Sprintf("The email address %s is already taken. Choose a unique email address to create your account.", userReq.Email)
+			cErr = errors.New(msg)
+			ctx.JSON(http.StatusUnprocessableEntity, model.MetaErrorResponse{
+				Code:    http.StatusUnprocessableEntity,
 				Message: cErr.Error(),
 			})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, model.MetaErrorResponse{
-			Code:    http.StatusInternalServerError,
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
 			Message: cErr.Error(),
 		})
 		return
@@ -55,8 +58,8 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 	token, _, ctErr := c.TokenMaker.CreateToken(res.UserName, c.Con.AccessTokenDuration, res.Uid)
 	if ctErr != nil {
 		c.Log.Error(ctErr)
-		ctx.JSON(http.StatusInternalServerError, model.MetaErrorResponse{
-			Code:    http.StatusInternalServerError,
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
 			Message: errors.New("cannot generate token").Error(),
 		})
 		return
@@ -200,7 +203,7 @@ func (c *UserController) ForgotPassword(ctx *gin.Context) {
 		})
 		return
 	}
-	ok, err := c.UserUsecase.ResetPassword(ctx, req)
+	ok, err := c.UserUsecase.ForgotPassword(ctx, req)
 	if !ok || err != nil {
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
 			Code:    http.StatusBadRequest,
@@ -246,6 +249,40 @@ func (c *UserController) NonActivatedUser(ctx *gin.Context) {
 		return
 	}
 
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    ok,
+	})
+}
+
+func (c *UserController) ResetPassword(ctx *gin.Context) {
+	var req model.ResetPasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.Log.Error(err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	if authPayload.Uid != req.Uid {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, model.MetaErrorResponse{
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+	ok, err := c.UserUsecase.ResetPassword(ctx, req)
+	if !ok || err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 	ctx.JSON(http.StatusOK, model.MetaResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
