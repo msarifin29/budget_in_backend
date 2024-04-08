@@ -19,10 +19,42 @@ type CreditRepository interface {
 	UpdateHistoryCredit(ctx context.Context, tx *sql.Tx, historyC model.UpdateHistoryCreditParams) (bool, error)
 	GetHistoryCreditById(ctx context.Context, tx *sql.Tx, credit model.GetHistoryCreditRequest) (model.HistoryCredit, error)
 	GetAllHistoryCredit(ctx context.Context, tx *sql.Tx, credit model.GetHistoriesCreditParams) ([]model.HistoryCredit, error)
+	GetAllHistoryCreditById(ctx context.Context, tx *sql.Tx, creditId float64) ([]model.HistoryCredit, error)
 	GetCountHistoryCredit(ctx context.Context, tx *sql.Tx, creditId float64) (float64, error)
 }
 
 type CreditRepositoryImpl struct{}
+
+// GetAllHistoryCreditById implements CreditRepository.
+func (CreditRepositoryImpl) GetAllHistoryCreditById(ctx context.Context, tx *sql.Tx, creditId float64) ([]model.HistoryCredit, error) {
+	script := `select credit_id, id, th, total, status, created_at, updated_at, type_payment, payment_time, date 
+	from history_credit where credit_id = ?`
+	rows, err := tx.QueryContext(ctx, script, creditId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	credits := []model.HistoryCredit{}
+	for rows.Next() {
+		var i model.HistoryCredit
+		update := zero.TimeFromPtr(i.UpdatedAt)
+
+		err := rows.Scan(
+			&i.CreditId, &i.Id, &i.Th,
+			&i.Total, &i.Status, &i.CreatedAt,
+			&update, &i.TypePayment,
+			&i.PaymentTime, &i.Date,
+		)
+		if err != nil {
+			return nil, err
+		}
+		credits = append(credits, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return credits, nil
+}
 
 // GetCountCredit implements CreditRepository.
 func (CreditRepositoryImpl) GetCountCredit(ctx context.Context, tx *sql.Tx, uid string) (float64, error) {

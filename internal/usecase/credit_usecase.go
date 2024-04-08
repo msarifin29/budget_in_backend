@@ -177,13 +177,21 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		err = errors.New("failed update total credit")
 		return model.UpdateHistoryResponse{}, err
 	}
-
-	ok, errUp := u.CreditRepo.UpdateCredit(ctx, tx, model.UpdateCreditRequest{Uid: params.Uid, Id: params.CreditId, StatusCredit: util.COMPLETED})
-	if !ok || err != nil {
-		u.Log.Error(errUp)
-		errUp = errors.New("failed update credit")
-		return model.UpdateHistoryResponse{}, errUp
+	isCompleted, errCheck := checkHistoryCredit(ctx, tx, u.CreditRepo, params.CreditId)
+	if errCheck != nil {
+		u.Log.Error(errCheck)
+		errCheck = errors.New("failed get history credit")
+		return model.UpdateHistoryResponse{}, errCheck
 	}
+	if isCompleted {
+		ok, errUp := u.CreditRepo.UpdateCredit(ctx, tx, model.UpdateCreditRequest{Uid: params.Uid, Id: params.CreditId, StatusCredit: util.COMPLETED})
+		if !ok || err != nil {
+			u.Log.Error(errUp)
+			errUp = errors.New("failed update credit")
+			return model.UpdateHistoryResponse{}, errUp
+		}
+	}
+
 	// Update debts from user
 	newCreditCompletted := credit.Installment * credit.LoanTerm
 	err = util.NewDebts(ctx, tx, u.Log, u.AccountRepo, util.COMPLETED, params.AccountId, newCreditCompletted)
@@ -218,7 +226,6 @@ func (u *CreditUsecaseImpl) UpdateHistoryCredit(ctx context.Context, params mode
 		u.Log.Errorf("failed add category expense %e :", categoryErr)
 		return model.UpdateHistoryResponse{}, categoryErr
 	}
-	u.Log.Infof("expense :%v", newEx)
 	return model.UpdateHistoryResponse{
 		Id:          historyC.Id,
 		Th:          historyC.Th,
@@ -308,4 +315,19 @@ func UpdateTotalBalanceOrCash(ctx context.Context, tx *sql.Tx,
 		}
 	}
 	return nil
+}
+
+func checkHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.CreditRepository, creditId float64) (bool, error) {
+	historyCredits, err := creditRepo.GetAllHistoryCreditById(ctx, tx, creditId)
+	if err != nil {
+		err = fmt.Errorf("failed get history credit %v", creditId)
+		return false, err
+	}
+	for _, i := range historyCredits {
+		fmt.Println("status credit => ", i.Status)
+		if i.Status == util.ACTIVE {
+			return false, nil
+		}
+	}
+	return true, nil
 }
