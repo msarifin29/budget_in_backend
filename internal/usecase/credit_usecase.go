@@ -54,7 +54,7 @@ func (u *CreditUsecaseImpl) GetAllHistoryCredit(ctx context.Context, params mode
 
 // CreateCredit implements CreditUsecase.
 func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.CreateCreditRequest) (model.Credit, error) {
-	loanTerm := util.GetTotalMonth(util.Date(params.StartDate), util.Date(params.EndDate))
+	loanTerm := util.GetTotalMonth(util.Date(params.StartDate), util.Date(params.EndDate)) + 1
 	tx, _ := u.db.Begin()
 	defer util.CommitOrRollback(tx)
 	req := model.Credit{
@@ -74,6 +74,7 @@ func (u *CreditUsecaseImpl) CreateCredit(ctx context.Context, params model.Creat
 		u.Log.Errorf("failed create credit %v", err)
 		return model.Credit{}, err
 	}
+
 	err = NewHistoryCredit(ctx, tx, u.CreditRepo, creditRes, u.Log)
 	if err != nil {
 		u.Log.Errorf("failed create history credit %v", err)
@@ -243,7 +244,7 @@ func NewHistoryCredit(ctx context.Context, tx *sql.Tx, creditRepo repository.Cre
 		req := model.HistoryCredit{
 			CreditId:    credit.Id,
 			Th:          float64(i + 1),
-			Total:       credit.Total,
+			Total:       credit.Installment,
 			Status:      util.ACTIVE,
 			TypePayment: "",
 			PaymentTime: credit.StartDate.Day(),

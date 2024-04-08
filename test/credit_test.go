@@ -19,22 +19,22 @@ func TestCreateCreditSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateCreditRequest{
-		Uid: "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
+		Uid: "da063cef-9f52-46da-b98f-0c0067e5869d",
 		// CategoryCredit: util.ELECTRONIC,
 		CategoryId: 1,
 		TypeCredit: util.MONTHLY,
 		// LoanTerm:    3,
-		Installment: 5000,
+		Installment: 12000,
 		// PaymentTime: time.Now().Day(),
-		StartDate: "2024-12-29",
-		EndDate:   "2025-03-30",
+		StartDate: "2024-06-29",
+		EndDate:   "2024-08-30",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/credits/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body =>", string(bytes))
@@ -54,7 +54,7 @@ func TestCreateCreditFailed(t *testing.T) {
 		CategoryCredit: util.ELECTRONIC,
 		TypeCredit:     util.MONTHLY,
 		// LoanTerm:       0,
-		Installment: 1000,
+		Installment: 15000,
 		// PaymentTime:    time.Now().Day(),
 
 	}
@@ -63,7 +63,7 @@ func TestCreateCreditFailed(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/credits/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.NoError(t, err)
@@ -189,7 +189,7 @@ func TestGetHistoriesCreditsSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetHistoriesCreditsRequest{
-		CreditId:  1,
+		CreditId:  17,
 		Page:      1,
 		TotalPage: 5,
 	}
@@ -202,7 +202,7 @@ func TestGetHistoriesCreditsSuccess(t *testing.T) {
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))
