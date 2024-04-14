@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -23,24 +24,17 @@ type Config struct {
 	AuthPassword        string        `mapstructure:"AUTH_PASSWORD"`
 }
 
-func LoadConfigDev(path string) (config Config, err error) {
+func LoadConfig(path string, fileName string) (config Config, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigName(`env_dev`)
-	viper.SetConfigType(`env`)
 
-	viper.AutomaticEnv()
-
-	err = viper.ReadInConfig()
-	if err != nil {
+	if fileName == "env_dev" {
+		viper.SetConfigName("env_dev")
+	} else if fileName == "env_prod" {
+		viper.SetConfigName("env_prod")
+	} else {
+		err = errors.New("invalid environment variable")
 		return
 	}
-	err = viper.Unmarshal(&config)
-	return
-}
-
-func LoadConfigProd(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName(`env_prod`)
 	viper.SetConfigType(`env`)
 
 	viper.AutomaticEnv()

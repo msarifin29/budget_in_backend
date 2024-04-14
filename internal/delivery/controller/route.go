@@ -7,6 +7,7 @@ import (
 )
 
 func (server *Server) SetUpRoute() {
+	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.Default()
 

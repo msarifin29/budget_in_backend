@@ -12,7 +12,7 @@ import (
 
 func NewTestServer(t *testing.T) *controller.Server {
 	log := config.NewLogger()
-	con, err := config.LoadConfigDev("..")
+	con, err := config.LoadConfig("..", "env_dev")
 	assert.NoError(t, err)
 	server, sErr := controller.NewServer(log, con)
 	assert.NoError(t, sErr)

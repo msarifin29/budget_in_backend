@@ -10,7 +10,7 @@ import (
 )
 
 func TestJWTMakerValid(t *testing.T) {
-	con, err := config.LoadConfigDev("..")
+	con, err := config.LoadConfig("..", "env_dev")
 	assert.NoError(t, err)
 	maker, err := util.NewJWTMaker(con.TokenSymetricKey)
 	assert.NoError(t, err)

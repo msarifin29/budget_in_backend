@@ -8,7 +8,7 @@ import (
 )
 
 func TestLoadDev(t *testing.T) {
-	c, err := config.LoadConfigDev("..")
+	c, err := config.LoadConfig("..", "env_dev")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, c)
 }

@@ -9,15 +9,15 @@ import (
 
 func main() {
 	logger := config.NewLogger()
-	configur, errCon := config.LoadConfigDev(".")
+	con, errCon := config.LoadConfig(".", "env_prod")
 	if errCon != nil {
 		log.Fatalf("cannot load config %e :", errCon)
 	}
-	server, err := controller.NewServer(logger, configur)
+	server, err := controller.NewServer(logger, con)
 	if err != nil {
 		log.Fatalf("cannot create server %e :", errCon)
 	}
-	errStart := server.Start(configur.ServerAddress)
+	errStart := server.Start(con.ServerAddress)
 	if errStart != nil {
 		log.Fatalf("cannot start server %e :", errStart)
 	}
