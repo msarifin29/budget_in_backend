@@ -88,8 +88,8 @@ func TestGetMaxBudgetSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetMaxBudgetRequest{
-		Uid:       "ea1b7ff6-e56b-4786-a585-e2ef07520370",
-		AccountId: "8dc08329-f468-4532-b942-52301d3cd1c2",
+		Uid:       "94c7f7d6-3082-414d-a9af-fd3b8bcbeb92",
+		AccountId: "29c08f49-f3b3-46ae-b8e1-1686fff0dbf7",
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/accounts/max_budget/", nil)
@@ -99,7 +99,7 @@ func TestGetMaxBudgetSuccess(t *testing.T) {
 	q.Add("account_id", fmt.Sprintf("%v", params.AccountId))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "ea1b7ff6-e56b-4786-a585-e2ef07520370", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "94c7f7d6-3082-414d-a9af-fd3b8bcbeb92", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))

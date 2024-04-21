@@ -24,7 +24,7 @@ type ExpenseRepositoryImpl struct{}
 
 // GetExpenseThisMonth implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenseThisMonth(ctx context.Context, tx *sql.Tx, uid string) (float64, error) {
-	script := `select SUM(total) from expenses where uid = ?`
+	script := `SELECT COALESCE(SUM(total), 0) AS total_expenses from expenses where uid = ?`
 	var total float64
 	row := tx.QueryRowContext(ctx, script, uid)
 	err := row.Scan(&total)
