@@ -41,7 +41,7 @@ func (CategoryRepositoryImpl) CreateCategoryIncomes(ctx context.Context, tx *sql
 
 // GetCategoryCredit implements CategoryRepository.
 func (CategoryRepositoryImpl) GetCategoryCredit(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error) {
-	script := `select * from t_category_credits where category_id = ?`
+	script := `select category_id, id, title from t_category_credits where category_id = ?`
 	row := tx.QueryRowContext(ctx, script, categoryId)
 	var category model.Category
 	err := row.Scan(&category.CategoryId, &category.Id, &category.Title)
@@ -50,7 +50,7 @@ func (CategoryRepositoryImpl) GetCategoryCredit(ctx context.Context, tx *sql.Tx,
 
 // GetCategoryExpense implements CategoryRepository.
 func (CategoryRepositoryImpl) GetCategoryExpense(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error) {
-	script := `select * from t_category_expenses where category_id = ?`
+	script := `select category_id, id, title from t_category_expenses where category_id = ?`
 	row := tx.QueryRowContext(ctx, script, categoryId)
 	var category model.Category
 	err := row.Scan(&category.CategoryId, &category.Id, &category.Title)
@@ -59,7 +59,7 @@ func (CategoryRepositoryImpl) GetCategoryExpense(ctx context.Context, tx *sql.Tx
 
 // GetCategoryIncome implements CategoryRepository.
 func (CategoryRepositoryImpl) GetCategoryIncome(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error) {
-	script := `select * from t_category_incomes where category_id = ?`
+	script := `select category_id, id, title from t_category_incomes where category_id = ?`
 	row := tx.QueryRowContext(ctx, script, categoryId)
 	var category model.Category
 	err := row.Scan(&category.CategoryId, &category.Id, &category.Title)

@@ -152,7 +152,8 @@ func (CreditRepositoryImpl) UpdateTotalCredit(ctx context.Context, tx *sql.Tx, u
 
 // GetCreditById implements CreditRepository.
 func (CreditRepositoryImpl) GetCreditById(ctx context.Context, tx *sql.Tx, credit model.GetCreditRequest) (model.Credit, error) {
-	script := `select * from credits where uid = ? && id = ?`
+	script := `select uid, id, category_credit, type_credit, total, loan_term, status_credit, created_at,
+	updated_at, installment, payment_time, start_date, end_date from credits where uid = ? && id = ?`
 	rows := tx.QueryRowContext(ctx, script, credit.Uid, credit.Id)
 	var i model.Credit
 	update := zero.TimeFromPtr(i.UpdatedAt)
