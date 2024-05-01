@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
@@ -38,16 +37,14 @@ func (u *MonthlyReportUsecaseImpl) GetMonthlyReport(ctx context.Context, params 
 		exErr = errors.New("failed get monthly expenses report")
 		return []model.MonthlyReportResponse{}, exErr
 	}
-	fmt.Println("in :", in)
-	fmt.Println("inErr :", inErr)
-	fmt.Println("ex :", ex)
-	fmt.Println("exErr :", exErr)
+
 	reports := []model.MonthlyReportResponse{}
 	for i := 1; i < 13; i++ {
 		var m model.MonthlyReportResponse
 		for _, v := range in {
 			m.Year = v.Year
 			m.Month = float64(i)
+
 			if len(in) != 0 {
 				if int(v.Month) == i {
 					m.TotalIncome = v.TotalIncome
@@ -57,6 +54,9 @@ func (u *MonthlyReportUsecaseImpl) GetMonthlyReport(ctx context.Context, params 
 			}
 		}
 		for _, expen := range ex {
+			m.Year = expen.Year
+			m.Month = float64(i)
+
 			if (len(ex)) != 0 {
 				if int(expen.Month) == i {
 					m.TotalExpense = expen.TotalExpense
