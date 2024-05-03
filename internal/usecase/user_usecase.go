@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/config"
@@ -22,6 +23,7 @@ type UserUsecase interface {
 	ForgotPassword(ctx context.Context, req model.EmailUserRequest) (bool, error)
 	ResetPassword(ctx context.Context, req model.ResetPasswordRequest) (bool, error)
 	NonActivatedUser(ctx context.Context, req model.NonActiveUserParams) (bool, error)
+	GetEmailUser(ctx context.Context, email model.CheckEmail) (bool, error)
 }
 
 type UserUsecaseImpl struct {
@@ -34,6 +36,29 @@ type UserUsecaseImpl struct {
 
 func NewUserUsecase(UserRepository repository.UserRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, conf config.Config) UserUsecase {
 	return &UserUsecaseImpl{UserRepository: UserRepository, AccountRepo: AccountRepo, Log: Log, db: db, conf: conf}
+}
+
+// GetEmailUser implements UserUsecase.
+func (u *UserUsecaseImpl) GetEmailUser(ctx context.Context, email model.CheckEmail) (bool, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+	users, err := u.UserRepository.GetEmailUser(ctx, tx)
+	if err != nil {
+		u.Log.Errorf("failed check email %e", err)
+		err = fmt.Errorf("failed check email")
+		return false, err
+	}
+	var inputEmail = ""
+	for _, i := range users {
+		if strings.Contains(email.Email, i.Email) {
+			inputEmail = i.Email
+		}
+	}
+	if inputEmail != "" {
+		err = fmt.Errorf("this email address is already in use. please choose a different one")
+		return false, err
+	}
+	return true, nil
 }
 
 // ResetPassword implements UserUsecase.

@@ -18,12 +18,40 @@ type UserRepository interface {
 	UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error)
 	ResetPassword(ctx context.Context, tx *sql.Tx, params model.ResetPasswordRequest) (bool, error)
 	NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, status string) (bool, error)
+	GetEmailUser(ctx context.Context, tx *sql.Tx) ([]model.User, error)
 }
 
 type UserRepositoryImpl struct{}
 
 func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{}
+}
+
+// GetEmailUser implements UserRepository.
+func (*UserRepositoryImpl) GetEmailUser(ctx context.Context, tx *sql.Tx) ([]model.User, error) {
+	sqlScript := `select email from users`
+	rows, err := tx.QueryContext(ctx, sqlScript)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	users := []model.User{}
+	for rows.Next() {
+		var i model.User
+		err := rows.Scan(&i.Email)
+		if err != nil {
+			return nil, err
+		}
+		if i.Email == "" {
+			i.Email = ""
+		}
+		users = append(users, i)
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+	}
+	return users, nil
+
 }
 
 // ResetPassword implements UserRepository.
@@ -107,7 +135,8 @@ func (u *UserRepositoryImpl) GetUser(ctx context.Context, tx *sql.Tx, email stri
 }
 
 func (u *UserRepositoryImpl) GetById(ctx context.Context, tx *sql.Tx, uid string) (model.User, error) {
-	sqlScript := `select * from users where uid = ? and status = "active" limit 1`
+	sqlScript := `select uid, username, email, password, photo, created_at, updated_at, type_user, balance, savings, cash, debts, currency, status
+	 from users where uid = ? and status = "active" limit 1`
 	row := tx.QueryRowContext(ctx, sqlScript, uid)
 
 	var i model.User

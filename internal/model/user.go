@@ -95,6 +95,9 @@ type UpdateUserRequest struct {
 type UserRequest struct {
 	Uid string `uri:"uid"`
 }
+type CheckEmail struct {
+	Email string `uri:"email"`
+}
 
 type NonActiveUserParams struct {
 	Uid    string `json:"uid" binding:"required"`

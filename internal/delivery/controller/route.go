@@ -15,6 +15,7 @@ func (server *Server) SetUpRoute() {
 
 	router.POST("/api/register", server.UserC.CreateUser)
 	router.POST("/api/login", server.UserC.LoginUser)
+	router.GET("/api/check-email/:email", server.UserC.CheckEmail)
 
 	router.POST("/api/user/forgot_password", server.UserC.ForgotPassword)
 

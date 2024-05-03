@@ -289,3 +289,29 @@ func (c *UserController) ResetPassword(ctx *gin.Context) {
 		Data:    ok,
 	})
 }
+
+func (c *UserController) CheckEmail(ctx *gin.Context) {
+	var req model.CheckEmail
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		c.Log.Errorf("binding %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	isValid, err := c.UserUsecase.GetEmailUser(ctx, req)
+	if err != nil || !isValid {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    isValid,
+	})
+}

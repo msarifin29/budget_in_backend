@@ -349,3 +349,29 @@ func TestResetPasswordNoAuthorization(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
+func TestCheckEmailIsExistSuccess(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.CheckEmail{Email: "test@gmail.com"}
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/check-email/"+params.Email, nil)
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body :", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+func TestCheckEmailIsExistFailed(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.CheckEmail{Email: "asamsul474@gmail.com"}
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/check-email/"+params.Email, nil)
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body :", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
