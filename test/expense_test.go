@@ -26,7 +26,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 		CategoryId:  2,
 		Notes:       "",
 		AccountId:   "9c482ceb-f4cb-4b64-8971-551713d5eb0e",
-		// CreatedAt:   "2015-09-02T08:00:00Z",
+		CreatedAt:   "2024-01-02T08:00:00Z",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
