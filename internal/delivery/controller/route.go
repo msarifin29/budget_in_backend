@@ -33,6 +33,7 @@ func (server *Server) SetUpRoute() {
 
 	// Monthly reports
 	autRoutes.GET("/api/user/monthly_report/:uid", server.MonthReportC.GetMonthlyReport)
+	autRoutes.GET("/api/user/monthly-report-detail/", server.MonthReportC.GetMonthlyReportDetail)
 
 	// Expense
 	autRoutes.POST("api/expenses/create", server.ExpenseC.CreateExpense)

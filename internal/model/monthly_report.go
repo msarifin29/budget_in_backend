@@ -36,3 +36,38 @@ type MonthlyReportResponse struct {
 	TotalIncome  float64 `json:"total_income"`
 	TotalExpense float64 `json:"total_expense"`
 }
+
+// Details
+type ParamMonthlyReportDetail struct {
+	Month string `json:"month" binding:"required"`
+	Uid   string `json:"uid" binding:"required"`
+}
+type RequestMonthlyReportDetail struct {
+	Month string `form:"month" binding:"required"`
+}
+type MonthlyXDetail struct {
+	Month         string          `json:"month"`
+	Uid           string          `json:"uid"`
+	Id            float64         `json:"id"`
+	ExpenseType   string          `json:"expense_type"`
+	Total         float64         `json:"total"`
+	Status        string          `json:"status"`
+	Notes         string          `json:"notes"`
+	TransactionId string          `json:"transaction_id"`
+	TCategory     CategoryReponse `json:"t_category"`
+	CreatedAt     *time.Time      `json:"created_at"`
+}
+type MonthlyIDetail struct {
+	Month         string          `json:"month"`
+	Uid           string          `json:"uid" `
+	Id            float64         `json:"id"`
+	TypeIncome    string          `json:"type_income"`
+	Total         float64         `json:"total"`
+	TransactionId string          `json:"transaction_id"`
+	TCategory     CategoryReponse `json:"t_category"`
+	CreatedAt     *time.Time      `json:"created_at"`
+}
+type MonthlyReportDetailResponse struct {
+	ExpensesRecords []MonthlyXDetail `json:"expenses"`
+	IncomesRecords  []MonthlyIDetail `json:"incomes"`
+}

@@ -19,12 +19,12 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateIncomeRequest{
-		Uid: "da063cef-9f52-46da-b98f-0c0067e5869d",
+		Uid: "d4c3c876-ebb5-4950-83a9-e6786e672423",
 		// CategoryIncome: util.SALARY,
 		TypeIncome: util.DEBIT,
 		Total:      20000,
 		CategoryId: 2,
-		AccountId:  "faae4ed7-f719-45a5-b259-3e6bf7407ba0",
+		AccountId:  "9c482ceb-f4cb-4b64-8971-551713d5eb0e",
 		// CreatedAt:  "", // 2015-09-02T08:00:00Z
 	}
 	body, err := json.Marshal(params)
@@ -32,7 +32,7 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/incomes/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))
