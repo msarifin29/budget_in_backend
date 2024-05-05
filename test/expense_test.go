@@ -202,7 +202,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 		Status: "success",
 		// ExpenseType: "Debit",
 		// Category:    "other",
-		Id:        8,
+		// Id:        8,
 		Page:      1,
 		TotalPage: 5,
 	}
@@ -218,7 +218,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))

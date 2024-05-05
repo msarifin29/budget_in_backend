@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
-	"github.com/msarifin29/be_budget_in/util/zero"
 )
 
 type ExpenseRepository interface {
@@ -87,7 +86,7 @@ func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, 
 // GetExpenses implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error) {
 	cId := categoryId(params.Id)
-	script := `select e.*, t.category_id, t.id as t_id, t.title
+	script := `select e.id, e.expense_type, e.total, e.notes, e.created_at, e.uid, e.status, e.transaction_id, t.category_id, t.id as t_id, t.title
 	from expenses e
 	LEFT JOIN t_category_expenses t ON e.id = t.category_id
 	where uid = ? and status = ? 
@@ -102,11 +101,10 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 	expenses := []model.ExpenseResponse{}
 	for rows.Next() {
 		var i model.ExpenseResponse
-		update := zero.TimeFromPtr(i.UpdatedAt)
 		if err := rows.Scan(
 			&i.Id, &i.ExpenseType, &i.Total, &i.Notes,
-			&i.CreatedAt, &update, &i.Uid, &i.Category,
-			&i.Status, &i.TransactionId, &i.TCategory.CategoryId,
+			&i.CreatedAt, &i.Uid, &i.Status,
+			&i.TransactionId, &i.TCategory.CategoryId,
 			&i.TCategory.Id, &i.TCategory.Title,
 		); err != nil {
 			return nil, err
@@ -127,15 +125,15 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 
 // GetExpenseById implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id float64) (model.Expense, error) {
-	script := `select * from expenses where id = ? limit 1`
+	script := `select id, expense_type, total, notes, created_at, uid, status, transaction_id 
+	from expenses where id = ? limit 1`
 
 	rows := tx.QueryRowContext(ctx, script, id)
 
 	var i model.Expense
-	update := zero.TimeFromPtr(i.UpdatedAt)
 	err := rows.Scan(
 		&i.Id, &i.ExpenseType, &i.Total, &i.Notes,
-		&i.CreatedAt, &update, &i.Uid, &i.Category,
+		&i.CreatedAt, &i.Uid, &i.Category,
 		&i.Status, &i.TransactionId,
 	)
 	if i.Notes == "" {
