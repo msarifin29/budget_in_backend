@@ -14,7 +14,7 @@ type ExpenseRepository interface {
 	UpdateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense, id float64) (model.Expense, error)
 	DeleteExpense(ctx context.Context, tx *sql.Tx, id float64) error
 	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error)
-	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id int32) (float64, error)
+	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id string, CreatedAt string) (float64, error)
 	GetExpensesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Expense, error)
 	GetExpenseThisMonth(ctx context.Context, tx *sql.Tx, uid string) (float64, error)
 }
@@ -72,28 +72,54 @@ func (*ExpenseRepositoryImpl) GetExpensesByMonth(ctx context.Context, tx *sql.Tx
 }
 
 // GetTotalExpenses implements ExpenseRepository.
-func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id int32) (float64, error) {
+func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id string, CreatedAt string) (float64, error) {
 	var total float64
-	cId := categoryId(Id)
-	script := `SELECT COUNT(*) AS total
+	query := `SELECT COUNT(*) AS total
 	FROM expenses e
 	LEFT JOIN t_category_expenses t ON e.id = t.category_id
-	where uid = ? and e.status = ? and e.expense_type LIKE ? and t.id LIKE ?`
-	err := tx.QueryRowContext(ctx, script, uid, status, "%"+expenseType+"%", "%"+cId+"%").Scan(&total)
+	WHERE uid = ? AND e.status = ?`
+	if expenseType != "" {
+		query += " AND e.expense_type LIKE ?"
+	}
+	if CreatedAt != "" {
+		query += " AND DATE(e.created_at) = ?"
+	}
+	if Id != "" {
+		query += " AND t.id = ?"
+	}
+	row := tx.QueryRowContext(ctx, query, append([]interface{}{uid, status}, optionalParams(expenseType, CreatedAt, Id)...)...)
+	err := row.Scan(&total)
 	return total, err
 }
 
 // GetExpenses implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error) {
-	cId := categoryId(params.Id)
-	script := `select e.id, e.expense_type, e.total, e.notes, e.created_at, e.uid, e.status, e.transaction_id, t.category_id, t.id as t_id, t.title
-	from expenses e
+	var err error
+	query := `SELECT e.id, e.expense_type, e.total, e.notes, e.created_at, e.uid, e.status, e.transaction_id, t.category_id, t.id as t_id, t.title
+	FROM expenses e
 	LEFT JOIN t_category_expenses t ON e.id = t.category_id
-	where uid = ? and status = ? 
-	and e.expense_type LIKE ? and t.id LIKE ?
-	order by id desc limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Status,
-		"%"+params.ExpenseType+"%", "%"+cId+"%", params.Limit, params.Offset)
+	WHERE uid = ? AND status = ?`
+	if params.ExpenseType != "" {
+		query += " AND e.expense_type LIKE ?"
+	}
+	if params.CreatedAt != "" {
+		query += " AND DATE(e.created_at) = ?"
+	}
+	if params.Id != "" {
+		query += " AND t.id = ?"
+	}
+	query += " ORDER BY id DESC LIMIT ? OFFSET ?"
+	var rows *sql.Rows
+	switch {
+	case params.ExpenseType != "":
+		rows, err = tx.QueryContext(ctx, query, params.Uid, params.Status, params.ExpenseType, params.Limit, params.Offset)
+	case params.CreatedAt != "":
+		rows, err = tx.QueryContext(ctx, query, params.Uid, params.Status, params.CreatedAt, params.Limit, params.Offset)
+	case params.Id != "":
+		rows, err = tx.QueryContext(ctx, query, params.Uid, params.Status, params.Id, params.Limit, params.Offset)
+	default:
+		rows, err = tx.QueryContext(ctx, query, params.Uid, params.Status, params.Limit, params.Offset)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -184,4 +210,14 @@ func categoryId(id int32) string {
 		return ""
 	}
 	return fmt.Sprintf("%v", int(id))
+}
+
+func optionalParams(params ...string) []interface{} {
+	var values []interface{}
+	for _, param := range params {
+		if param != "" {
+			values = append(values, param)
+		}
+	}
+	return values
 }

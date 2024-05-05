@@ -50,7 +50,8 @@ type GetExpenseParams struct {
 	Status      string `json:"status"`
 	ExpenseType string `json:"expense_type"`
 	Category    string `json:"category"` // Not used
-	Id          int32  `json:"id"`
+	Id          string `json:"id"`
+	CreatedAt   string `json:"created_at"`
 	Limit       int32  `json:"limit"`
 	Offset      int32  `json:"offset"`
 }
@@ -63,7 +64,8 @@ type GetExpenseRequest struct {
 	Status      string `form:"status" binding:"required,status"`
 	ExpenseType string `form:"expense_type"`
 	Category    string `form:"category"` // Not Used
-	Id          int32  `form:"id"`
+	Id          int    `form:"id"`
+	CreatedAt   string `form:"created_at"`
 	Page        int32  `form:"page" binding:"required,min=1"`
 	TotalPage   int32  `form:"total_page" binding:"required,min=5,max=10"`
 }

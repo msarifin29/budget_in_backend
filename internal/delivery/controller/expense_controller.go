@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -154,12 +155,16 @@ func (c *ExpenseController) GetExpenses(ctx *gin.Context) {
 		return
 	}
 	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	var eId string
+	if req.Id != 0 {
+		eId = fmt.Sprintf("%v", req.Id)
+	}
 	params := model.GetExpenseParams{
-		Uid:    authPayload.Uid,
-		Status: req.Status,
-		// Category:    req.Category,
+		Uid:         authPayload.Uid,
+		Status:      req.Status,
 		ExpenseType: req.ExpenseType,
-		Id:          req.Id,
+		Id:          eId,
+		CreatedAt:   req.CreatedAt,
 		Limit:       req.TotalPage,
 		Offset:      (req.Page - 1) * req.TotalPage,
 	}

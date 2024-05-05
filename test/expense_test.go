@@ -200,9 +200,9 @@ func TestGetExpensesSuccess(t *testing.T) {
 
 	params := model.GetExpenseRequest{
 		Status: "success",
-		// ExpenseType: "Debit",
-		// Category:    "other",
-		// Id:        8,
+		// ExpenseType: "Cash",
+		// Id: 3,
+		// CreatedAt: "2024-01-02",
 		Page:      1,
 		TotalPage: 5,
 	}
@@ -211,7 +211,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 	// Add query parameters to request URL
 	q := req.URL.Query()
 	q.Add("expense_type", fmt.Sprintf("%v", params.ExpenseType))
-	// q.Add("category", fmt.Sprintf("%v", params.Category))
+	q.Add("created_at", fmt.Sprintf("%v", params.CreatedAt))
 	q.Add("id", fmt.Sprintf("%v", params.Id))
 	q.Add("status", fmt.Sprintf("%v", params.Status))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
