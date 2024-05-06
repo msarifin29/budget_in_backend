@@ -22,6 +22,7 @@ type Server struct {
 	CreditC      CreditController
 	AccountC     AccountController
 	MonthReportC MonthlyReportController
+	PrivacyC     PrivacyController
 }
 
 func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
@@ -57,6 +58,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	creditController := NewCreditController(creditUsecase, Log)
 	accountController := NewAccountController(accountUsacase, Log)
 	monthlyController := NewMonthlyController(monthlyUsecase, Log)
+	privacyController := NewPrivacyController(Log)
 
 	server := &Server{
 		Log:          Log,
@@ -68,6 +70,7 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 		CreditC:      *creditController,
 		AccountC:     *accountController,
 		MonthReportC: *monthlyController,
+		PrivacyC:     *privacyController,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {

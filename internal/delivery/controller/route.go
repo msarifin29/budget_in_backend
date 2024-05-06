@@ -13,14 +13,16 @@ func (server *Server) SetUpRoute() {
 
 	binding.Validator.Engine()
 
+	// No Authorization
 	router.POST("/api/register", server.UserC.CreateUser)
 	router.POST("/api/login", server.UserC.LoginUser)
 	router.GET("/api/check-email/:email", server.UserC.CheckEmail)
-
 	router.POST("/api/user/forgot_password", server.UserC.ForgotPassword)
+	router.GET("/api/privacy-police/:lang", server.PrivacyC.PrivacyPolice)
 
 	autRoutes := router.Group("/").Use(delivery.AuthMiddleware(server.TokenMaker))
 
+	// Onboarding
 	autRoutes.POST("/api/accounts/create", server.AccountC.CreateAccount)
 	autRoutes.PUT("/api/accounts/update_max_budget", server.AccountC.UpdateMaxBudget)
 	autRoutes.GET("/api/accounts/max_budget/", server.AccountC.GetMaxBudget)
