@@ -20,8 +20,6 @@ func NewPrivacyController(Log *logrus.Logger) *PrivacyController {
 func (c *PrivacyController) PrivacyPolice(ctx *gin.Context) {
 	var req model.PrivacyParam
 
-	ctx.Header("Content-Type", "text/html")
-
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		c.Log.Errorf("failed binding request with %t:", err)
 		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
