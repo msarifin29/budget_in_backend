@@ -29,13 +29,14 @@ SELECT
     uid,
     COALESCE(SUM(total), 0) AS total_expenses
 FROM 
-    expenses where uid = ? && status = 'success'
+    expenses WHERE uid = ? AND status = 'success' AND MONTH(created_at) = MONTH(CURDATE())
 GROUP BY month, uid
 ORDER BY month ASC, uid ASC;`
 	var total float64
 	var userId, month string
 	row := tx.QueryRowContext(ctx, script, uid)
 	err := row.Scan(&month, &userId, &total)
+	fmt.Println("kambing ", total)
 	return total, err
 }
 
