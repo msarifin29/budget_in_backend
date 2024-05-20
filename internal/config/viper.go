@@ -27,10 +27,10 @@ type Config struct {
 func LoadConfig(path string, fileName string) (config Config, err error) {
 	viper.AddConfigPath(path)
 
-	if fileName == "env_dev" {
-		viper.SetConfigName("env_dev")
-	} else if fileName == "env_prod" {
-		viper.SetConfigName("env_prod")
+	if fileName == "dev" {
+		viper.SetConfigName("dev")
+	} else if fileName == "prod" {
+		viper.SetConfigName("prod")
 	} else {
 		err = errors.New("invalid environment variable")
 		return

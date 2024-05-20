@@ -14,8 +14,8 @@ WORKDIR /app
 
 COPY ./templates/email.html ./templates/
 COPY --from=builder /app/main .
-COPY env_dev.env .
-COPY env_prod.env .
+COPY dev.env .
+COPY prod.env .
 COPY --from=0 /app/templates /app/templates
 
 EXPOSE 8080 9090
