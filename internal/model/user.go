@@ -100,8 +100,8 @@ type CheckEmail struct {
 }
 
 type NonActiveUserParams struct {
-	Uid    string `json:"uid" binding:"required"`
-	Status string `json:"status" binding:"required"`
+	Uid   string `json:"uid" binding:"required"`
+	Email string `json:"email" binding:"required"`
 }
 type NonActiveUserRequest struct {
 	Uid string `json:"uid"`

@@ -17,7 +17,7 @@ type UserRepository interface {
 	GetUserByEmail(ctx context.Context, tx *sql.Tx, req model.EmailUserRequest) (string, string, error)
 	UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error)
 	ResetPassword(ctx context.Context, tx *sql.Tx, params model.ResetPasswordRequest) (bool, error)
-	NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, status string) (bool, error)
+	NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, email string) (bool, error)
 	GetEmailUser(ctx context.Context, tx *sql.Tx) ([]model.User, error)
 }
 
@@ -65,9 +65,9 @@ func (*UserRepositoryImpl) ResetPassword(ctx context.Context, tx *sql.Tx, params
 }
 
 // NonActivatedUser implements UserRepository.
-func (*UserRepositoryImpl) NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, status string) (bool, error) {
-	sqlScript := `update users set status = ? where uid = ?`
-	_, err := tx.ExecContext(ctx, sqlScript, status, uid)
+func (*UserRepositoryImpl) NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, email string) (bool, error) {
+	sqlScript := `update users set email = ? where uid = ?`
+	_, err := tx.ExecContext(ctx, sqlScript, email, uid)
 	if err != nil {
 		return false, err
 	}

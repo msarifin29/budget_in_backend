@@ -19,7 +19,7 @@ func TestCreateUserSuccess(t *testing.T) {
 
 	params := model.CreateUserRequest{
 		UserName: "testing",
-		Email:    "asamsul474@gmail.com",
+		Email:    "test2@gmail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  200000,
@@ -271,14 +271,14 @@ func TestDeleteUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.NonActiveUserRequest{
-		Uid: "ea1b7ff6-e56b-4786-a585-e2ef07520370",
+		Uid: "fb2437f0-4234-467b-8af5-c9825c99400d",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/user/delete", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "ea1b7ff6-e56b-4786-a585-e2ef07520370", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "fb2437f0-4234-467b-8af5-c9825c99400d", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("response : ", string(bytes))
