@@ -15,7 +15,6 @@ type ExpenseRepository interface {
 	DeleteExpense(ctx context.Context, tx *sql.Tx, id float64) error
 	GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error)
 	GetTotalExpenses(ctx context.Context, tx *sql.Tx, uid string, status string, expenseType string, Id string, CreatedAt string) (float64, error)
-	GetExpensesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Expense, error)
 	GetExpenseThisMonth(ctx context.Context, tx *sql.Tx, uid string) (float64, error)
 }
 
@@ -38,38 +37,6 @@ ORDER BY month ASC, uid ASC;`
 	err := row.Scan(&month, &userId, &total)
 	fmt.Println("kambing ", total)
 	return total, err
-}
-
-// GetExpensesByMonth implements ExpenseRepository.
-func (*ExpenseRepositoryImpl) GetExpensesByMonth(ctx context.Context, tx *sql.Tx, params model.MonthlyParams) ([]model.Expense, error) {
-	script := `SELECT id,expense_type,total,created_at,uid,category,status
-	from expenses where uid = ?
-	AND YEAR(created_at) = ? AND MONTH(created_at) = ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, params.Year, params.Month)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	expenses := []model.Expense{}
-	for rows.Next() {
-		var i model.Expense
-		if err := rows.Scan(
-			&i.Id,
-			&i.ExpenseType,
-			&i.Total,
-			&i.CreatedAt,
-			&i.Uid,
-			&i.Category,
-			&i.Status,
-		); err != nil {
-			return nil, err
-		}
-		expenses = append(expenses, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return expenses, nil
 }
 
 // GetTotalExpenses implements ExpenseRepository.

@@ -19,7 +19,6 @@ type ExpenseUsecase interface {
 	UpdateExpense(ctx context.Context, expense model.UpdateExpenseRequest) (bool, error)
 	DeleteExpense(ctx context.Context, id float64) error
 	GetExpenses(ctx context.Context, params model.GetExpenseParams) ([]model.ExpenseResponse, float64, error)
-	GetExpensesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error)
 }
 
 type ExpenseUsecaseImpl struct {
@@ -29,24 +28,6 @@ type ExpenseUsecaseImpl struct {
 	AccountRepo       repository.AccountRepository
 	Log               *logrus.Logger
 	db                *sql.DB
-}
-
-// GetExpensesByMonth implements ExpenseUsecase.
-func (u *ExpenseUsecaseImpl) GetExpensesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error) {
-	var totalExpenses float64
-	tx, _ := u.db.Begin()
-	defer util.CommitOrRollback(tx)
-
-	expenses, err := u.ExpenseRepository.GetExpensesByMonth(ctx, tx, params)
-	if err != nil {
-		u.Log.Error(err)
-		err = errors.New("failed get expenses")
-		return 0, err
-	}
-	for _, ex := range expenses {
-		totalExpenses += ex.Total
-	}
-	return totalExpenses, nil
 }
 
 // GetExpensez implements ExpenseUsecase.
