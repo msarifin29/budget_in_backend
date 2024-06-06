@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
@@ -33,20 +32,18 @@ func (u *AccountUsacaseImpl) GetMaxBudget(ctx context.Context, account model.Get
 	defer util.CommitOrRollback(tx)
 	totalExpense := 0
 	resAccount, er := u.AccountRepo.GetAccountByUserId(ctx, tx, account.Uid)
-	if er != nil || strings.Contains(er.Error(), sql.ErrNoRows.Error()) {
+	if er != nil {
 		u.Log.Errorf("Failed get max budget %e", er)
 		er = errors.New("failed get max budget")
 		return model.MaxBudgetResponse{}, er
 	}
-	if resAccount.MaxBudget != 0 {
-		totalEx, err := u.ExpenseRepo.GetExpenseThisMonth(ctx, tx, account.Uid)
-		if err != nil {
-			u.Log.Errorf("Failed get expense %e", err)
-			err = errors.New("failed get expense")
-			return model.MaxBudgetResponse{}, err
-		}
-		totalExpense = int(totalEx)
+	totalEx, err := u.ExpenseRepo.GetExpenseThisMonth(ctx, tx, account.Uid)
+	if err != nil {
+		u.Log.Errorf("Failed get expense %e", err)
+		err = errors.New("failed get expense")
+		return model.MaxBudgetResponse{}, err
 	}
+	totalExpense = int(totalEx)
 
 	return model.MaxBudgetResponse{
 		Uid:          resAccount.UserId,

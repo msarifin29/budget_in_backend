@@ -23,19 +23,26 @@ type ExpenseRepositoryImpl struct{}
 // GetExpenseThisMonth implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenseThisMonth(ctx context.Context, tx *sql.Tx, uid string) (float64, error) {
 	script := `
+WITH expense_data AS (SELECT 
+        TO_CHAR(created_at, 'YYYY-MM') AS month,
+        uid,
+        COALESCE(SUM(total), 0) AS total_expenses
+    FROM  expenses 
+    WHERE uid = $1 AND status = 'success' 
+        AND EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
+    GROUP BY month, uid)
 SELECT 
-    DATE_FORMAT(created_at, '%Y-%m') AS month,
-    uid,
-    COALESCE(SUM(total), 0) AS total_expenses
-FROM 
-    expenses WHERE uid = ? AND status = 'success' AND MONTH(created_at) = MONTH(CURDATE())
-GROUP BY month, uid
+    COALESCE(expense_data.month, TO_CHAR(CURRENT_DATE, 'YYYY-MM')) AS month,
+    $1 AS uid,
+    COALESCE(expense_data.total_expenses, 0) AS total_expenses
+FROM (SELECT 1) AS dummy
+LEFT JOIN expense_data ON TRUE
 ORDER BY month ASC, uid ASC;`
 	var total float64
 	var userId, month string
 	row := tx.QueryRowContext(ctx, script, uid)
 	err := row.Scan(&month, &userId, &total)
-	fmt.Println("kambing ", total)
 	return total, err
 }
 

@@ -63,8 +63,8 @@ func TestUpdateMaxBudgetSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateMaxBudgetRequest{
-		Uid:       "d4c3c876-ebb5-4950-83a9-e6786e672423",
-		AccountId: "9c482ceb-f4cb-4b64-8971-551713d5eb0e",
+		Uid:       "3dafa83b-ce13-4bda-883b-191f122a76f8",
+		AccountId: "155c136d-cddb-4b07-8a29-4a979387ea41",
 		MaxBudget: 200000,
 	}
 	body, err := json.Marshal(params)
@@ -72,7 +72,7 @@ func TestUpdateMaxBudgetSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/accounts/update_max_budget", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))
@@ -88,8 +88,8 @@ func TestGetMaxBudgetSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetMaxBudgetRequest{
-		Uid:       "d4c3c876-ebb5-4950-83a9-e6786e672423",
-		AccountId: "9c482ceb-f4cb-4b64-8971-551713d5eb0e",
+		Uid:       "3dafa83b-ce13-4bda-883b-191f122a76f8",
+		AccountId: "155c136d-cddb-4b07-8a29-4a979387ea41",
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/accounts/max_budget/", nil)
@@ -99,7 +99,7 @@ func TestGetMaxBudgetSuccess(t *testing.T) {
 	q.Add("account_id", fmt.Sprintf("%v", params.AccountId))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))
