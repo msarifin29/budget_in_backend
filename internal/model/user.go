@@ -26,9 +26,9 @@ type CreateUserRequest struct {
 	Email    string  `json:"email" binding:"required,email"`
 	Password string  `json:"password" binding:"required,min=6"`
 	TypeUser string  `json:"type_user" binding:"required,type_user"`
-	Balance  float64 `json:"balance" binding:"required"`
+	Balance  float64 `json:"balance"`
 	Savings  float64 `json:"savings"`
-	Cash     float64 `json:"cash" binding:"required"`
+	Cash     float64 `json:"cash"`
 	Debts    float64 `json:"debts"`
 	Currency string  `json:"currency"`
 }

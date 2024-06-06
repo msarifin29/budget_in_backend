@@ -141,11 +141,6 @@ func (u *UserUsecaseImpl) CreateUser(ctx context.Context, user model.CreateUserR
 		Email:    user.Email,
 		Password: password,
 		TypeUser: user.TypeUser,
-		Balance:  0,
-		Savings:  0,
-		Cash:     0,
-		Debts:    0,
-		Currency: "IDR",
 	}
 
 	req, reqErr := u.UserRepository.CreateUser(ctx, tx, userReq)

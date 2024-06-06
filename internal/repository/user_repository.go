@@ -95,12 +95,8 @@ func (*UserRepositoryImpl) GetUserAccount(ctx context.Context, tx *sql.Tx, uid s
 }
 
 func (u *UserRepositoryImpl) CreateUser(ctx context.Context, tx *sql.Tx, user model.User) (model.User, error) {
-	sqlScript := `INSERT INTO users (uid, username, email, password, type_user, balance, savings, cash, debts, currency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
-	_, err := tx.ExecContext(ctx, sqlScript,
-		&user.Uid, &user.UserName, &user.Email,
-		&user.Password, &user.TypeUser, &user.Balance,
-		&user.Savings, &user.Cash, &user.Debts,
-		&user.Currency)
+	sqlScript := `INSERT INTO users (uid, username, email, password, type_user) VALUES (?, ?, ?, ?, ?);`
+	_, err := tx.ExecContext(ctx, sqlScript, &user.Uid, &user.UserName, &user.Email, &user.Password, &user.TypeUser)
 
 	return model.User{
 		Uid:      user.Uid,
@@ -108,11 +104,6 @@ func (u *UserRepositoryImpl) CreateUser(ctx context.Context, tx *sql.Tx, user mo
 		Email:    user.Email,
 		Password: user.Password,
 		TypeUser: user.TypeUser,
-		Balance:  user.Balance,
-		Savings:  user.Savings,
-		Cash:     user.Cash,
-		Debts:    user.Debts,
-		Currency: user.Currency,
 	}, err
 }
 
