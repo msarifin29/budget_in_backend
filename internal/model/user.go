@@ -13,11 +13,11 @@ type User struct {
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 	TypeUser  string     `json:"type_user"`
-	Balance   float64    `json:"balance"`
-	Savings   float64    `json:"savings"`
-	Cash      float64    `json:"cash"`
-	Debts     float64    `json:"debts"`
-	Currency  string     `json:"currency"`
+	Balance   float64    `json:"balance"`  // Depreceted 'old entity' will be remove later
+	Savings   float64    `json:"savings"`  // Depreceted 'old entity' will be remove later
+	Cash      float64    `json:"cash"`     // Depreceted 'old entity' will be remove later
+	Debts     float64    `json:"debts"`    // Depreceted 'old entity' will be remove later
+	Currency  string     `json:"currency"` // Depreceted 'old entity' will be remove later
 	Status    string     `json:"status"`
 }
 

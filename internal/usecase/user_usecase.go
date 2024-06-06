@@ -109,7 +109,7 @@ func (u *UserUsecaseImpl) NonActivatedUser(ctx context.Context, req model.NonAct
 		message := "user not found with id :" + req.Uid
 		return false, errors.New(message)
 	}
-	ok, err := u.UserRepository.NonActivatedUser(ctx, tx, user.Uid, req.Uid+"@mail.com")
+	ok, err := u.UserRepository.NonActivatedUser(ctx, tx, user.Uid, "inactive-"+req.Uid+"-"+req.Email)
 	if !ok || err != nil {
 		u.Log.Errorf("failed delete account %s :", err)
 		err = errors.New("failed delete account")

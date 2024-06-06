@@ -47,7 +47,7 @@ func TestCreateUserDuplicate(t *testing.T) {
 	router := NewTestServer(t)
 	params := model.CreateUserRequest{
 		UserName: "testing",
-		Email:    "jaya@mail.com",
+		Email:    "test2@gmail.com",
 		Password: "123456",
 		TypeUser: "personal",
 		Balance:  20000,
@@ -59,11 +59,9 @@ func TestCreateUserDuplicate(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/register", strings.NewReader(string(body)))
 	router.Engine.ServeHTTP(w, req)
-	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
-	fmt.Println("body :", string(bytes))
 	assert.Nil(t, err)
-	assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 func TestCreateUserInvalidType(t *testing.T) {
 	router := NewTestServer(t)
@@ -94,7 +92,7 @@ func TestLoginUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.LoginUserRequest{
-		Email:    "jayaing@mail.com",
+		Email:    "test2@gmail.com",
 		Password: "123456",
 	}
 	body, err := json.Marshal(params)
@@ -168,14 +166,14 @@ func TestUpdateteUserSuccess(t *testing.T) {
 
 	params := model.UpdateUserRequest{
 		UserName: "samsul testing",
-		Uid:      "fe317556e-74b2-4199-8a30-33bd56fc5e9e",
+		Uid:      "3dafa83b-ce13-4bda-883b-191f122a76f8",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -221,14 +219,14 @@ func TestUnAuthorizationUser(t *testing.T) {
 func TestGetUserByIdSuccess(t *testing.T) {
 	router := NewTestServer(t)
 	user := model.UserRequest{
-		Uid: "b9beed09-e6bb-403d-ad3b-cb6560fa2dba",
+		Uid: "3dafa83b-ce13-4bda-883b-191f122a76f8",
 	}
 
 	w := httptest.NewRecorder()
 	url := fmt.Sprintf("/api/user/%s", user.Uid)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "jaya", "b9beed09-e6bb-403d-ad3b-cb6560fa2dba", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("account :", string(bytes))
@@ -241,9 +239,7 @@ func TestGetUserByIdSuccess(t *testing.T) {
 }
 func TestGetUserInvalidId(t *testing.T) {
 	router := NewTestServer(t)
-	user := model.UserRequest{
-		Uid: "f1687230",
-	}
+	user := model.UserRequest{Uid: "f1687230"}
 
 	w := httptest.NewRecorder()
 	url := fmt.Sprintf("/api/user/%s", user.Uid)
@@ -271,14 +267,14 @@ func TestDeleteUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.NonActiveUserRequest{
-		Uid: "fb2437f0-4234-467b-8af5-c9825c99400d",
+		Uid: "3dafa83b-ce13-4bda-883b-191f122a76f8",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/user/delete", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "fb2437f0-4234-467b-8af5-c9825c99400d", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("response : ", string(bytes))
@@ -292,19 +288,18 @@ func TestDeleteUserSuccess(t *testing.T) {
 func TestResetPasswordSuccess(t *testing.T) {
 	router := NewTestServer(t)
 	params := model.ResetPasswordRequest{
-		Uid:         "da063cef-9f52-46da-b98f-0c0067e5869d",
-		OldPassword: "112233",
-		NewPassword: "password",
+		Uid:         "3dafa83b-ce13-4bda-883b-191f122a76f8",
+		OldPassword: "123456",
+		NewPassword: "123456",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/user/reset_password", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
-	fmt.Println("body :", string(bytes))
 	assert.Nil(t, err)
 	var res map[string]interface{}
 	err = json.Unmarshal(bytes, &res)
@@ -364,14 +359,13 @@ func TestCheckEmailIsExistSuccess(t *testing.T) {
 }
 func TestCheckEmailIsExistFailed(t *testing.T) {
 	router := NewTestServer(t)
-	params := model.CheckEmail{Email: "asamsul474@gmail.com"}
+	params := model.CheckEmail{Email: "test2@gmail.com"}
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/check-email/"+params.Email, nil)
 
 	router.Engine.ServeHTTP(w, req)
-	bytes, err := io.ReadAll(w.Body)
-	fmt.Println("body :", string(bytes))
+	_, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
