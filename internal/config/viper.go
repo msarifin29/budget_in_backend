@@ -11,7 +11,9 @@ import (
 type Config struct {
 	Log                 *logrus.Logger
 	DBDriver            string        `mapstructure:"DB_DRIVER"`
+	DBPostgresDriver    string        `mapstructure:"DB_POSTGRES_DRIVER"`
 	DBSource            string        `mapstructure:"DB_SOURCE"`
+	DBPostgresSource    string        `mapstructure:"DB_POSTGRES_SOURCE"`
 	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
 	TokenSymetricKey    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`

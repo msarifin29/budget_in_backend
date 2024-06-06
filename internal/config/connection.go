@@ -5,6 +5,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,7 +14,8 @@ func Connection(log *logrus.Logger) *sql.DB {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	db, err := sql.Open(configuration.DBDriver, configuration.DBSource)
+	// db, err := sql.Open(configuration.DBDriver, configuration.DBSource) for MySQL
+	db, err := sql.Open(configuration.DBPostgresDriver, configuration.DBPostgresSource)
 	if err != nil {
 		log.Fatal(err)
 	}

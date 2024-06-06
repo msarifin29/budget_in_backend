@@ -80,8 +80,6 @@ github.com/goccy/go-json/internal/runtime
 # github.com/google/uuid v1.6.0
 ## explicit
 github.com/google/uuid
-# github.com/guregu/null/v5 v5.0.0
-## explicit; go 1.21.4
 # github.com/hashicorp/hcl v1.0.0
 ## explicit
 github.com/hashicorp/hcl
@@ -104,6 +102,11 @@ github.com/klauspost/cpuid/v2
 ## explicit; go 1.18
 github.com/leodido/go-urn
 github.com/leodido/go-urn/scim/schema
+# github.com/lib/pq v1.10.9
+## explicit; go 1.13
+github.com/lib/pq
+github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/magiconair/properties v1.8.7
 ## explicit; go 1.19
 github.com/magiconair/properties
