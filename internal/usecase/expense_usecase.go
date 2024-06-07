@@ -57,7 +57,6 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 	req := model.Expense{
 		ExpenseType:   expense.ExpenseType,
 		Total:         expense.Total,
-		Category:      expense.Category,
 		Status:        util.SUCCESS,
 		Notes:         notes.String,
 		Uid:           expense.Uid,
@@ -87,9 +86,8 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 	}
 	paramCategory := model.Category{
 		CategoryId: res.Id,
-
-		Id:    expense.CategoryId,
-		Title: util.InputCategoryexpense(expense.CategoryId),
+		Id:         expense.CategoryId,
+		Title:      util.InputCategoryexpense(expense.CategoryId),
 	}
 	category, categoryErr := u.CategoryRepo.CreateCategoryExpense(ctx, tx, paramCategory)
 	if categoryErr != nil {

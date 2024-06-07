@@ -9,7 +9,7 @@ type Expense struct {
 	Id            float64    `json:"id"`
 	ExpenseType   string     `json:"expense_type"`
 	Total         float64    `json:"total"`
-	Category      string     `json:"category"`
+	Category      string     `json:"category"` // Not used will be remove later
 	Status        string     `json:"status"`
 	Notes         string     `json:"notes"`
 	TransactionId string     `json:"transaction_id"`
@@ -20,7 +20,7 @@ type Expense struct {
 type CreateExpenseRequest struct {
 	Uid           string  `json:"uid" binding:"required"`
 	ExpenseType   string  `json:"expense_type" binding:"required,expense_type"`
-	Category      string  `json:"category"`
+	Category      string  `json:"category"` // Not used will be remove later
 	CategoryId    float64 `json:"category_id" binding:"required"`
 	Total         float64 `json:"total" binding:"required,min=2000"`
 	Notes         string  `json:"notes"`
@@ -31,7 +31,7 @@ type CreateExpenseRequest struct {
 type CreateExpenseParams struct {
 	Uid         string  `json:"uid" binding:"required"`
 	ExpenseType string  `json:"expense_type" binding:"required,expense_type"`
-	Category    string  `json:"category"`
+	Category    string  `json:"category"` // Not used will be remove later
 	CategoryId  float64 `json:"category_id" binding:"required"`
 	Total       float64 `json:"total" binding:"required,min=2000"`
 	Notes       string  `json:"notes"`
@@ -61,7 +61,7 @@ type ExpenseParamWithId struct {
 }
 
 type GetExpenseRequest struct {
-	Status      string `form:"status" binding:"required,status"`
+	Status      string `form:"status"`
 	ExpenseType string `form:"expense_type"`
 	Category    string `form:"category"` // Not Used
 	Id          int    `form:"id"`

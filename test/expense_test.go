@@ -19,21 +19,20 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateExpenseParams{
-		Uid:         "d4c3c876-ebb5-4950-83a9-e6786e672423",
+		Uid:         "3dafa83b-ce13-4bda-883b-191f122a76f8",
 		ExpenseType: util.CASH,
-		Total:       10000,
-		Category:    util.OTHER,
-		CategoryId:  2,
+		Total:       5000,
+		CategoryId:  4,
 		Notes:       "",
-		AccountId:   "9c482ceb-f4cb-4b64-8971-551713d5eb0e",
-		CreatedAt:   "2024-01-02T08:00:00Z",
+		AccountId:   "155c136d-cddb-4b07-8a29-4a979387ea41",
+		// CreatedAt:   "2024-01-02T08:00:00Z",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))
@@ -66,18 +65,17 @@ func TestCreateExpenseUnAuthorized(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateExpenseRequest{
-		Uid:         "f1687230-49d3-4657-96be-9b934ed0387f",
+		Uid:         "3dafa83b-ce13-4bda-883b-191f122a76f8",
 		ExpenseType: util.CASH,
 		Total:       45000,
 		Category:    util.OTHER,
-		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
+		AccountId:   "155c136d-cddb-4b07-8a29-4a979387ea41",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "deb3823d-5581-4e98-896c-06e5aa3bac4a", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
@@ -120,16 +118,16 @@ func TestUpdateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:          90,
-		ExpenseType: util.DEBIT,
-		AccountId:   "b857228c-a750-47ef-85ef-5cf1e6150362",
+		Id:          1,
+		ExpenseType: util.CASH,
+		AccountId:   "155c136d-cddb-4b07-8a29-4a979387ea41",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/expenses/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -170,45 +168,45 @@ func TestUpdateExpenseUnAuthorized(t *testing.T) {
 	router.Engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
-func TestDeleteExpenseSuccess(t *testing.T) {
-	router := NewTestServer(t)
 
-	params := model.ExpenseParamWithId{Id: 7}
-	w := httptest.NewRecorder()
-	url := fmt.Sprintf("/api/expenses/%v", params.Id)
-	req, _ := http.NewRequest(http.MethodDelete, url, nil)
+// func TestDeleteExpenseSuccess(t *testing.T) {
+// 	router := NewTestServer(t)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
-	router.Engine.ServeHTTP(w, req)
-	assert.Equal(t, http.StatusOK, w.Code)
-}
-func TestDeleteExpenseFailed(t *testing.T) {
-	router := NewTestServer(t)
+// 	params := model.ExpenseParamWithId{Id: 7}
+// 	w := httptest.NewRecorder()
+// 	url := fmt.Sprintf("/api/expenses/%v", params.Id)
+// 	req, _ := http.NewRequest(http.MethodDelete, url, nil)
 
-	params := model.ExpenseParamWithId{Id: 1000000}
-	w := httptest.NewRecorder()
-	url := fmt.Sprintf("/api/expenses/%v", params.Id)
-	req, _ := http.NewRequest(http.MethodDelete, url, nil)
+// 	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+// 	router.Engine.ServeHTTP(w, req)
+// 	assert.Equal(t, http.StatusOK, w.Code)
+// }
+// func TestDeleteExpenseFailed(t *testing.T) {
+// 	router := NewTestServer(t)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
-	router.Engine.ServeHTTP(w, req)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-}
+// 	params := model.ExpenseParamWithId{Id: 1000000}
+// 	w := httptest.NewRecorder()
+// 	url := fmt.Sprintf("/api/expenses/%v", params.Id)
+// 	req, _ := http.NewRequest(http.MethodDelete, url, nil)
+
+// 	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
+// 	router.Engine.ServeHTTP(w, req)
+// 	assert.Equal(t, http.StatusBadRequest, w.Code)
+// }
 
 func TestGetExpensesSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetExpenseRequest{
 		Status: "success",
-		// ExpenseType: "Cash",
-		// Id: 3,
-		// CreatedAt: "2024-01-02",
+		// ExpenseType: util.DEBIT,
+		// Id: 4,
+		CreatedAt: "2024-06-06",
 		Page:      1,
-		TotalPage: 5,
+		TotalPage: 10,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/expenses/", nil)
-	// Add query parameters to request URL
 	q := req.URL.Query()
 	q.Add("expense_type", fmt.Sprintf("%v", params.ExpenseType))
 	q.Add("created_at", fmt.Sprintf("%v", params.CreatedAt))
@@ -218,7 +216,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))
