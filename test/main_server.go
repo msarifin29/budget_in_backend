@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"testing"
 
-	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/msarifin29/be_budget_in/internal/config"
 	"github.com/msarifin29/be_budget_in/internal/delivery/controller"
