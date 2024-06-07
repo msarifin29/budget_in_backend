@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/util/zero"
@@ -61,7 +60,6 @@ func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, ui
 		script += " and i.id = $3"
 		param = append(param, cId)
 	}
-	fmt.Println("param => ", param)
 	err := tx.QueryRowContext(ctx, script, param...).Scan(&total)
 	return total, err
 }
