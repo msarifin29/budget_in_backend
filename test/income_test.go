@@ -19,12 +19,11 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateIncomeRequest{
-		Uid: "d4c3c876-ebb5-4950-83a9-e6786e672423",
-		// CategoryIncome: util.SALARY,
+		Uid:        "3dafa83b-ce13-4bda-883b-191f122a76f8",
 		TypeIncome: util.DEBIT,
 		Total:      20000,
 		CategoryId: 2,
-		AccountId:  "9c482ceb-f4cb-4b64-8971-551713d5eb0e",
+		AccountId:  "155c136d-cddb-4b07-8a29-4a979387ea41",
 		// CreatedAt:  "", // 2015-09-02T08:00:00Z
 	}
 	body, err := json.Marshal(params)
@@ -32,7 +31,7 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/incomes/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))
@@ -84,24 +83,23 @@ func TestGetIncomesSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.GetIncomeRequest{
-		// CategoryIncome: util.DAILY,
-		// TypeIncome: "Cash",
-		// CategoryId: 1,
-		Page:      1,
-		TotalPage: 10,
+		TypeIncome: util.DEBIT,
+		CategoryId: 2,
+		Page:       1,
+		TotalPage:  10,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/incomes/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
-	q.Add("category_income", fmt.Sprintf("%v", params.CategoryIncome))
+	// q.Add("category_income", fmt.Sprintf("%v", params.CategoryIncome))
 	q.Add("category_id", fmt.Sprintf("%v", params.CategoryId))
 	q.Add("type_income", fmt.Sprintf("%v", params.TypeIncome))
 	q.Add("page", fmt.Sprintf("%d", params.Page))
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "da063cef-9f52-46da-b98f-0c0067e5869d", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))

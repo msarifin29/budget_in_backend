@@ -34,7 +34,7 @@ func (CategoryRepositoryImpl) CreateCategoryExpense(ctx context.Context, tx *sql
 
 // CreateCategoryIncomes implements CategoryRepository.
 func (CategoryRepositoryImpl) CreateCategoryIncomes(ctx context.Context, tx *sql.Tx, category model.Category) (model.Category, error) {
-	script := `insert into t_category_incomes (category_id,id,title) values (?,?,?)`
+	script := `insert into t_category_incomes (category_id,id,title) values ($1,$2,$3)`
 	_, err := tx.ExecContext(ctx, script, category.CategoryId, category.Id, category.Title)
 	return category, err
 }
@@ -59,7 +59,7 @@ func (CategoryRepositoryImpl) GetCategoryExpense(ctx context.Context, tx *sql.Tx
 
 // GetCategoryIncome implements CategoryRepository.
 func (CategoryRepositoryImpl) GetCategoryIncome(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error) {
-	script := `select category_id, id, title from t_category_incomes where category_id = ?`
+	script := `select category_id, id, title from t_category_incomes where category_id = $1`
 	row := tx.QueryRowContext(ctx, script, categoryId)
 	var category model.Category
 	err := row.Scan(&category.CategoryId, &category.Id, &category.Title)

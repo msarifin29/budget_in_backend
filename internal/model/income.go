@@ -7,7 +7,7 @@ import (
 type Income struct {
 	Uid            string     `json:"uid" `
 	Id             float64    `json:"id"`
-	CategoryIncome string     `json:"category_income"`
+	CategoryIncome string     `json:"category_income"` // Old entity , will be remove later
 	TypeIncome     string     `json:"type_income"`
 	Total          float64    `json:"total"`
 	TransactionId  string     `json:"transaction_id"`
@@ -16,7 +16,7 @@ type Income struct {
 }
 type CreateIncomeRequest struct {
 	Uid            string  `json:"uid" binding:"required"`
-	CategoryIncome string  `json:"category_income"`
+	CategoryIncome string  `json:"category_income"` // Old entity , will be remove later
 	CategoryId     int32   `json:"category_id"`
 	TypeIncome     string  `json:"type_income" binding:"required,type_income"`
 	Total          float64 `json:"total" binding:"required,min=2000"`
@@ -26,7 +26,7 @@ type CreateIncomeRequest struct {
 }
 type CreateIncomeParams struct {
 	Uid            string  `json:"uid" binding:"required"`
-	CategoryIncome string  `json:"category_income"`
+	CategoryIncome string  `json:"category_income"` // Old entity , will be remove later
 	CategoryId     int32   `json:"category_id" binding:"required"`
 	TypeIncome     string  `json:"type_income" binding:"required,type_income"`
 	Total          float64 `json:"total" binding:"required,min=2000"`
@@ -36,14 +36,14 @@ type CreateIncomeParams struct {
 }
 type GetIncomeParams struct {
 	Uid            string `json:"uid" binding:"required"`
-	CategoryIncome string `json:"category_income"`
+	CategoryIncome string `json:"category_income"` // Old entity , will be remove later
 	CategoryId     int32  `json:"category_id"`
 	TypeIncome     string `json:"type_income"`
 	Limit          int32  `json:"limit"`
 	Offset         int32  `json:"offset"`
 }
 type GetIncomeRequest struct {
-	CategoryIncome string `form:"category_income"`
+	CategoryIncome string `form:"category_income"` // Old entity , will be remove later
 	TypeIncome     string `form:"type_income"`
 	CategoryId     int32  `form:"category_id"`
 	Page           int32  `form:"page" binding:"required,min=1"`
@@ -52,7 +52,7 @@ type GetIncomeRequest struct {
 type IncomeResponse struct {
 	Uid            string          `json:"uid" `
 	Id             float64         `json:"id"`
-	CategoryIncome string          `json:"category_income"`
+	CategoryIncome string          `json:"category_income"` // Old entity , will be remove later
 	TypeIncome     string          `json:"type_income"`
 	Total          float64         `json:"total"`
 	TransactionId  string          `json:"transaction_id"`

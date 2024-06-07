@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/util/zero"
@@ -54,21 +55,27 @@ func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, ui
 	cId := categoryId(Id)
 	script := `SELECT COUNT(*)as total from incomes i
 	LEFT JOIN t_category_incomes t ON i.id = t.category_id
-	where uid = ? && t.id LIKE ? and type_income LIKE ?`
-	err := tx.QueryRowContext(ctx, script, uid, `%`+cId+`%`, `%`+typeIncome+`%`).Scan(&total)
+	where uid = $1 and type_income LIKE $2`
+	param := []interface{}{uid, `%` + typeIncome + `%`}
+	if len(param) == 3 {
+		script += " and i.id = $3"
+		param = append(param, cId)
+	}
+	fmt.Println("param => ", param)
+	err := tx.QueryRowContext(ctx, script, param...).Scan(&total)
 	return total, err
 }
 
 // CreateIncome implements IncomeRepository.
 func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error) {
-	script := `insert into incomes (uid,category_income,type_income,total,created_at,transaction_id) values (?,?,?,?,?,?)`
-	result, errX := tx.ExecContext(ctx, script, income.Uid, income.CategoryIncome, income.TypeIncome, income.Total, income.CreatedAt, income.TransactionId)
+	script := `insert into incomes (uid,type_income,total,created_at,transaction_id) values ($1,$2,$3,$4,$5) RETURNING id`
+	var id int64
+	errX := tx.QueryRowContext(ctx, script, income.Uid, income.TypeIncome, income.Total, income.CreatedAt, income.TransactionId).Scan(&id)
 	if errX != nil {
 		return model.Income{}, errX
 	}
-	lastId, err := result.LastInsertId()
-	income.Id = float64(lastId)
-	return income, err
+	income.Id = float64(id)
+	return income, errX
 }
 
 // GetIncomes implements IncomeRepository.
@@ -78,9 +85,21 @@ func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params 
 	select i.*, t.category_id, t.id as t_id, t.title
 	from incomes i
 	LEFT JOIN t_category_incomes t ON i.id = t.category_id
-	where uid = ? and i.type_income LIKE ? and t.id LIKE ?
-	order by id desc limit ? offset ?`
-	rows, err := tx.QueryContext(ctx, script, params.Uid, `%`+params.TypeIncome+`%`, `%`+cId+`%`, params.Limit, params.Offset)
+	where uid = $1 and i.type_income LIKE $2`
+
+	param := []interface{}{params.Uid, `%` + params.TypeIncome + `%`}
+	if cId != "" {
+		script += " and t.id = $3"
+		param = append(param, cId)
+	}
+	if len(param) == 3 {
+		script += " ORDER BY id DESC LIMIT $4 OFFSET $5"
+		param = append(param, params.Limit, params.Offset)
+	} else {
+		script += " ORDER BY id DESC LIMIT $3 OFFSET $4"
+		param = append(param, params.Limit, params.Offset)
+	}
+	rows, err := tx.QueryContext(ctx, script, param...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,18 +109,11 @@ func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params 
 	update := zero.TimeFromPtr(i.UpdatedAt)
 	for rows.Next() {
 		err := rows.Scan(
-			&i.Uid, &i.Id,
-			&i.CategoryIncome, &i.Total,
-			&i.CreatedAt, &update,
-			&i.TypeIncome, &i.TransactionId,
-			&i.TCategory.CategoryId,
-			&i.TCategory.Id, &i.TCategory.Title,
+			&i.Uid, &i.Id, &i.Total, &i.CreatedAt, &update, &i.TypeIncome, &i.TransactionId,
+			&i.TCategory.CategoryId, &i.TCategory.Id, &i.TCategory.Title,
 		)
 		if err != nil {
 			return nil, err
-		}
-		if i.TransactionId == "" {
-			i.TransactionId = ""
 		}
 		incomes = append(incomes, i)
 	}
