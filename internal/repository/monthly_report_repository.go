@@ -21,14 +21,12 @@ type MonthlyReportRepositoryImpl struct{}
 func (MonthlyReportRepositoryImpl) MonthlyReportIncomesDetail(ctx context.Context, tx *sql.Tx, param model.ParamMonthlyReportDetail) ([]model.MonthlyIDetail, error) {
 	script := `
 SELECT 
-    DATE_FORMAT(i.created_at, '%Y-%m') AS month, i.uid, i.id AS income_id, i.total,
-    i.created_at AS income_created_at, i.type_income, i.transaction_id, tce.category_id, tce.id AS t_id, tce.title AS category_title
-FROM 
-    incomes i
-LEFT JOIN 
-    t_category_incomes tce ON i.id = tce.category_id
-    where uid = ? && DATE_FORMAT(i.created_at, '%Y-%m') = ?
-ORDER BY month ASC, i.uid ASC; `
+    TO_CHAR(i.created_at, 'YYYY-MM') AS month, i.uid, i.id AS income_id, i.total, i.created_at AS income_created_at, 
+    i.type_income, i.transaction_id, tce.category_id, tce.id AS t_id, tce.title AS category_title
+FROM incomes i
+LEFT JOIN t_category_incomes tce ON i.id = tce.category_id
+WHERE i.uid = $1 AND TO_CHAR(i.created_at, 'YYYY-MM') = $2
+ORDER BY month ASC, i.uid ASC;`
 	rows, err := tx.QueryContext(ctx, script, param.Uid, param.Month)
 	if err != nil {
 		return nil, err
@@ -59,8 +57,14 @@ ORDER BY month ASC, i.uid ASC; `
 
 // GetMonthlyExpenseReport implements MonthlyReportRepository.
 func (MonthlyReportRepositoryImpl) GetMonthlyExpenseReport(ctx context.Context, tx *sql.Tx, uid model.ParamMonthlyReport) ([]model.MonthlyReportResponse, error) {
-	script := `select YEAR(created_at) AS year,MONTH(created_at) AS month, uid, sum(total) as total_expenses  
-	from expenses where uid = ? GROUP BY YEAR(created_at), MONTH(created_at), uid;`
+	script := `SELECT 
+    EXTRACT(YEAR FROM created_at) AS year,
+    EXTRACT(MONTH FROM created_at) AS month,
+    uid,
+    SUM(total) AS total_expenses
+FROM expenses
+WHERE uid = $1
+GROUP BY EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at), uid;`
 	rows, err := tx.QueryContext(ctx, script, uid.Uid)
 	if err != nil {
 		return nil, err
@@ -100,8 +104,15 @@ func (MonthlyReportRepositoryImpl) GetMonthlyExpenseReport(ctx context.Context, 
 
 // GetMonthlyIncomeReport implements MonthlyReportRepository.
 func (MonthlyReportRepositoryImpl) GetMonthlyIncomeReport(ctx context.Context, tx *sql.Tx, uid model.ParamMonthlyReport) ([]model.MonthlyReportResponse, error) {
-	script := `select YEAR(created_at) AS year, MONTH(created_at) AS month, uid, sum(total) as total_income  
-	from incomes where uid = ? GROUP BY YEAR(created_at), MONTH(created_at), uid;`
+	script := ` 
+	SELECT 
+    EXTRACT(YEAR FROM created_at) AS year,
+    EXTRACT(MONTH FROM created_at) AS month,
+    uid,
+    SUM(total) AS total_income
+FROM incomes
+WHERE uid = $1
+GROUP BY EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at), uid;`
 	rows, err := tx.QueryContext(ctx, script, uid.Uid)
 	if err != nil {
 		return nil, err
@@ -144,14 +155,12 @@ func (MonthlyReportRepositoryImpl) MonthlyReportExpensesDetail(ctx context.Conte
 	param model.ParamMonthlyReportDetail) ([]model.MonthlyXDetail, error) {
 	script := `
 SELECT 
-    DATE_FORMAT(e.created_at, '%Y-%m') AS month,
+    TO_CHAR(e.created_at, 'YYYY-MM') AS month,
     e.uid, e.id AS expense_id, e.expense_type, e.total, e.Notes, e.created_at AS expense_created_at, 
-    e.status AS expense_status, e.transaction_id, tce.category_id,tce.id AS t_id, tce.title AS category_title
-FROM 
-    expenses e
-LEFT JOIN 
-    t_category_expenses tce ON e.id = tce.category_id
-    where uid = ? && status ='success' && DATE_FORMAT(e.created_at, '%Y-%m') = ?
+    e.status AS expense_status, e.transaction_id, tce.category_id, tce.id AS t_id, tce.title AS category_title
+FROM expenses e
+LEFT JOIN t_category_expenses tce ON e.id = tce.category_id
+    WHERE uid = $1 AND status ='success' AND TO_CHAR(e.created_at, 'YYYY-MM') = $2
 ORDER BY month ASC, e.uid ASC;`
 	rows, err := tx.QueryContext(ctx, script, param.Uid, param.Month)
 	if err != nil {

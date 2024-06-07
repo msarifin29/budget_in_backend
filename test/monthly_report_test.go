@@ -17,9 +17,9 @@ func TestGetMonthlyReportSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/user/monthly_report/d4c3c876-ebb5-4950-83a9-e6786e672423", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/user/monthly_report/3dafa83b-ce13-4bda-883b-191f122a76f8", nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("monthly_report :", string(bytes))
@@ -32,13 +32,13 @@ func TestGetMonthlyReportSuccess(t *testing.T) {
 }
 func TestGetMonthlyReportDetailSuccess(t *testing.T) {
 	router := NewTestServer(t)
-	param := model.RequestMonthlyReportDetail{Month: "2024-05"}
+	param := model.RequestMonthlyReportDetail{Month: "2024-06"}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/user/monthly-report-detail/", nil)
 	q := req.URL.Query()
 	q.Add("month", fmt.Sprintf("%v", param.Month))
 	req.URL.RawQuery = q.Encode()
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "d4c3c876-ebb5-4950-83a9-e6786e672423", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("detail :", string(bytes))
