@@ -22,7 +22,7 @@ func (server *Server) SetUpRoute() {
 
 	autRoutes := router.Group("/").Use(delivery.AuthMiddleware(server.TokenMaker))
 
-	// Onboarding
+	// Accounts
 	autRoutes.POST("/api/accounts/create", server.AccountC.CreateAccount)
 	autRoutes.PUT("/api/accounts/update_max_budget", server.AccountC.UpdateMaxBudget)
 	autRoutes.GET("/api/accounts/max_budget/", server.AccountC.GetMaxBudget)
