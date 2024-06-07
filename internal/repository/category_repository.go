@@ -12,18 +12,18 @@ type CategoryRepository interface {
 	GetCategoryExpense(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error)
 	CreateCategoryIncomes(ctx context.Context, tx *sql.Tx, category model.Category) (model.Category, error)
 	GetCategoryIncome(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error)
-	CreateCategoryCredits(ctx context.Context, tx *sql.Tx, category model.Category) (model.Category, error)
-	GetCategoryCredit(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error)
+	// CreateCategoryCredits(ctx context.Context, tx *sql.Tx, category model.Category) (model.Category, error)
+	// GetCategoryCredit(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error)
 }
 
 type CategoryRepositoryImpl struct{}
 
 // CreateCategoryCredits implements CategoryRepository.
-func (CategoryRepositoryImpl) CreateCategoryCredits(ctx context.Context, tx *sql.Tx, category model.Category) (model.Category, error) {
-	script := `insert into t_category_credits (category_id,id,title) values (?,?,?)`
-	_, err := tx.ExecContext(ctx, script, category.CategoryId, category.Id, category.Title)
-	return category, err
-}
+// func (CategoryRepositoryImpl) CreateCategoryCredits(ctx context.Context, tx *sql.Tx, category model.Category) (model.Category, error) {
+// 	script := `insert into t_category_credits (category_id,id,title) values (?,?,?)`
+// 	_, err := tx.ExecContext(ctx, script, category.CategoryId, category.Id, category.Title)
+// 	return category, err
+// }
 
 // CreateCategoryExpense implements CategoryRepository.
 func (CategoryRepositoryImpl) CreateCategoryExpense(ctx context.Context, tx *sql.Tx, category model.Category) (model.Category, error) {
@@ -40,13 +40,13 @@ func (CategoryRepositoryImpl) CreateCategoryIncomes(ctx context.Context, tx *sql
 }
 
 // GetCategoryCredit implements CategoryRepository.
-func (CategoryRepositoryImpl) GetCategoryCredit(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error) {
-	script := `select category_id, id, title from t_category_credits where category_id = ?`
-	row := tx.QueryRowContext(ctx, script, categoryId)
-	var category model.Category
-	err := row.Scan(&category.CategoryId, &category.Id, &category.Title)
-	return category, err
-}
+// func (CategoryRepositoryImpl) GetCategoryCredit(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error) {
+// 	script := `select category_id, id, title from t_category_credits where category_id = ?`
+// 	row := tx.QueryRowContext(ctx, script, categoryId)
+// 	var category model.Category
+// 	err := row.Scan(&category.CategoryId, &category.Id, &category.Title)
+// 	return category, err
+// }
 
 // GetCategoryExpense implements CategoryRepository.
 func (CategoryRepositoryImpl) GetCategoryExpense(ctx context.Context, tx *sql.Tx, categoryId float64) (model.Category, error) {
