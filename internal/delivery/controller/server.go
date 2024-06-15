@@ -12,14 +12,13 @@ import (
 )
 
 type Server struct {
-	Log        *logrus.Logger
-	Engine     *gin.Engine
-	Con        config.Config
-	TokenMaker util.Maker
-	UserC      UserController
-	ExpenseC   ExpenseController
-	IncomeC    IncomeController
-	// CreditC      CreditController *Depreceted Will be remove later
+	Log          *logrus.Logger
+	Engine       *gin.Engine
+	Con          config.Config
+	TokenMaker   util.Maker
+	UserC        UserController
+	ExpenseC     ExpenseController
+	IncomeC      IncomeController
 	AccountC     AccountController
 	MonthReportC MonthlyReportController
 	PrivacyC     PrivacyController
@@ -38,7 +37,6 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	expenseRepo := repository.NewExpenseRepository()
 	balanceRepo := repository.NewBalanceRepository()
 	incomeRepo := repository.NewIncomeRepository()
-	// creditRepo := repository.NewCreditRepository()
 	accountRepo := repository.NewAccountRepository()
 	monthlyRepo := repository.NewMonthlyRepository()
 	categoryRepo := repository.NewCategoryRepository()
@@ -47,7 +45,6 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	userUsecase := usecase.NewUserUsecase(userRepo, accountRepo, Log, db, Con)
 	expenseUseCase := usecase.NewExpenseUsecase(categoryRepo, expenseRepo, balanceRepo, accountRepo, Log, db)
 	incomeUsecase := usecase.NewIncomeUsecase(incomeRepo, balanceRepo, accountRepo, Log, db, categoryRepo)
-	// creditUsecase := usecase.NewCreditUsecase(creditRepo, balanceRepo, accountRepo, Log, db, expenseRepo, categoryRepo)
 	accountUsacase := usecase.NewAccountUsacase(accountRepo, expenseRepo, Log, db)
 	monthlyUsecase := usecase.NewMonthlyReportUsecase(monthlyRepo, Log, db)
 
@@ -55,19 +52,17 @@ func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
 	userController := NewUserController(userUsecase, Log, Con, tokenMaker)
 	expenseController := NewExpenseController(expenseUseCase, Log)
 	incomeController := NewIncomeController(incomeUsecase, Log)
-	// creditController := NewCreditController(creditUsecase, Log)
 	accountController := NewAccountController(accountUsacase, Log)
 	monthlyController := NewMonthlyController(monthlyUsecase, Log)
 	privacyController := NewPrivacyController(Log)
 
 	server := &Server{
-		Log:        Log,
-		Con:        Con,
-		TokenMaker: tokenMaker,
-		UserC:      *userController,
-		ExpenseC:   *expenseController,
-		IncomeC:    *incomeController,
-		// CreditC:      *creditController,
+		Log:          Log,
+		Con:          Con,
+		TokenMaker:   tokenMaker,
+		UserC:        *userController,
+		ExpenseC:     *expenseController,
+		IncomeC:      *incomeController,
 		AccountC:     *accountController,
 		MonthReportC: *monthlyController,
 		PrivacyC:     *privacyController,
