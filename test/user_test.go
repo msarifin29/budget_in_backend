@@ -18,13 +18,14 @@ func TestCreateUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateUserRequest{
-		UserName: "testing",
-		Email:    "test2@gmail.com",
-		Password: "123456",
-		TypeUser: "personal",
-		Balance:  200000,
-		Cash:     50000,
-		Currency: "IDR",
+		UserName:    "sam",
+		Email:       "test3@gmail.com",
+		Password:    "123456",
+		AccountName: "BANK JAGO",
+		TypeUser:    "personal",
+		Balance:     200000,
+		Cash:        50000,
+		Currency:    "IDR",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
@@ -219,14 +220,14 @@ func TestUnAuthorizationUser(t *testing.T) {
 func TestGetUserByIdSuccess(t *testing.T) {
 	router := NewTestServer(t)
 	user := model.UserRequest{
-		Uid: "3dafa83b-ce13-4bda-883b-191f122a76f8",
+		Uid: "9df434d9-acf6-47b6-b5b7-ee6bbb2347da",
 	}
 
 	w := httptest.NewRecorder()
 	url := fmt.Sprintf("/api/user/%s", user.Uid)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "sam", "9df434d9-acf6-47b6-b5b7-ee6bbb2347da", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("account :", string(bytes))

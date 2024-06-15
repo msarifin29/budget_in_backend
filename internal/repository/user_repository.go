@@ -76,7 +76,7 @@ func (*UserRepositoryImpl) NonActivatedUser(ctx context.Context, tx *sql.Tx, uid
 
 // GetUserAccount implements UserRepository.
 func (*UserRepositoryImpl) GetUserAccount(ctx context.Context, tx *sql.Tx, uid string) (model.AccountUser, error) {
-	sqlScript := `SELECT accounts.user_id as uid,accounts.account_id, users.username,users.email, accounts.balance,accounts.cash,accounts.debts,
+	sqlScript := `SELECT accounts.user_id as uid,accounts.account_id, users.username, accounts.account_name, users.email, accounts.balance,accounts.cash,accounts.debts,
 	accounts.savings,accounts.currency,accounts.created_at,accounts.updated_at
 	FROM users JOIN accounts
 	on users.uid = accounts.user_id 
@@ -86,7 +86,7 @@ func (*UserRepositoryImpl) GetUserAccount(ctx context.Context, tx *sql.Tx, uid s
 	var i model.AccountUser
 	update := zero.TimeFromPtr(&i.UpdatedAt)
 	err := row.Scan(
-		&i.Uid, &i.AccountId, &i.UserName,
+		&i.Uid, &i.AccountId, &i.UserName, &i.AccountName,
 		&i.Email, &i.Balance, &i.Cash,
 		&i.Debts, &i.Savings, &i.Currency,
 		&i.CreatedAt, &update,

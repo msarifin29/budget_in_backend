@@ -9,7 +9,7 @@ import (
 
 func main() {
 	logger := config.NewLogger()
-	con, errCon := config.LoadConfig(".", "prod")
+	con, errCon := config.LoadConfig(".", "dev")
 	if errCon != nil {
 		log.Fatalf("cannot load config %e :", errCon)
 	}

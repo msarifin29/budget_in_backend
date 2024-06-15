@@ -18,8 +18,8 @@ func TestCreateAccountSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateAccountRequest{
-		UserId:      "fadab647-cf23-46fc-bd4d-e7d06d32d753",
-		AccountName: "",
+		UserId:      "9df434d9-acf6-47b6-b5b7-ee6bbb2347da",
+		AccountName: "BANK BCA",
 		Balance:     20000,
 		Cash:        20000,
 		Currency:    "IDR",
@@ -29,7 +29,7 @@ func TestCreateAccountSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/accounts/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul", "fadab647-cf23-46fc-bd4d-e7d06d32d753", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "sam", "9df434d9-acf6-47b6-b5b7-ee6bbb2347da", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)

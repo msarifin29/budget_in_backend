@@ -9,7 +9,7 @@ import (
 )
 
 func Connection(log *logrus.Logger) *sql.DB {
-	configuration, err := LoadConfig("../.", "prod")
+	configuration, err := LoadConfig("../.", "dev")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
