@@ -62,6 +62,10 @@ type MaxBudgetResponse struct {
 	TotalExpense float64 `json:"total_expense"`
 }
 
+type GetAllAccountRequest struct {
+	UserId string `form:"user_id" json:"user_id" binding:"required"`
+}
+
 func NewAccount(account Account) *Account {
 	return &Account{
 		UserId:      account.UserId,

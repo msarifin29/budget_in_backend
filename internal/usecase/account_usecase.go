@@ -15,6 +15,7 @@ import (
 
 type AccountUsacase interface {
 	CreateAccount(ctx context.Context, account model.CreateAccountRequest) (model.Account, error)
+	GetAllAccounts(ctx context.Context, param model.GetAllAccountRequest) ([]model.Account, error)
 	UpdateMaxBudget(ctx context.Context, account model.UpdateMaxBudgetRequest) (bool, error)
 	GetMaxBudget(ctx context.Context, account model.GetMaxBudgetParam) (model.MaxBudgetResponse, error)
 }
@@ -24,6 +25,21 @@ type AccountUsacaseImpl struct {
 	ExpenseRepo repository.ExpenseRepository
 	Log         *logrus.Logger
 	db          *sql.DB
+}
+
+// GetAllAccounts implements AccountUsacase.
+func (u *AccountUsacaseImpl) GetAllAccounts(ctx context.Context, param model.GetAllAccountRequest) ([]model.Account, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	accounts, err := u.AccountRepo.GetAllAccount(ctx, tx, param)
+	if err != nil {
+		u.Log.Errorf("Failed get max budget %e", err)
+		err = errors.New("failed get max budget")
+		return []model.Account{}, err
+	}
+
+	return accounts, nil
 }
 
 // GetMaxBudget implements AccountUsacase.

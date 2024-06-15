@@ -111,3 +111,26 @@ func TestGetMaxBudgetSuccess(t *testing.T) {
 	assert.Equal(t, "Success", res["message"])
 	assert.NotEmpty(t, res["data"])
 }
+
+func TestGetAllAccountsSuccess(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.GetAllAccountRequest{UserId: "9df434d9-acf6-47b6-b5b7-ee6bbb2347da"}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/accounts/", nil)
+	q := req.URL.Query()
+	q.Add("user_id", fmt.Sprintf("%v", params.UserId))
+	req.URL.RawQuery = q.Encode()
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "sam", "9df434d9-acf6-47b6-b5b7-ee6bbb2347da", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body : ", string(bytes))
+	assert.Nil(t, err)
+	var res model.MetaResponse
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res.Message)
+	assert.NotEmpty(t, res.Data)
+}

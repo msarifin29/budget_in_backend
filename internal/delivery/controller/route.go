@@ -24,6 +24,7 @@ func (server *Server) SetUpRoute() {
 
 	// Accounts
 	autRoutes.POST("/api/accounts/create", server.AccountC.CreateAccount)
+	autRoutes.GET("/api/accounts/", server.AccountC.GetAllAccounts)
 	autRoutes.PUT("/api/accounts/update_max_budget", server.AccountC.UpdateMaxBudget)
 	autRoutes.GET("/api/accounts/max_budget/", server.AccountC.GetMaxBudget)
 

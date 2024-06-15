@@ -11,7 +11,7 @@ import (
 type AccountRepository interface {
 	CreateAccount(ctx context.Context, tx *sql.Tx, account model.Account) (model.Account, error)
 	GetAccountByAccountId(ctx context.Context, tx *sql.Tx, account model.GetAccountRequest) (model.Account, error)
-	GetAllAccount(ctx context.Context, tx *sql.Tx, userId string) ([]model.Account, error)
+	GetAllAccount(ctx context.Context, tx *sql.Tx, param model.GetAllAccountRequest) ([]model.Account, error)
 	UpdateAccountName(ctx context.Context, tx *sql.Tx, account model.UpdateAccountName) error
 	UpdateAccountBalance(ctx context.Context, tx *sql.Tx, account model.UpdateAccountBalance) error
 	UpdateAccountCash(ctx context.Context, tx *sql.Tx, account model.UpdateAccountCash) error
@@ -89,10 +89,10 @@ func (AccountRepositoryImpl) GetAccountByAccountId(ctx context.Context, tx *sql.
 }
 
 // GetAllAccount implements AccountRepository.
-func (AccountRepositoryImpl) GetAllAccount(ctx context.Context, tx *sql.Tx, userId string) ([]model.Account, error) {
+func (AccountRepositoryImpl) GetAllAccount(ctx context.Context, tx *sql.Tx, param model.GetAllAccountRequest) ([]model.Account, error) {
 	script := `select user_id, account_id, account_name, balance, cash, debts, savings, currency, created_at, updated_at 
 	from accounts where user_id = $1`
-	rows, err := tx.QueryContext(ctx, script, userId)
+	rows, err := tx.QueryContext(ctx, script, param.UserId)
 	if err != nil {
 		return nil, err
 	}
