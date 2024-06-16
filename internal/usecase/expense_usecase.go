@@ -24,10 +24,10 @@ type ExpenseUsecase interface {
 type ExpenseUsecaseImpl struct {
 	CategoryRepo      repository.CategoryRepository
 	ExpenseRepository repository.ExpenseRepository
-	BalanceRepository repository.BalanceRepository
-	AccountRepo       repository.AccountRepository
-	Log               *logrus.Logger
-	db                *sql.DB
+	// BalanceRepository repository.BalanceRepository
+	AccountRepo repository.AccountRepository
+	Log         *logrus.Logger
+	db          *sql.DB
 }
 
 // GetExpensez implements ExpenseUsecase.
@@ -192,16 +192,16 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 func NewExpenseUsecase(
 	CategoryRepo repository.CategoryRepository,
 	ExpenseRepository repository.ExpenseRepository,
-	BalanceRepository repository.BalanceRepository,
+	// BalanceRepository repository.BalanceRepository,
 	AccountRepo repository.AccountRepository,
 	Log *logrus.Logger,
 	db *sql.DB) ExpenseUsecase {
 	return &ExpenseUsecaseImpl{
 		CategoryRepo:      CategoryRepo,
 		ExpenseRepository: ExpenseRepository,
-		BalanceRepository: BalanceRepository,
-		AccountRepo:       AccountRepo,
-		Log:               Log,
-		db:                db,
+		// BalanceRepository: BalanceRepository,
+		AccountRepo: AccountRepo,
+		Log:         Log,
+		db:          db,
 	}
 }

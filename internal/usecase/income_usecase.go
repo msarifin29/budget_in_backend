@@ -22,10 +22,10 @@ type IncomeUsecase interface {
 type IncomeUsecaseImpl struct {
 	CategoryRepo repository.CategoryRepository
 	IncomeRepo   repository.IncomeRepository
-	BalanceRepo  repository.BalanceRepository
-	AccountRepo  repository.AccountRepository
-	Log          *logrus.Logger
-	db           *sql.DB
+	// BalanceRepo  repository.BalanceRepository
+	AccountRepo repository.AccountRepository
+	Log         *logrus.Logger
+	db          *sql.DB
 }
 
 // GetIncomesByMonth implements IncomeUsecase.
@@ -109,9 +109,15 @@ func (u *IncomeUsecaseImpl) GetIncomes(ctx context.Context, params model.GetInco
 	return incomes, total, nil
 }
 
-func NewIncomeUsecase(IncomeRepo repository.IncomeRepository, BalanceRepo repository.BalanceRepository,
-	AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, CategoryRepo repository.CategoryRepository) IncomeUsecase {
-	return &IncomeUsecaseImpl{IncomeRepo: IncomeRepo, BalanceRepo: BalanceRepo, AccountRepo: AccountRepo, Log: Log, db: db, CategoryRepo: CategoryRepo}
+func NewIncomeUsecase(IncomeRepo repository.IncomeRepository,
+	// BalanceRepo repository.BalanceRepository,
+	AccountRepo repository.AccountRepository,
+	Log *logrus.Logger, db *sql.DB,
+	CategoryRepo repository.CategoryRepository) IncomeUsecase {
+	return &IncomeUsecaseImpl{IncomeRepo: IncomeRepo,
+		// BalanceRepo: BalanceRepo,
+		AccountRepo: AccountRepo, Log: Log,
+		db: db, CategoryRepo: CategoryRepo}
 }
 
 func NewIncome(ctx context.Context, tx *sql.Tx, accountRepo repository.AccountRepository, Log *logrus.Logger, typeIncome string, accountId string, input float64) error {

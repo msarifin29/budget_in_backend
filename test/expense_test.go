@@ -19,12 +19,12 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateExpenseParams{
-		Uid:         "3dafa83b-ce13-4bda-883b-191f122a76f8",
+		Uid:         "8601f262-5c0f-4024-86db-8f4737360180",
 		ExpenseType: util.CASH,
 		Total:       5000,
 		CategoryId:  4,
 		Notes:       "",
-		AccountId:   "155c136d-cddb-4b07-8a29-4a979387ea41",
+		AccountId:   "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 		// CreatedAt:   "2024-01-02T08:00:00Z",
 	}
 	body, err := json.Marshal(params)
@@ -32,7 +32,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/expenses/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))
@@ -201,7 +201,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 		Status: "success",
 		// ExpenseType: util.DEBIT,
 		// Id: 4,
-		CreatedAt: "2024-06-06",
+		// CreatedAt: "2024-06-06",
 		Page:      1,
 		TotalPage: 10,
 	}
@@ -216,7 +216,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))

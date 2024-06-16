@@ -19,11 +19,11 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.CreateIncomeRequest{
-		Uid:        "3dafa83b-ce13-4bda-883b-191f122a76f8",
+		Uid:        "8601f262-5c0f-4024-86db-8f4737360180",
 		TypeIncome: util.DEBIT,
 		Total:      20000,
 		CategoryId: 2,
-		AccountId:  "155c136d-cddb-4b07-8a29-4a979387ea41",
+		AccountId:  "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 		// CreatedAt:  "", // 2015-09-02T08:00:00Z
 	}
 	body, err := json.Marshal(params)
@@ -31,7 +31,7 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/incomes/create", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println(string(bytes))
@@ -99,7 +99,7 @@ func TestGetIncomesSuccess(t *testing.T) {
 	q.Add("total_page", fmt.Sprintf("%d", params.TotalPage))
 	req.URL.RawQuery = q.Encode()
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	fmt.Println("body : ", string(bytes))
