@@ -236,7 +236,7 @@ func (u *UserUsecaseImpl) ForgotPassword(ctx context.Context, req model.EmailUse
 		return false, err
 	}
 	subject := "Reset Password"
-	newPassword := util.RandomString(6)
+	newPassword := util.RandomString(10)
 
 	receiver := emailUser
 	r := util.NewRequest([]string{receiver}, subject, u.conf, u.Log)
