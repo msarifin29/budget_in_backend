@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/util"
@@ -55,8 +54,9 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		CategoryIncome: params.CategoryIncome,
 		TypeIncome:     params.TypeIncome,
 		Total:          params.Total,
-		TransactionId:  uuid.NewString(),
+		TransactionId:  util.RandomString(10),
 		CreatedAt:      util.CreatedAt(params.CreatedAt),
+		AccountId:      params.AccountId,
 	}
 	err := NewIncome(ctx, tx, u.AccountRepo, u.Log, params.TypeIncome, params.AccountId, params.Total)
 	if err != nil {

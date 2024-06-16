@@ -13,6 +13,7 @@ type Income struct {
 	TransactionId  string     `json:"transaction_id"`
 	CreatedAt      *time.Time `json:"created_at"`
 	UpdatedAt      *time.Time `json:"updated_at"`
+	AccountId      string     `json:"account_id"`
 }
 type CreateIncomeRequest struct {
 	Uid            string  `json:"uid" binding:"required"`
@@ -59,6 +60,7 @@ type IncomeResponse struct {
 	TCategory      CategoryReponse `json:"t_category"`
 	CreatedAt      *time.Time      `json:"created_at"`
 	UpdatedAt      *time.Time      `json:"updated_at"`
+	AccountId      string          `json:"account_id"`
 }
 type IncomesResponse struct {
 	Page      int32            `json:"page"`

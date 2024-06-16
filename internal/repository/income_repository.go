@@ -66,9 +66,9 @@ func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, ui
 
 // CreateIncome implements IncomeRepository.
 func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error) {
-	script := `insert into incomes (uid,type_income,total,created_at,transaction_id) values ($1,$2,$3,$4,$5) RETURNING id`
+	script := `insert into incomes (uid,type_income,total,created_at,transaction_id,account_id) values ($1,$2,$3,$4,$5,$6) RETURNING id`
 	var id int64
-	errX := tx.QueryRowContext(ctx, script, income.Uid, income.TypeIncome, income.Total, income.CreatedAt, income.TransactionId).Scan(&id)
+	errX := tx.QueryRowContext(ctx, script, &income.Uid, &income.TypeIncome, &income.Total, &income.CreatedAt, &income.TransactionId, &income.AccountId).Scan(&id)
 	if errX != nil {
 		return model.Income{}, errX
 	}
@@ -80,7 +80,7 @@ func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, incom
 func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params model.GetIncomeParams) ([]model.IncomeResponse, error) {
 	cId := categoryId(params.CategoryId)
 	script := `
-	select i.*, t.category_id, t.id as t_id, t.title
+	select i.uid, i.id, i.total, i.created_at, i.updated_at, i.type_income, i.transaction_id, t.category_id, t.id as t_id, t.title, i.account_id
 	from incomes i
 	LEFT JOIN t_category_incomes t ON i.id = t.category_id
 	where uid = $1 and i.type_income LIKE $2`
@@ -108,7 +108,7 @@ func (*IncomeRepositoryImpl) GetIncomes(ctx context.Context, tx *sql.Tx, params 
 	for rows.Next() {
 		err := rows.Scan(
 			&i.Uid, &i.Id, &i.Total, &i.CreatedAt, &update, &i.TypeIncome, &i.TransactionId,
-			&i.TCategory.CategoryId, &i.TCategory.Id, &i.TCategory.Title,
+			&i.TCategory.CategoryId, &i.TCategory.Id, &i.TCategory.Title, &i.AccountId,
 		)
 		if err != nil {
 			return nil, err
