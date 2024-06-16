@@ -24,8 +24,8 @@ type Server struct {
 	PrivacyC     PrivacyController
 }
 
-func NewServer(Log *logrus.Logger, Con config.Config) (*Server, error) {
-	db := config.Connection(Log)
+func NewServer(Log *logrus.Logger, Con config.Config, fileName string) (*Server, error) {
+	db := config.Connection(Log, fileName)
 	tokenMaker, err := util.NewJWTMaker(Con.TokenSymetricKey)
 
 	if err != nil {

@@ -9,11 +9,11 @@ import (
 
 func main() {
 	logger := config.NewLogger()
-	con, errCon := config.LoadConfig(".", "dev")
+	con, errCon := config.LoadConfig("../..", "prod")
 	if errCon != nil {
 		log.Fatalf("cannot load config %e :", errCon)
 	}
-	server, err := controller.NewServer(logger, con, "dev")
+	server, err := controller.NewServer(logger, con, "prod")
 	if err != nil {
 		log.Fatalf("cannot create server %e :", errCon)
 	}

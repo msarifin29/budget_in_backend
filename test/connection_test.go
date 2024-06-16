@@ -9,7 +9,7 @@ import (
 )
 
 func TestConnection(t *testing.T) {
-	db := config.Connection(config.NewLogger())
+	db := config.Connection(config.NewLogger(), "dev")
 
 	err := db.Ping()
 	assert.NoErrorf(t, err, "error %t")

@@ -15,7 +15,7 @@ func TestMainServer(t *testing.T) {
 	log := config.NewLogger()
 	con, err := config.LoadConfig("..", "dev")
 	assert.NoError(t, err)
-	server, sErr := controller.NewServer(log, con)
+	server, sErr := controller.NewServer(log, con, "dev")
 	assert.NoError(t, sErr)
 	err = server.Start(con.ServerAddress)
 	assert.NoError(t, err)

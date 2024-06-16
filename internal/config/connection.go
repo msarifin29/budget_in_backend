@@ -8,8 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Connection(log *logrus.Logger) *sql.DB {
-	configuration, err := LoadConfig("../.", "dev")
+func Connection(log *logrus.Logger, fileName string) *sql.DB {
+	configuration, err := LoadConfig("../.", fileName)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
