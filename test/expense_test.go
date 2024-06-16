@@ -20,12 +20,14 @@ func TestCreateExpenseSuccess(t *testing.T) {
 
 	params := model.CreateExpenseParams{
 		Uid:         "8601f262-5c0f-4024-86db-8f4737360180",
-		ExpenseType: util.CASH,
+		ExpenseType: util.DEBIT,
 		Total:       5000,
 		CategoryId:  4,
 		Notes:       "",
 		AccountId:   "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 		// CreatedAt:   "2024-01-02T08:00:00Z",
+		BankName: "PT. BANK JABAR BANTEN SYARIAH",
+		BankId:   "425",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

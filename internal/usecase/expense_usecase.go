@@ -62,6 +62,8 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		TransactionId: util.RandomString(10),
 		CreatedAt:     util.CreatedAt(expense.CreatedAt),
 		AccountId:     expense.AccountId,
+		BankName:      expense.BankName,
+		BankId:        expense.BankId,
 	}
 	if req.Total < 2000 {
 		u.Log.Errorf("Invalid input total min 2000 , actually %v", req.Total)

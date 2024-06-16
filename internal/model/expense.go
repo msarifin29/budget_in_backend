@@ -16,6 +16,8 @@ type Expense struct {
 	CreatedAt     *time.Time `json:"created_at"`
 	UpdatedAt     *time.Time `json:"updated_at"`
 	AccountId     string     `json:"account_id"`
+	BankName      string     `json:"bank_name"`
+	BankId        string     `json:"bank_id"`
 }
 
 type CreateExpenseRequest struct {
@@ -28,6 +30,8 @@ type CreateExpenseRequest struct {
 	AccountId     string  `json:"account_id" binding:"required"`
 	TransactionId string  `json:"transaction_id"`
 	CreatedAt     string  `json:"created_at"`
+	BankName      string  `json:"bank_name"`
+	BankId        string  `json:"bank_id"`
 }
 type CreateExpenseParams struct {
 	Uid         string  `json:"uid" binding:"required"`
@@ -38,6 +42,8 @@ type CreateExpenseParams struct {
 	Notes       string  `json:"notes"`
 	AccountId   string  `json:"account_id" binding:"required"`
 	CreatedAt   string  `json:"created_at"`
+	BankName    string  `json:"bank_name"`
+	BankId      string  `json:"bank_id"`
 }
 
 type UpdateExpenseRequest struct {
@@ -84,6 +90,8 @@ type ExpenseResponse struct {
 	CreatedAt     *time.Time      `json:"created_at"`
 	UpdatedAt     *time.Time      `json:"updated_at"`
 	AccountId     string          `json:"account_id"`
+	BankName      string          `json:"bank_name"`
+	BankId        string          `json:"bank_id"`
 }
 
 type ExpensesResponse struct {

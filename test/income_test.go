@@ -25,6 +25,8 @@ func TestCreateIncomeSuccess(t *testing.T) {
 		CategoryId: 2,
 		AccountId:  "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 		// CreatedAt:  "", // 2015-09-02T08:00:00Z
+		BankName: "PT. BANK JABAR BANTEN SYARIAH",
+		BankId:   "425",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)

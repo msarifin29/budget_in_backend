@@ -57,6 +57,8 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		TransactionId:  util.RandomString(10),
 		CreatedAt:      util.CreatedAt(params.CreatedAt),
 		AccountId:      params.AccountId,
+		BankName:       params.BankName,
+		BankId:         params.BankId,
 	}
 	err := NewIncome(ctx, tx, u.AccountRepo, u.Log, params.TypeIncome, params.AccountId, params.Total)
 	if err != nil {

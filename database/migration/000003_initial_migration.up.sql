@@ -66,3 +66,7 @@ ALTER TABLE "t_category_incomes" ADD CONSTRAINT "fk_t_category_incomes_incomes" 
 
 ALTER TABLE "accounts" ADD CONSTRAINT "fk_accounts_users" FOREIGN KEY ("user_id") REFERENCES "users" ("uid");
 
+ALTER TABLE "expenses" ADD COLUMN "bank_name" VARCHAR(75) DEFAULT '';
+ALTER TABLE "expenses" ADD COLUMN "bank_id" VARCHAR(10) DEFAULT '';
+ALTER TABLE "incomes" ADD COLUMN "bank_name" VARCHAR(75) DEFAULT '';
+ALTER TABLE "incomes" ADD COLUMN "bank_id" VARCHAR(10) DEFAULT '';

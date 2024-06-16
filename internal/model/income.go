@@ -14,6 +14,8 @@ type Income struct {
 	CreatedAt      *time.Time `json:"created_at"`
 	UpdatedAt      *time.Time `json:"updated_at"`
 	AccountId      string     `json:"account_id"`
+	BankName       string     `json:"bank_name"`
+	BankId         string     `json:"bank_id"`
 }
 type CreateIncomeRequest struct {
 	Uid            string  `json:"uid" binding:"required"`
@@ -24,6 +26,8 @@ type CreateIncomeRequest struct {
 	AccountId      string  `json:"account_id" binding:"required"`
 	TransactionId  string  `json:"transaction_id" binding:"required"`
 	CreatedAt      string  `json:"created_at"`
+	BankName       string  `json:"bank_name"`
+	BankId         string  `json:"bank_id"`
 }
 type CreateIncomeParams struct {
 	Uid            string  `json:"uid" binding:"required"`
@@ -34,6 +38,8 @@ type CreateIncomeParams struct {
 	AccountId      string  `json:"account_id" binding:"required"`
 	TransactionId  string  `json:"transaction_id"`
 	CreatedAt      string  `json:"created_at"`
+	BankName       string  `json:"bank_name"`
+	BankId         string  `json:"bank_id"`
 }
 type GetIncomeParams struct {
 	Uid            string `json:"uid" binding:"required"`
@@ -61,6 +67,8 @@ type IncomeResponse struct {
 	CreatedAt      *time.Time      `json:"created_at"`
 	UpdatedAt      *time.Time      `json:"updated_at"`
 	AccountId      string          `json:"account_id"`
+	BankName       string          `json:"bank_name"`
+	BankId         string          `json:"bank_id"`
 }
 type IncomesResponse struct {
 	Page      int32            `json:"page"`
