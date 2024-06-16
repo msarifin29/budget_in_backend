@@ -15,6 +15,7 @@ type Expense struct {
 	TransactionId string     `json:"transaction_id"`
 	CreatedAt     *time.Time `json:"created_at"`
 	UpdatedAt     *time.Time `json:"updated_at"`
+	AccountId     string     `json:"account_id"`
 }
 
 type CreateExpenseRequest struct {
@@ -82,6 +83,7 @@ type ExpenseResponse struct {
 	TCategory     CategoryReponse `json:"t_category"`
 	CreatedAt     *time.Time      `json:"created_at"`
 	UpdatedAt     *time.Time      `json:"updated_at"`
+	AccountId     string          `json:"account_id"`
 }
 
 type ExpensesResponse struct {

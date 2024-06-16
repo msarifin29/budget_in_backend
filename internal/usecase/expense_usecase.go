@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/google/uuid"
 	"github.com/msarifin29/be_budget_in/internal/model"
 	"github.com/msarifin29/be_budget_in/internal/repository"
 	"github.com/msarifin29/be_budget_in/util"
@@ -60,8 +59,9 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		Status:        util.SUCCESS,
 		Notes:         notes.String,
 		Uid:           expense.Uid,
-		TransactionId: uuid.NewString(),
+		TransactionId: util.RandomString(10),
 		CreatedAt:     util.CreatedAt(expense.CreatedAt),
+		AccountId:     expense.AccountId,
 	}
 	if req.Total < 2000 {
 		u.Log.Errorf("Invalid input total min 2000 , actually %v", req.Total)
@@ -106,6 +106,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		TransactionId: res.TransactionId,
 		CreatedAt:     res.CreatedAt,
 		UpdatedAt:     &update.Time,
+		AccountId:     res.AccountId,
 	}, nil
 }
 

@@ -87,7 +87,7 @@ func (*ExpenseRepositoryImpl) GetTotalExpenses(ctx context.Context, tx *sql.Tx, 
 // GetExpenses implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, params model.GetExpenseParams) ([]model.ExpenseResponse, error) {
 	var err error
-	query := `SELECT e.id, e.expense_type, e.total, e.notes, e.created_at, e.uid, e.status, e.transaction_id, t.category_id, t.id as t_id, t.title
+	query := `SELECT e.id, e.expense_type, e.total, e.notes, e.created_at, e.uid, e.status, e.transaction_id, t.category_id, t.id as t_id, t.title, e.account_id
 	FROM expenses e
 	LEFT JOIN t_category_expenses t ON e.id = t.category_id
 	WHERE uid = $1 AND status = $2`
@@ -136,15 +136,12 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 			&i.Id, &i.ExpenseType, &i.Total, &i.Notes,
 			&i.CreatedAt, &i.Uid, &i.Status,
 			&i.TransactionId, &i.TCategory.CategoryId,
-			&i.TCategory.Id, &i.TCategory.Title,
+			&i.TCategory.Id, &i.TCategory.Title, &i.AccountId,
 		); err != nil {
 			return nil, err
 		}
 		if i.Notes == "" {
 			i.Notes = ""
-		}
-		if i.TransactionId == "" {
-			i.TransactionId = ""
 		}
 		expenses = append(expenses, i)
 	}
@@ -156,18 +153,15 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 
 // GetExpenseById implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id float64) (model.Expense, error) {
-	script := `select id, expense_type, total, notes, created_at, uid, status, transaction_id 
+	script := `select id, expense_type, total, notes, created_at, uid, status, transaction_id, account_id 
 	from expenses where id = $1 limit 1`
 
 	rows := tx.QueryRowContext(ctx, script, id)
 
 	var i model.Expense
-	err := rows.Scan(&i.Id, &i.ExpenseType, &i.Total, &i.Notes, &i.CreatedAt, &i.Uid, &i.Status, &i.TransactionId)
+	err := rows.Scan(&i.Id, &i.ExpenseType, &i.Total, &i.Notes, &i.CreatedAt, &i.Uid, &i.Status, &i.TransactionId, &i.AccountId)
 	if i.Notes == "" {
 		i.Notes = ""
-	}
-	if i.TransactionId == "" {
-		i.TransactionId = ""
 	}
 	return i, err
 }
@@ -175,9 +169,9 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 // CreateExpense implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) CreateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense) (model.Expense, error) {
 	var id int
-	script := `insert into expenses (expense_type,total,notes,uid,status,created_at,transaction_id) values ($1,$2,$3,$4,$5,$6,$7) RETURNING id`
+	script := `insert into expenses (expense_type,total,notes,uid,status,created_at,transaction_id, account_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`
 	errX := tx.QueryRowContext(ctx, script, &expense.ExpenseType, &expense.Total, &expense.Notes, &expense.Uid,
-		&expense.Status, &expense.CreatedAt, &expense.TransactionId).Scan(&id)
+		&expense.Status, &expense.CreatedAt, &expense.TransactionId, &expense.AccountId).Scan(&id)
 	if errX != nil {
 		return model.Expense{}, errX
 	}

@@ -120,14 +120,14 @@ func TestUpdateExpenseSuccess(t *testing.T) {
 	params := model.UpdateExpenseRequest{
 		Id:          1,
 		ExpenseType: util.CASH,
-		AccountId:   "155c136d-cddb-4b07-8a29-4a979387ea41",
+		AccountId:   "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 	}
 	body, err := json.Marshal(params)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/api/expenses/update", strings.NewReader(string(body)))
 
-	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "3dafa83b-ce13-4bda-883b-191f122a76f8", time.Minute)
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
 	router.Engine.ServeHTTP(w, req)
 	bytes, err := io.ReadAll(w.Body)
 	assert.Nil(t, err)
@@ -201,7 +201,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 		Status: "success",
 		// ExpenseType: util.DEBIT,
 		// Id: 4,
-		// CreatedAt: "2024-06-06",
+		CreatedAt: "2024-06-16",
 		Page:      1,
 		TotalPage: 10,
 	}
