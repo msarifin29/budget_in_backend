@@ -19,7 +19,8 @@ CREATE TABLE "expenses" (
   "updated_at" timestamp DEFAULT null,
   "uid" varchar(255) NOT NULL,
   "status" varchar(10) DEFAULT 'success',
-  "transaction_id" varchar(255) NOT NULL
+  "transaction_id" varchar(255) NOT NULL,
+  "account_id" VARCHAR(100) NOT NULL DEFAULT ''
 );
 
 CREATE TABLE "incomes" (
@@ -29,7 +30,8 @@ CREATE TABLE "incomes" (
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP DEFAULT null,
   "type_income" VARCHAR(15) NOT NULL DEFAULT 'debit',
-  "transaction_id" varchar(255) NOT NULL
+  "transaction_id" varchar(255) NOT NULL,
+  "account_id" VARCHAR(100) NOT NULL DEFAULT ''
 );
 
 CREATE TABLE "t_category_expenses" (
@@ -64,6 +66,3 @@ ALTER TABLE "t_category_incomes" ADD CONSTRAINT "fk_t_category_incomes_incomes" 
 
 ALTER TABLE "accounts" ADD CONSTRAINT "fk_accounts_users" FOREIGN KEY ("user_id") REFERENCES "users" ("uid");
 
-ALTER TABLE "expenses" ADD COLUMN "account_id" VARCHAR(100) NOT NULL DEFAULT '';
-
-ALTER TABLE "incomes" ADD COLUMN "account_id" VARCHAR(100) NOT NULL DEFAULT '';
