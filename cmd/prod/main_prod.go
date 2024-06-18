@@ -11,7 +11,7 @@ var env, port string
 
 func init() {
 	env = "prod"
-	port = ":80"
+	port = ":8081"
 }
 func main() {
 	logger := config.NewLogger()
