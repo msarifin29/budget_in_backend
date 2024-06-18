@@ -23,6 +23,8 @@ ExecStart=/home/samsul-dev/projects/budget_in_backend/bin/devapp
 WorkingDirectory=/home/samsul-dev/projects/budget_in_backend
 EnvironmentFile=/home/samsul-dev/projects/budget_in_backend/dev.env
 Restart=on-failure
+User=samsul-dev
+Group=samsul-dev
 
 [Install]
 WantedBy=multi-user.target
@@ -58,7 +60,6 @@ sudo systemctl enable devapp.service
 
 ## Build and Run 
 1. `go build -o bin/prod-app ./cmd/prod`
-2. `nohup ./bin/pro-app &> prod-app.log &`
 
 ## Check Running Processes 
 
@@ -77,6 +78,8 @@ ExecStart=/home/samsul-dev/projects/budget_in_backend/bin/prod-app
 WorkingDirectory=/home/samsul-dev/projects/budget_in_backend
 EnvironmentFile=/home/samsul-dev/projects/budget_in_backend/prod.env
 Restart=on-failure
+User=samsul-dev
+Group=samsul-dev
 
 [Install]
 WantedBy=multi-user.target
