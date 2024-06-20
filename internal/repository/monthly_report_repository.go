@@ -63,7 +63,7 @@ func (MonthlyReportRepositoryImpl) GetMonthlyExpenseReport(ctx context.Context, 
     uid,
     SUM(total) AS total_expenses
 FROM expenses
-WHERE uid = $1
+WHERE uid = $1 AND status = 'success'
 GROUP BY EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at), uid;`
 	rows, err := tx.QueryContext(ctx, script, uid.Uid)
 	if err != nil {

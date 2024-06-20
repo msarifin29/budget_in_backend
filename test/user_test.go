@@ -93,7 +93,7 @@ func TestLoginUserSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.LoginUserRequest{
-		Email:    "test2@gmail.com",
+		Email:    "test3@gmail.com",
 		Password: "123456",
 	}
 	body, err := json.Marshal(params)
