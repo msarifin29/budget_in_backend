@@ -73,6 +73,7 @@ func (u *IncomeUsecaseImpl) CreateIncome(ctx context.Context, params model.Creat
 		CategoryId: res.Id,
 		Id:         float64(params.CategoryId),
 		Title:      util.InputCategoryIncome(float64(params.CategoryId)),
+		UserId:     params.Uid,
 	}
 
 	category, catErr := u.CategoryRepo.CreateCategoryIncomes(ctx, tx, paramCategory)
@@ -112,12 +113,10 @@ func (u *IncomeUsecaseImpl) GetIncomes(ctx context.Context, params model.GetInco
 }
 
 func NewIncomeUsecase(IncomeRepo repository.IncomeRepository,
-	// BalanceRepo repository.BalanceRepository,
 	AccountRepo repository.AccountRepository,
 	Log *logrus.Logger, db *sql.DB,
 	CategoryRepo repository.CategoryRepository) IncomeUsecase {
 	return &IncomeUsecaseImpl{IncomeRepo: IncomeRepo,
-		// BalanceRepo: BalanceRepo,
 		AccountRepo: AccountRepo, Log: Log,
 		db: db, CategoryRepo: CategoryRepo}
 }

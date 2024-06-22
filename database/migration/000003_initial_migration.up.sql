@@ -70,3 +70,9 @@ ALTER TABLE "expenses" ADD COLUMN "bank_name" VARCHAR(75) DEFAULT '';
 ALTER TABLE "expenses" ADD COLUMN "bank_id" VARCHAR(10) DEFAULT '';
 ALTER TABLE "incomes" ADD COLUMN "bank_name" VARCHAR(75) DEFAULT '';
 ALTER TABLE "incomes" ADD COLUMN "bank_id" VARCHAR(10) DEFAULT '';
+
+ALTER TABLE "t_category_expenses" ADD COLUMN "user_id" VARCHAR(50) DEFAULT '';
+ALTER TABLE "t_category_expenses" ADD COLUMN "status" VARCHAR(10) DEFAULT 'success';
+
+ALTER TABLE "t_category_incomes" ADD COLUMN "user_id" VARCHAR(50) DEFAULT '';
+ALTER TABLE "t_category_incomes" ADD COLUMN "status" VARCHAR(10) DEFAULT 'success';

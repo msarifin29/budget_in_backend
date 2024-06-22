@@ -23,10 +23,9 @@ type ExpenseUsecase interface {
 type ExpenseUsecaseImpl struct {
 	CategoryRepo      repository.CategoryRepository
 	ExpenseRepository repository.ExpenseRepository
-	// BalanceRepository repository.BalanceRepository
-	AccountRepo repository.AccountRepository
-	Log         *logrus.Logger
-	db          *sql.DB
+	AccountRepo       repository.AccountRepository
+	Log               *logrus.Logger
+	db                *sql.DB
 }
 
 // GetExpensez implements ExpenseUsecase.
@@ -90,6 +89,7 @@ func (u *ExpenseUsecaseImpl) CreateExpense(ctx context.Context, expense model.Cr
 		CategoryId: res.Id,
 		Id:         expense.CategoryId,
 		Title:      util.InputCategoryexpense(expense.CategoryId),
+		UserId:     expense.Uid,
 	}
 	category, categoryErr := u.CategoryRepo.CreateCategoryExpense(ctx, tx, paramCategory)
 	if categoryErr != nil {
@@ -182,6 +182,11 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 		Status:      x.Status,
 		ExpenseType: expense.ExpenseType,
 	}
+	errUp := u.CategoryRepo.UpdateStatusCategoryExpense(ctx, tx, expense.Id)
+	if errUp != nil {
+		u.Log.Errorf("failed update status category expense %u :", errUp)
+		return false, errUp
+	}
 
 	res, err := u.ExpenseRepository.UpdateExpense(ctx, tx, req, expense.Id)
 	if err != nil {
@@ -195,16 +200,14 @@ func (u *ExpenseUsecaseImpl) UpdateExpense(ctx context.Context, expense model.Up
 func NewExpenseUsecase(
 	CategoryRepo repository.CategoryRepository,
 	ExpenseRepository repository.ExpenseRepository,
-	// BalanceRepository repository.BalanceRepository,
 	AccountRepo repository.AccountRepository,
 	Log *logrus.Logger,
 	db *sql.DB) ExpenseUsecase {
 	return &ExpenseUsecaseImpl{
 		CategoryRepo:      CategoryRepo,
 		ExpenseRepository: ExpenseRepository,
-		// BalanceRepository: BalanceRepository,
-		AccountRepo: AccountRepo,
-		Log:         Log,
-		db:          db,
+		AccountRepo:       AccountRepo,
+		Log:               Log,
+		db:                db,
 	}
 }

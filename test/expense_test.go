@@ -120,8 +120,8 @@ func TestUpdateExpenseSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
 	params := model.UpdateExpenseRequest{
-		Id:          1,
-		ExpenseType: util.CASH,
+		Id:          2,
+		ExpenseType: util.DEBIT,
 		AccountId:   "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 	}
 	body, err := json.Marshal(params)
