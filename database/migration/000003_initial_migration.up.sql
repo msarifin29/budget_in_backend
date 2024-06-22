@@ -20,7 +20,10 @@ CREATE TABLE "expenses" (
   "uid" varchar(255) NOT NULL,
   "status" varchar(10) DEFAULT 'success',
   "transaction_id" varchar(255) NOT NULL,
-  "account_id" VARCHAR(100) NOT NULL DEFAULT ''
+  "account_id" VARCHAR(100) NOT NULL DEFAULT '',
+  "bank_name" VARCHAR(75) DEFAULT '',
+  "bank_id" VARCHAR(10) DEFAULT '',
+  "c_id" int
 );
 
 CREATE TABLE "incomes" (
@@ -31,19 +34,26 @@ CREATE TABLE "incomes" (
   "updated_at" TIMESTAMP DEFAULT null,
   "type_income" VARCHAR(15) NOT NULL DEFAULT 'debit',
   "transaction_id" varchar(255) NOT NULL,
-  "account_id" VARCHAR(100) NOT NULL DEFAULT ''
+  "account_id" VARCHAR(100) NOT NULL DEFAULT '',
+  "bank_name" VARCHAR(75) DEFAULT '',
+  "bank_id" VARCHAR(10) DEFAULT '',
+  "c_id" int
 );
 
 CREATE TABLE "t_category_expenses" (
   "category_id" int UNIQUE PRIMARY KEY NOT NULL,
   "id" int NOT NULL,
-  "title" varchar(50) NOT NULL
+  "title" varchar(50) NOT NULL,
+  "user_id" VARCHAR(50) DEFAULT '',
+  "status" VARCHAR(10) DEFAULT 'success'
 );
 
 CREATE TABLE "t_category_incomes" (
   "category_id" int UNIQUE PRIMARY KEY NOT NULL,
   "id" int NOT NULL,
-  "title" varchar(50) NOT NULL
+  "title" varchar(50) NOT NULL,
+  "user_id" VARCHAR(50) DEFAULT '',
+  "status" VARCHAR(10) DEFAULT 'success'
 );
 
 CREATE TABLE "accounts" (
@@ -66,16 +76,3 @@ ALTER TABLE "t_category_incomes" ADD CONSTRAINT "fk_t_category_incomes_incomes" 
 
 ALTER TABLE "accounts" ADD CONSTRAINT "fk_accounts_users" FOREIGN KEY ("user_id") REFERENCES "users" ("uid");
 
-ALTER TABLE "expenses" ADD COLUMN "bank_name" VARCHAR(75) DEFAULT '';
-ALTER TABLE "expenses" ADD COLUMN "bank_id" VARCHAR(10) DEFAULT '';
-ALTER TABLE "expenses" ADD COLUMN "c_id" int;
-
-ALTER TABLE "incomes" ADD COLUMN "bank_name" VARCHAR(75) DEFAULT '';
-ALTER TABLE "incomes" ADD COLUMN "bank_id" VARCHAR(10) DEFAULT '';
-ALTER TABLE "incomes" ADD COLUMN "c_id" int;
-
-ALTER TABLE "t_category_expenses" ADD COLUMN "user_id" VARCHAR(50) DEFAULT '';
-ALTER TABLE "t_category_expenses" ADD COLUMN "status" VARCHAR(10) DEFAULT 'success';
-
-ALTER TABLE "t_category_incomes" ADD COLUMN "user_id" VARCHAR(50) DEFAULT '';
-ALTER TABLE "t_category_incomes" ADD COLUMN "status" VARCHAR(10) DEFAULT 'success';
