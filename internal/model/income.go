@@ -16,6 +16,7 @@ type Income struct {
 	AccountId      string     `json:"account_id"`
 	BankName       string     `json:"bank_name"`
 	BankId         string     `json:"bank_id"`
+	Cid            int32      `json:"c_id"`
 }
 type CreateIncomeRequest struct {
 	Uid            string  `json:"uid" binding:"required"`
@@ -28,6 +29,7 @@ type CreateIncomeRequest struct {
 	CreatedAt      string  `json:"created_at"`
 	BankName       string  `json:"bank_name"`
 	BankId         string  `json:"bank_id"`
+	Cid            int32   `json:"c_id"`
 }
 type CreateIncomeParams struct {
 	Uid            string  `json:"uid" binding:"required"`

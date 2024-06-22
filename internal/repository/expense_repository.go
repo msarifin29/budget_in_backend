@@ -91,7 +91,7 @@ func (*ExpenseRepositoryImpl) GetExpenses(ctx context.Context, tx *sql.Tx, param
 	t.category_id, t.id as t_id, t.title, e.account_id, e.bank_name, e.bank_id
 	FROM expenses e
 	LEFT JOIN t_category_expenses t ON e.id = t.category_id
-	WHERE uid = $1 AND status = $2`
+	WHERE uid = $1 AND e.status = $2`
 	param := []interface{}{params.Uid, params.Status}
 	if params.ExpenseType != "" {
 		query += " AND e.expense_type LIKE $3"
@@ -169,10 +169,10 @@ func (*ExpenseRepositoryImpl) GetExpenseById(ctx context.Context, tx *sql.Tx, id
 // CreateExpense implements ExpenseRepository.
 func (*ExpenseRepositoryImpl) CreateExpense(ctx context.Context, tx *sql.Tx, expense model.Expense) (model.Expense, error) {
 	var id int
-	script := `insert into expenses (expense_type,total,notes,uid,status,created_at,transaction_id, account_id, bank_name, bank_id) 
-	values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`
+	script := `insert into expenses (expense_type,total,notes,uid,status,created_at,transaction_id, account_id, bank_name, bank_id,c_id) 
+	values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`
 	errX := tx.QueryRowContext(ctx, script, &expense.ExpenseType, &expense.Total, &expense.Notes, &expense.Uid,
-		&expense.Status, &expense.CreatedAt, &expense.TransactionId, &expense.AccountId, &expense.BankName, &expense.BankId).Scan(&id)
+		&expense.Status, &expense.CreatedAt, &expense.TransactionId, &expense.AccountId, &expense.BankName, &expense.BankId, expense.Cid).Scan(&id)
 	if errX != nil {
 		return model.Expense{}, errX
 	}

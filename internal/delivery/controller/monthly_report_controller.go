@@ -81,3 +81,32 @@ func (c *MonthlyReportController) GetMonthlyReportDetail(ctx *gin.Context) {
 		Data:    records,
 	})
 }
+
+func (c *MonthlyReportController) GetMonthlyReportCategory(ctx *gin.Context) {
+	var req model.RequestMonthlyReportCategory
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		c.Log.Errorf("failed binding request query with %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+	categories, err := c.Usecase.GetMonthlyReportCategory(ctx, model.ParamMonthlyReportCategory{
+		Uid:   authPayload.Uid,
+		Month: req.Month,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    categories,
+	})
+}

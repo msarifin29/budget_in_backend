@@ -18,6 +18,7 @@ type Expense struct {
 	AccountId     string     `json:"account_id"`
 	BankName      string     `json:"bank_name"`
 	BankId        string     `json:"bank_id"`
+	Cid           float64    `json:"c_id"`
 }
 
 type CreateExpenseRequest struct {

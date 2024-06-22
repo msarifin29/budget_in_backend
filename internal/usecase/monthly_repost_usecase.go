@@ -14,11 +14,34 @@ import (
 type MonthlyReportUsecase interface {
 	GetMonthlyReport(ctx context.Context, params model.ParamMonthlyReport) ([]model.MonthlyReportResponse, error)
 	GetMonthlyReportDetail(ctx context.Context, params model.ParamMonthlyReportDetail) (model.MonthlyReportDetailResponse, error)
+	GetMonthlyReportCategory(ctx context.Context, params model.ParamMonthlyReportCategory) (model.MonthlyReportCategoryResponse, error)
 }
 type MonthlyReportUsecaseImpl struct {
 	MonthlyRepo repository.MonthlyReportRepository
 	Log         *logrus.Logger
 	db          *sql.DB
+}
+
+// GetMonthlyReportExpenseByCategory implements MonthlyReportUsecase.
+func (u *MonthlyReportUsecaseImpl) GetMonthlyReportCategory(ctx context.Context, params model.ParamMonthlyReportCategory) (model.MonthlyReportCategoryResponse, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+	expenses, err := u.MonthlyRepo.GetMonthlyReportCategoryExpense(ctx, tx, params)
+	if err != nil {
+		u.Log.Errorf("failed get monthly report expenses %v", err)
+		err = errors.New("failed get monthly expenses")
+		return model.MonthlyReportCategoryResponse{}, err
+	}
+	incomes, errX := u.MonthlyRepo.GetMonthlyReportCategoryIncome(ctx, tx, params)
+	if errX != nil {
+		u.Log.Errorf("failed get monthly report incomes %v", errX)
+		err = errors.New("failed get monthly incomes")
+		return model.MonthlyReportCategoryResponse{}, errX
+	}
+	return model.MonthlyReportCategoryResponse{
+		Incomes:  incomes,
+		Expenses: expenses,
+	}, nil
 }
 
 // GetMonthlyReportDetail implements MonthlyReportUsecase.

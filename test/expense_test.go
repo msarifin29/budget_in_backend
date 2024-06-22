@@ -23,7 +23,7 @@ func TestCreateExpenseSuccess(t *testing.T) {
 		ExpenseType: util.DEBIT,
 		Total:       5000,
 		CategoryId:  4,
-		Notes:       "",
+		Notes:       "Buy a coffe",
 		AccountId:   "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 		// CreatedAt:   "2024-01-02T08:00:00Z",
 		BankName: "PT. BANK JABAR BANTEN SYARIAH",
@@ -203,7 +203,7 @@ func TestGetExpensesSuccess(t *testing.T) {
 		Status: "success",
 		// ExpenseType: util.DEBIT,
 		// Id: 4,
-		CreatedAt: "2024-06-16",
+		// CreatedAt: "2024-06-16",
 		Page:      1,
 		TotalPage: 10,
 	}

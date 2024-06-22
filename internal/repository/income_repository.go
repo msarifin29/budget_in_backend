@@ -66,10 +66,10 @@ func (*IncomeRepositoryImpl) GetTotalIncomes(ctx context.Context, tx *sql.Tx, ui
 
 // CreateIncome implements IncomeRepository.
 func (*IncomeRepositoryImpl) CreateIncome(ctx context.Context, tx *sql.Tx, income model.Income) (model.Income, error) {
-	script := `insert into incomes (uid,type_income,total,created_at,transaction_id,account_id,bank_name,bank_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`
+	script := `insert into incomes (uid,type_income,total,created_at,transaction_id,account_id,bank_name,bank_id,c_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`
 	var id int64
 	errX := tx.QueryRowContext(ctx, script, &income.Uid, &income.TypeIncome, &income.Total, &income.CreatedAt,
-		&income.TransactionId, &income.AccountId, &income.BankName, &income.BankId).Scan(&id)
+		&income.TransactionId, &income.AccountId, &income.BankName, &income.BankId, &income.Cid).Scan(&id)
 	if errX != nil {
 		return model.Income{}, errX
 	}

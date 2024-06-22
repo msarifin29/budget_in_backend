@@ -49,3 +49,25 @@ func TestGetMonthlyReportDetailSuccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "Success", res["message"])
 }
+func TestGetMonthlyReportByCategorySuccess(t *testing.T) {
+	router := NewTestServer(t)
+	param := model.RequestMonthlyReportCategory{Month: "2024-06"}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/user/monthly-report/category/", nil)
+
+	q := req.URL.Query()
+	q.Add("month", fmt.Sprintf("%v", param.Month))
+	req.URL.RawQuery = q.Encode()
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("body :", string(bytes))
+	assert.Nil(t, err)
+
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Success", res["message"])
+}

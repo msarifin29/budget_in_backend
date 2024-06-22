@@ -71,3 +71,39 @@ type MonthlyReportDetailResponse struct {
 	ExpensesRecords []MonthlyXDetail `json:"expenses"`
 	IncomesRecords  []MonthlyIDetail `json:"incomes"`
 }
+
+type MonthlyReportCategoryExpense struct {
+	CategoryId sql.NullString  `json:"category_id"`
+	Title      sql.NullString  `json:"title"`
+	Total      sql.NullFloat64 `json:"total"`
+}
+
+type MonthlyReportCategoryExpenseResponse struct {
+	CategoryId string  `json:"category_id"`
+	Title      string  `json:"title"`
+	Total      float64 `json:"total"`
+}
+type MonthlyReportCategoryIncome struct {
+	CategoryId sql.NullString  `json:"category_id"`
+	Title      sql.NullString  `json:"title"`
+	Total      sql.NullFloat64 `json:"total"`
+}
+
+type MonthlyReportCategoryIncomeResponse struct {
+	CategoryId string  `json:"category_id"`
+	Title      string  `json:"title"`
+	Total      float64 `json:"total"`
+}
+
+type MonthlyReportCategoryResponse struct {
+	Incomes  []MonthlyReportCategoryIncomeResponse  `json:"incomes"`
+	Expenses []MonthlyReportCategoryExpenseResponse `json:"expenses"`
+}
+
+type ParamMonthlyReportCategory struct {
+	Uid   string `json:"uid" binding:"required"`
+	Month string `json:"month" binding:"required"`
+}
+type RequestMonthlyReportCategory struct {
+	Month string `form:"month" binding:"required"`
+}

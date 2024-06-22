@@ -21,8 +21,8 @@ func TestCreateIncomeSuccess(t *testing.T) {
 	params := model.CreateIncomeRequest{
 		Uid:        "8601f262-5c0f-4024-86db-8f4737360180",
 		TypeIncome: util.DEBIT,
-		Total:      20000,
-		CategoryId: 2,
+		Total:      200000,
+		CategoryId: 4,
 		AccountId:  "e38418b8-3342-4d10-b7c2-e09e9fc90193",
 		// CreatedAt:  "", // 2015-09-02T08:00:00Z
 		BankName: "PT. BANK JABAR BANTEN SYARIAH",
@@ -86,15 +86,14 @@ func TestGetIncomesSuccess(t *testing.T) {
 
 	params := model.GetIncomeRequest{
 		TypeIncome: util.DEBIT,
-		CategoryId: 2,
-		Page:       1,
-		TotalPage:  10,
+		// CategoryId: 2,
+		Page:      1,
+		TotalPage: 10,
 	}
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/incomes/", nil)
 	// Add query parameters to request URL
 	q := req.URL.Query()
-	// q.Add("category_income", fmt.Sprintf("%v", params.CategoryIncome))
 	q.Add("category_id", fmt.Sprintf("%v", params.CategoryId))
 	q.Add("type_income", fmt.Sprintf("%v", params.TypeIncome))
 	q.Add("page", fmt.Sprintf("%d", params.Page))

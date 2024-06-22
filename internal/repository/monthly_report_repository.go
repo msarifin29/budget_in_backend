@@ -13,9 +13,98 @@ type MonthlyReportRepository interface {
 	MonthlyReportIncomesDetail(ctx context.Context, tx *sql.Tx, param model.ParamMonthlyReportDetail) ([]model.MonthlyIDetail, error)
 	GetMonthlyIncomeReport(ctx context.Context, tx *sql.Tx, uid model.ParamMonthlyReport) ([]model.MonthlyReportResponse, error)
 	GetMonthlyExpenseReport(ctx context.Context, tx *sql.Tx, uid model.ParamMonthlyReport) ([]model.MonthlyReportResponse, error)
+	GetMonthlyReportCategoryExpense(ctx context.Context, tx *sql.Tx, param model.ParamMonthlyReportCategory) ([]model.MonthlyReportCategoryExpenseResponse, error)
+	GetMonthlyReportCategoryIncome(ctx context.Context, tx *sql.Tx, param model.ParamMonthlyReportCategory) ([]model.MonthlyReportCategoryIncomeResponse, error)
 }
 
 type MonthlyReportRepositoryImpl struct{}
+
+// GetMonthlyReportCategoryIncome implements MonthlyReportRepository.
+func (m MonthlyReportRepositoryImpl) GetMonthlyReportCategoryIncome(ctx context.Context, tx *sql.Tx, param model.ParamMonthlyReportCategory) ([]model.MonthlyReportCategoryIncomeResponse, error) {
+	script := `
+SELECT tce.id, tce.title ,SUM(e.total) 
+FROM incomes e
+LEFT JOIN t_category_incomes tce ON e.c_id = tce.id AND e.id = tce.category_id
+WHERE e.uid = $1 
+    AND TO_CHAR(e.created_at, 'YYYY-MM') = $2
+GROUP BY tce.id, tce.title
+ORDER BY tce.id ASC;`
+	rows, err := tx.QueryContext(ctx, script, param.Uid, param.Month)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	categories := []model.MonthlyReportCategoryIncomeResponse{}
+	for rows.Next() {
+		var i model.MonthlyReportCategoryExpense
+		err := rows.Scan(&i.CategoryId, &i.Title, &i.Total)
+		if err != nil {
+			return nil, err
+		}
+		v, er := json.Marshal(&i)
+		if er != nil {
+			return nil, er
+		}
+		e := json.Unmarshal(v, &i)
+		if e != nil {
+			return nil, e
+		}
+		res := model.MonthlyReportCategoryIncomeResponse{
+			CategoryId: i.CategoryId.String,
+			Title:      i.Title.String,
+			Total:      i.Total.Float64,
+		}
+		categories = append(categories, res)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
+
+// GetMonthlyReportExpenseByCategory implements MonthlyReportRepository.
+func (m MonthlyReportRepositoryImpl) GetMonthlyReportCategoryExpense(ctx context.Context, tx *sql.Tx, param model.ParamMonthlyReportCategory) ([]model.MonthlyReportCategoryExpenseResponse, error) {
+	script := `
+SELECT tce.id, tce.title ,SUM(e.total) 
+FROM expenses e
+LEFT JOIN t_category_expenses tce ON e.c_id = tce.id AND e.id = tce.category_id
+WHERE e.uid = $1 
+    AND e.status = 'success' 
+    AND TO_CHAR(e.created_at, 'YYYY-MM') = $2
+GROUP BY tce.id, tce.title
+ORDER BY tce.id ASC;`
+	rows, err := tx.QueryContext(ctx, script, param.Uid, param.Month)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	categories := []model.MonthlyReportCategoryExpenseResponse{}
+	for rows.Next() {
+		var i model.MonthlyReportCategoryExpense
+		err := rows.Scan(&i.CategoryId, &i.Title, &i.Total)
+		if err != nil {
+			return nil, err
+		}
+		v, er := json.Marshal(&i)
+		if er != nil {
+			return nil, er
+		}
+		e := json.Unmarshal(v, &i)
+		if e != nil {
+			return nil, e
+		}
+		res := model.MonthlyReportCategoryExpenseResponse{
+			CategoryId: i.CategoryId.String,
+			Title:      i.Title.String,
+			Total:      i.Total.Float64,
+		}
+		categories = append(categories, res)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
 
 // MonthlyReportIncomesDetail implements MonthlyReportRepository.
 func (MonthlyReportRepositoryImpl) MonthlyReportIncomesDetail(ctx context.Context, tx *sql.Tx, param model.ParamMonthlyReportDetail) ([]model.MonthlyIDetail, error) {
