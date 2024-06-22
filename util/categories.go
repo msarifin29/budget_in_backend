@@ -3,7 +3,7 @@ package util
 import "github.com/go-playground/validator/v10"
 
 const (
-	OTHER   = "other"
+	OTHER   = "Other"
 	DAILY   = "daily"
 	WEEKLY  = "weekly"
 	MONTHLY = "monthly"
@@ -11,10 +11,10 @@ const (
 
 // Category income
 const ( // other id 1
-	BUSINES          = "business"          // id 2
-	SALARY           = "salary"            // id 3
-	ADDITIONALiNCOME = "additional income" // id 4
-	LOAN             = "loan"              // id 5
+	BUSINES          = "Business"          // id 2
+	SALARY           = "Salary"            // id 3
+	ADDITIONALiNCOME = "Additional Income" // id 4
+	LOAN             = "Loan"              // id 5
 )
 
 func IsSupportedCategoryType(status string) bool {
@@ -66,18 +66,18 @@ func InputCategoryIncome(id float64) string {
 
 // Category expense
 const ( // other id 1
-	FOODANDDRINK    = "food and drink"    // id 2
-	SHOPPING        = "shopping"          // id 3
-	TRANSPORT       = "transport"         // id 4
-	MOTORCYCLEORCAR = "motorcycle or car" // id 5
-	TRAVELING       = "traveling"         // id 6
-	HEALTY          = "healty"            // id 7
-	COSTANDBILL     = "cost and bill"     // id 8
-	EDUCATION       = "education"         // id 9
-	SPORTANDHOBBY   = "sport and hobby"   // id 10
-	BEAUTY          = "beauty"            // id 11
-	WORK            = "work"              // id 12
-	FOODINGREDIENTS = "food ingredients"  // id 13
+	FOODANDDRINK    = "Food and Drink"    // id 2
+	SHOPPING        = "Shopping"          // id 3
+	TRANSPORT       = "Transport"         // id 4
+	MOTORCYCLEORCAR = "Motorcycle or Car" // id 5
+	TRAVELING       = "Traveling"         // id 6
+	HEALTY          = "Healty"            // id 7
+	COSTANDBILL     = "Cost and Bill"     // id 8
+	EDUCATION       = "Education"         // id 9
+	SPORTANDHOBBY   = "Sport and Hobby"   // id 10
+	BEAUTY          = "Beauty"            // id 11
+	WORK            = "Work"              // id 12
+	FOODINGREDIENTS = "Food Ingredients"  // id 13
 )
 
 func IsSupportedCategoryExpense(status string) bool {
