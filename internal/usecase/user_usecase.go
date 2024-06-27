@@ -23,6 +23,7 @@ type UserUsecase interface {
 	ForgotPassword(ctx context.Context, req model.EmailUserRequest) (bool, error)
 	ResetPassword(ctx context.Context, req model.ResetPasswordRequest) (bool, error)
 	NonActivatedUser(ctx context.Context, req model.NonActiveUserParams) (bool, error)
+	DeleteEmailUserUser(ctx context.Context, email string) (bool, error)
 	GetEmailUser(ctx context.Context, email model.CheckEmail) (bool, error)
 }
 
@@ -36,6 +37,29 @@ type UserUsecaseImpl struct {
 
 func NewUserUsecase(UserRepository repository.UserRepository, AccountRepo repository.AccountRepository, Log *logrus.Logger, db *sql.DB, conf config.Config) UserUsecase {
 	return &UserUsecaseImpl{UserRepository: UserRepository, AccountRepo: AccountRepo, Log: Log, db: db, conf: conf}
+}
+
+// DeleteEmailUserUser implements UserUsecase.
+func (u *UserUsecaseImpl) DeleteEmailUserUser(ctx context.Context, email string) (bool, error) {
+	tx, err := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+	if err != nil {
+		u.Log.Errorf("failed start transaction %e :", err)
+		return false, err
+	}
+	emailUser, errE := u.UserRepository.GetEmail(ctx, tx, email)
+	if errE != nil || emailUser != email {
+		u.Log.Errorf("The email address  %s  was not found", errE)
+		err = errors.New("The email address " + email + " was not found")
+		return false, err
+	}
+	ok, err := u.UserRepository.DeleteEmailUser(ctx, tx, uuid.NewString(), emailUser)
+	if !ok || err != nil {
+		u.Log.Errorf("failed delete email %s :", err)
+		err = errors.New("failed delete email")
+		return false, err
+	}
+	return ok, nil
 }
 
 // GetEmailUser implements UserUsecase.

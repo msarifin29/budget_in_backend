@@ -18,6 +18,8 @@ type UserRepository interface {
 	UpdatePassword(ctx context.Context, tx *sql.Tx, email string, newPassword string) (bool, error)
 	ResetPassword(ctx context.Context, tx *sql.Tx, params model.ResetPasswordRequest) (bool, error)
 	NonActivatedUser(ctx context.Context, tx *sql.Tx, uid string, email string) (bool, error)
+	DeleteEmailUser(ctx context.Context, tx *sql.Tx, newEmail string, email string) (bool, error)
+	GetEmail(ctx context.Context, tx *sql.Tx, email string) (string, error)
 	GetEmailUser(ctx context.Context, tx *sql.Tx) ([]model.User, error)
 }
 
@@ -25,6 +27,28 @@ type UserRepositoryImpl struct{}
 
 func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{}
+}
+
+// GetEmail implements UserRepository.
+func (u *UserRepositoryImpl) GetEmail(ctx context.Context, tx *sql.Tx, email string) (string, error) {
+	sqlScript := `select email from users where email = $1`
+	var emailuser string
+	row := tx.QueryRowContext(ctx, sqlScript, email)
+	err := row.Scan(&emailuser)
+	if err != nil {
+		return "", err
+	}
+	return emailuser, nil
+}
+
+// DeleteEmailUser implements UserRepository.
+func (u *UserRepositoryImpl) DeleteEmailUser(ctx context.Context, tx *sql.Tx, newEmail string, email string) (bool, error) {
+	sqlScript := `update users set email = $1 where email = $2`
+	_, err := tx.ExecContext(ctx, sqlScript, newEmail, email)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // GetEmailUser implements UserRepository.

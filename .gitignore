@@ -4,3 +4,4 @@ prod.env
 docker-compose.yaml
 docker-compose.prod.yaml
 Dockerfile.prod
+bin/

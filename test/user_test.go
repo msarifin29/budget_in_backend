@@ -370,3 +370,30 @@ func TestCheckEmailIsExistFailed(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
+func TestDeleteEmailUserSuccess(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.CheckEmail{Email: "asamsul474@gmail.com"}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/user/delete/"+params.Email, nil)
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("response : ", string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+func TestDeleteEmailUserFailed(t *testing.T) {
+	router := NewTestServer(t)
+	params := model.CheckEmail{Email: "novalid@gmail.com"}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/user/delete/"+params.Email, nil)
+
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println("response : ", string(bytes))
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}

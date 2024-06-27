@@ -19,6 +19,7 @@ func (server *Server) SetUpRoute() {
 	router.GET("/api/check-email/:email", server.UserC.CheckEmail)
 	router.POST("/api/user/forgot_password", server.UserC.ForgotPassword)
 	router.GET("/api/privacy-police/:lang", server.PrivacyC.PrivacyPolice)
+	router.PUT("/api/user/delete/:email", server.UserC.DeleteEmailUserUser)
 
 	autRoutes := router.Group("/").Use(delivery.AuthMiddleware(server.TokenMaker))
 
