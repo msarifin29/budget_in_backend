@@ -16,6 +16,7 @@ type IncomeUsecase interface {
 	CreateIncome(ctx context.Context, params model.CreateIncomeParams) (model.IncomeResponse, error)
 	GetIncomes(ctx context.Context, params model.GetIncomeParams) ([]model.IncomeResponse, float64, error)
 	GetIncomesByMonth(ctx context.Context, params model.MonthlyParams) (float64, error)
+	CashWithdrawal(ctx context.Context, params model.CashWithdrawalParam) (bool, error)
 }
 
 type IncomeUsecaseImpl struct {
@@ -25,6 +26,39 @@ type IncomeUsecaseImpl struct {
 	AccountRepo repository.AccountRepository
 	Log         *logrus.Logger
 	db          *sql.DB
+}
+
+// CashWithdrawal implements IncomeUsecase.
+func (u *IncomeUsecaseImpl) CashWithdrawal(ctx context.Context, params model.CashWithdrawalParam) (bool, error) {
+	tx, _ := u.db.Begin()
+	defer util.CommitOrRollback(tx)
+
+	account, errA := u.AccountRepo.GetAccountByAccountId(ctx, tx, model.GetAccountRequest{AccountId: params.AccountId})
+	if errA != nil {
+		u.Log.Errorf("failed get account %s", errA)
+		errA = errors.New("failed get account")
+		return false, errA
+	} else if account.Balance < params.Total {
+		u.Log.Errorf("the balance is not sufficient %s", errA)
+		errA = errors.New("the balance is not sufficient")
+		return false, errA
+	}
+	newBlance := account.Balance - params.Total
+	errU := u.AccountRepo.UpdateAccountBalance(ctx, tx, model.UpdateAccountBalance{AccountId: params.AccountId, Balance: newBlance})
+	if errU != nil {
+		u.Log.Errorf("failed update balance %s", errU)
+		errU = errors.New("failed update balance")
+		return false, errU
+	}
+
+	newCash := account.Cash + params.Total
+	errC := u.AccountRepo.UpdateAccountCash(ctx, tx, model.UpdateAccountCash{AccountId: params.AccountId, Cash: newCash})
+	if errC != nil {
+		u.Log.Errorf("failed update cash %s", errC)
+		errC = errors.New("failed update cash")
+		return false, errC
+	}
+	return true, nil
 }
 
 // GetIncomesByMonth implements IncomeUsecase.

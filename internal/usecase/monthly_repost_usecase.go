@@ -35,7 +35,7 @@ func (u *MonthlyReportUsecaseImpl) GetMonthlyReportCategory(ctx context.Context,
 	incomes, errX := u.MonthlyRepo.GetMonthlyReportCategoryIncome(ctx, tx, params)
 	if errX != nil {
 		u.Log.Errorf("failed get monthly report incomes %v", errX)
-		err = errors.New("failed get monthly incomes")
+		errX = errors.New("failed get monthly incomes")
 		return model.MonthlyReportCategoryResponse{}, errX
 	}
 	return model.MonthlyReportCategoryResponse{

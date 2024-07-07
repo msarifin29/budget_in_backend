@@ -15,6 +15,7 @@ const ( // other id 1
 	SALARY           = "Salary"            // id 3
 	ADDITIONALiNCOME = "Additional Income" // id 4
 	LOAN             = "Loan"              // id 5
+	CASHWITHDRAWAL   = "Cash Withdrawal"   // id 6
 )
 
 func IsSupportedCategoryType(status string) bool {
@@ -44,6 +45,8 @@ func InputCategoryIncome(id float64) string {
 		return ADDITIONALiNCOME
 	case 5:
 		return LOAN
+	case 6:
+		return CASHWITHDRAWAL
 	default:
 		return OTHER
 	}

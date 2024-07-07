@@ -79,3 +79,13 @@ type IncomesResponse struct {
 	Total     int32            `json:"total"`
 	Data      []IncomeResponse `json:"data"`
 }
+
+type CashWithdrawalParam struct {
+	Uid       string  `json:"uid" binding:"required"`
+	AccountId string  `json:"account_id"`
+	Total     float64 `json:"total"`
+}
+type CashWithdrawalRequest struct {
+	AccountId string  `json:"account_id"`
+	Total     float64 `json:"total"`
+}
