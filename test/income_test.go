@@ -224,3 +224,47 @@ func TestCreateCashWithdrawalInvalidAccountId(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
+func TestCreateTopUpInvalidInput(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.TopUpRequest{
+		Total:     5000,
+		AccountId: "e38418b8-3342-4d10-b7c2-e09e9fc90193",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/incomes/top-up", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println(string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+func TestCreateTopUpInvalidAccountId(t *testing.T) {
+	router := NewTestServer(t)
+
+	params := model.TopUpRequest{
+		Total:     200000000,
+		AccountId: "e38418b8",
+	}
+	body, err := json.Marshal(params)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/api/incomes/top-up", strings.NewReader(string(body)))
+
+	SetAuthorization(t, req, router.TokenMaker, "bearer", "testing", "8601f262-5c0f-4024-86db-8f4737360180", time.Minute)
+	router.Engine.ServeHTTP(w, req)
+	bytes, err := io.ReadAll(w.Body)
+	fmt.Println(string(bytes))
+	assert.Nil(t, err)
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}

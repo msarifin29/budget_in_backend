@@ -167,3 +167,35 @@ func (c *IncomeController) CashWithdrawal(ctx *gin.Context) {
 		Data:    res,
 	})
 }
+func (c *IncomeController) TopUp(ctx *gin.Context) {
+	var req model.TopUpRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.Log.Errorf("failed binding request %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	authPayload := ctx.MustGet(delivery.AuthorizationPayloadKey).(*util.Payload)
+
+	param := model.TopUpParam{
+		Uid:       authPayload.Uid,
+		AccountId: req.AccountId,
+		Total:     req.Total,
+	}
+	res, err := c.IncomeUsecase.TopUp(ctx, param)
+	if err != nil {
+		c.Log.Errorf("failed top up %t:", err)
+		ctx.JSON(http.StatusBadRequest, model.MetaErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, model.MetaResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    res,
+	})
+}

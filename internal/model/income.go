@@ -89,3 +89,13 @@ type CashWithdrawalRequest struct {
 	AccountId string  `json:"account_id"`
 	Total     float64 `json:"total"`
 }
+
+type TopUpParam struct {
+	Uid       string  `json:"uid" binding:"required"`
+	AccountId string  `json:"account_id"`
+	Total     float64 `json:"total"`
+}
+type TopUpRequest struct {
+	AccountId string  `json:"account_id"`
+	Total     float64 `json:"total"`
+}

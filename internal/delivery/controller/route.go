@@ -51,6 +51,7 @@ func (server *Server) SetUpRoute() {
 	autRoutes.POST("/api/incomes/create", server.IncomeC.CreateIncome)
 	autRoutes.GET("/api/incomes/", server.IncomeC.GetIncomes)
 	autRoutes.PUT("/api/incomes/cash-withdrawal", server.IncomeC.CashWithdrawal)
+	autRoutes.PUT("/api/incomes/top-up", server.IncomeC.TopUp)
 
 	server.Engine = router
 }
