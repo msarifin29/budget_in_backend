@@ -1,6 +1,6 @@
 # Required 
-[go version 1.21.5]()
-[postgresql]()
+[go version 1.21.5](https://go.dev/dl/)
+[postgresql](https://www.postgresql.org/)
 
 ## How to Run
 
