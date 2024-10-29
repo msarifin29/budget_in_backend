@@ -1,112 +1,29 @@
-# go version 1.21.5
+# Required 
+[go version 1.21.5]()
+[postgresql]()
 
-# Development
+## How to Run
 
-## Build and Run 
-
- `go build -o bin/dev-app ./cmd/dev`
-
-## Check Running Processes 
-
-- Create file or edit new service file
-`sudo nano /etc/systemd/system/devapp.service`
-
-- content 
+* first
+ make schema database in folder database/migration
+* second 
+create `dev.env` in root project
+* third
+copy this into your `dev.env` file
 ```
-[Unit]
-Description=Go DevApp Service
-After=network.target
-
-[Service]
-Type=simple
-ExecStart=/home/samsul-dev/projects/budget_in_backend/bin/devapp
-WorkingDirectory=/home/samsul-dev/projects/budget_in_backend
-EnvironmentFile=/home/samsul-dev/projects/budget_in_backend/dev.env
-Restart=on-failure
-User=samsul-dev
-Group=samsul-dev
-
-[Install]
-WantedBy=multi-user.target
+ENVIRONMENT=development
+APP=budget_in
+DB_POSTGRES_SOURCE=postgresql://postgres:{PASSWORD}@localhost:5432/{DB_NAME}?sslmode=disable
+DB_POSTGRES_DRIVER=postgres
+ACCESS_TOKEN_DURATION=131400m
+TOKEN_SYMMETRIC_KEY=123456789ABCDEFGHIJ987654321ACBD	
+SERVER_ADDRESS=0.0.0.0
+SET_MAX_IDLE_CONNS=64
+SET_MAX_OPEN_CONNS=64
+SET_CONN_MAX_LIFE_TIME=60
+SET_CONN_MAX_IDLE_TIME=10
+SENDER_NAME =Budget In {your email}
+AUTH_EMAIL={your email}
+AUTH_PASSWORD={your auth password}
 ```
-
-- Reload and Start the Service
-```
-sudo systemctl daemon-reload
-sudo systemctl start devapp.service
-sudo systemctl enable devapp.service
-```
-
-## Killing the Process 
-
-- Check status
-`sudo systemctl status devapp.service`
-
-- Stop service
-`sudo systemctl stop devapp.service`
-
-- Disable the Service
-`sudo systemctl disable devapp.service`
-
-# Delete the Service
-
-- Remove the Service file
-`sudo rm /etc/systemd/system/devapp.service`
-
-- Verify the Service is Removed
-`systemctl status devapp.service`
-
-# Production
-
-## Build and Run 
-1. `go build -o bin/prod-app ./cmd/prod`
-
-## Check Running Processes 
-
-- Create file or edit new service file
-`sudo nano /etc/systemd/system/prodapp.service`
-
-- content 
-```
-[Unit]
-Description=Go ProdApp Service
-After=network.target
-
-[Service]
-Type=simple
-ExecStart=/home/samsul-dev/projects/budget_in_backend/bin/prod-app
-WorkingDirectory=/home/samsul-dev/projects/budget_in_backend
-EnvironmentFile=/home/samsul-dev/projects/budget_in_backend/prod.env
-Restart=on-failure
-User=samsul-dev
-Group=samsul-dev
-
-[Install]
-WantedBy=multi-user.target
-```
-
-- Reload and Start the Service
-```
-sudo systemctl daemon-reload
-sudo systemctl start prodapp.service
-sudo systemctl enable prodapp.service
-```
-
-## Killing the Process 
-
-- Check status
-`sudo systemctl status prodapp.service`
-
-- Stop service
-`sudo systemctl stop prodapp.service`
-
-- Disable the Service
-`sudo systemctl disable prodapp.service`
-
-# Delete the Service
-
-- Remove the Service file
-`sudo rm /etc/systemd/system/prodapp.service`
-
-- Verify the Service is Removed
-`systemctl status prodapp.service`
+following this article to generated auth password [article](https://knowledge.workspace.google.com/kb/how-to-create-app-passwords-000009237)
