@@ -171,31 +171,6 @@ func TestUpdateExpenseUnAuthorized(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-// func TestDeleteExpenseSuccess(t *testing.T) {
-// 	router := NewTestServer(t)
-
-// 	params := model.ExpenseParamWithId{Id: 7}
-// 	w := httptest.NewRecorder()
-// 	url := fmt.Sprintf("/api/expenses/%v", params.Id)
-// 	req, _ := http.NewRequest(http.MethodDelete, url, nil)
-
-// 	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
-// 	router.Engine.ServeHTTP(w, req)
-// 	assert.Equal(t, http.StatusOK, w.Code)
-// }
-// func TestDeleteExpenseFailed(t *testing.T) {
-// 	router := NewTestServer(t)
-
-// 	params := model.ExpenseParamWithId{Id: 1000000}
-// 	w := httptest.NewRecorder()
-// 	url := fmt.Sprintf("/api/expenses/%v", params.Id)
-// 	req, _ := http.NewRequest(http.MethodDelete, url, nil)
-
-// 	SetAuthorization(t, req, router.TokenMaker, "bearer", "samsul testing", "f1687230-49d3-4657-96be-9b934ed0387f", time.Minute)
-// 	router.Engine.ServeHTTP(w, req)
-// 	assert.Equal(t, http.StatusBadRequest, w.Code)
-// }
-
 func TestGetExpensesSuccess(t *testing.T) {
 	router := NewTestServer(t)
 
